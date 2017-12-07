@@ -40,7 +40,7 @@ service nginx restart
 ```
 -----
 
-## Webp support 
+### Webp support 
 
 Add the file webp.conf in /etc/nginx/conf.d folder :
 ```
