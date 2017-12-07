@@ -30,7 +30,7 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 
 ## Nginx configuration
 
-My current Nginx configuration is available here : [title](https://github.com/VirtuBox/nginx-ee/blob/master/nginx.conf)
+My current Nginx configuration is available here : [nginx.conf](https://github.com/VirtuBox/nginx-ee/blob/master/nginx.conf)
 You can apply it with  : 
 ```
 wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx.conf
