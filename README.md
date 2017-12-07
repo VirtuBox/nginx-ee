@@ -51,5 +51,6 @@ location ~* ^/wp-content/.+\.(png|jpg)$ {
   try_files $uri$webp_suffix $uri =404;
 }
 ```
+Check if there are no error with `nginx -t` and reload nginx with `service nginx reload`
 
 
