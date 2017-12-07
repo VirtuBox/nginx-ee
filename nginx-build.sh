@@ -88,9 +88,9 @@ make -j $(nproc)
 make install
 sudo systemctl unmask nginx
 sudo systemctl enable nginx
-sudo systemctl start nginx
-nginx -t && service nginx reload
-
-
-
 sudo systemctl restart nginx
+
+
+
+
+
