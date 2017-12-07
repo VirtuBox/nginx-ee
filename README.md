@@ -53,4 +53,17 @@ location ~* ^/wp-content/.+\.(png|jpg)$ {
 ```
 Check if there are no error with `nginx -t` and reload nginx with `service nginx reload`
 
+### Error during the compilation
+
+1. Run the pre-compilation part with this script : 
+```
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/debug/pre-compile.sh)
+```
+2. If there is no error during the first part, launch the compilation configuration :
+```
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/debug/configure.sh)
+```
+Then open an issue or answer on the  [rtcamp community thread](http://community.rtcamp.com/t/compile-the-latest-nginx-release-from-source-with-easyengine/9912) with error logs and informations about your server.
+
+
 
