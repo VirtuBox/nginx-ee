@@ -1,4 +1,4 @@
-# nginx-ee
+# Bash script to compile the latest nginx release from source with EasyEngine
 
 This is a script to compile the latest nginx release from source with easyengine. It was currently tested on Ubuntu 16.04 LTS.
 Feel free to open an issue if you have any error during the compilation.
@@ -16,7 +16,7 @@ others modification :
 
 -----
 
-## Compile Nginx
+### Compile Nginx
 
 Without pagespeed
 ```
@@ -27,8 +27,9 @@ With pagespeed
 ```
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build-pagespeed.sh)
 ```
+-----
 
-## Nginx configuration
+### Nginx configuration
 
 My current Nginx configuration is available here : [nginx.conf](https://github.com/VirtuBox/nginx-ee/blob/master/etc/nginx/nginx.conf)
 You can apply it with  : 
@@ -37,6 +38,7 @@ wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-e
 nginx -t
 service nginx restart
 ```
+-----
 
 ## Webp support 
 
@@ -53,6 +55,8 @@ location ~* ^/wp-content/.+\.(png|jpg)$ {
 ```
 Check if there are no error with `nginx -t` and reload nginx with `service nginx reload`
 
+-----
+
 ### Error during the compilation
 
 1. Run the pre-compilation part with this script : 
@@ -64,6 +68,7 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/debu
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/debug/configure.sh)
 ```
 Then open an issue or answer on the  [rtcamp community thread](http://community.rtcamp.com/t/compile-the-latest-nginx-release-from-source-with-easyengine/9912) with error logs and informations about your server.
+
 
 
 
