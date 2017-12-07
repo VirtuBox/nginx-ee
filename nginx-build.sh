@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apt-get install -y build-essential libtool automake autoconf zlib1g-dev libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev
+apt-get install -y build-essential git libtool automake autoconf zlib1g-dev libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev
 
 rm -rf /usr/local/src/*
 cd /usr/local/src
