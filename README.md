@@ -30,13 +30,26 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 
 ## Nginx configuration
 
-My current Nginx configuration is available here : [nginx.conf](https://github.com/VirtuBox/nginx-ee/blob/master/nginx.conf)
+My current Nginx configuration is available here : [nginx.conf](https://github.com/VirtuBox/nginx-ee/blob/master/etc/nginx/nginx.conf)
 You can apply it with  : 
 ```
-wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx.conf
+wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/nginx/nginx.conf
 nginx -t
 service nginx restart
 ```
 
+## Webp support 
+
+Add the file webp.conf in /etc/nginx/conf.d folder :
+```
+wget -O /etc/nginx/conf.d/webp.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/nginx/conf.d/webp.conf
+```
+Then add a file wepb-enabled.conf in your website nginx configuration folder /var/www/yoursite.tld/conf/nginx/ with the following content :
+```
+location ~* ^/wp-content/.+\.(png|jpg)$ {
+  add_header Vary Accept;
+  try_files $uri$webp_suffix $uri =404;
+}
+```
 
 
