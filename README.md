@@ -11,7 +11,7 @@ others modification :
 * ngx_brotli
 * ngx_slowfs_cache
 * ngx_http_substitutions_filter_module
-* nginx-dynamic-tls-records-patch_1.30.0+
+* nginx-dynamic-tls-records-patch_1.13.0+
 * ngx_pagespeed (optional)
 
 -----
