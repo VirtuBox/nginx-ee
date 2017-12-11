@@ -39,8 +39,8 @@ mv nginx-1.13.7 nginx
 
 cd /usr/local/src/nginx/
 
-wget https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.11.5%2B.patch
-patch -p1 < nginx__dynamic_tls_records_1.11.5*.patch
+wget https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch
+patch -p1 < nginx__dynamic_tls_records_1.13*.patch
 
 ./configure \
  --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' \
