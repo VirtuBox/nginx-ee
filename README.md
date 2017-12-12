@@ -1,4 +1,4 @@
-# Bash script to compile the latest nginx release from source with EasyEngine
+# Compile the latest nginx mainline release for EasyEngine
 
 This is a script to compile the latest nginx release from source with easyengine. It was currently tested on Ubuntu 16.04 LTS.
 Feel free to open an issue if you have any error during the compilation.
