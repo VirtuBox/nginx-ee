@@ -4,7 +4,7 @@ This is a script to compile the latest nginx release from source with easyengine
 Feel free to open an issue if you have any error during the compilation.
 
 -----
-Nginx current version : 1.13.7
+Nginx current release : **v1.13.7**
 
 others modification :
 * ngx_coolkit
@@ -14,6 +14,10 @@ others modification :
 * nginx-dynamic-tls-records-patch_1.13.0+
 * ngx_http_auth_pam_module
 * ngx_pagespeed (optional)
+-----
+
+**Compatible Operating System :**
+* Ubuntu 16.04 LTS
 
 -----
 
