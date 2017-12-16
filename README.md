@@ -55,6 +55,10 @@ Then add a file wepb-enabled.conf in your website nginx configuration folder /va
 ```
 location ~* ^/wp-content/.+\.(png|jpg)$ {
   add_header Vary Accept;
+  add_header "Access-Control-Allow-Origin" "*";
+  access_log off;
+  log_not_found off;
+  expires max;
   try_files $uri$webp_suffix $uri =404;
 }
 ```
