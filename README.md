@@ -78,6 +78,9 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/debu
 ```
 Then open an issue or answer on the  [rtcamp community thread](http://community.rtcamp.com/t/compile-the-latest-nginx-release-from-source-with-easyengine/9912) with error logs and informations about your server.
 
+-----
+Published by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
+
 
 
 
