@@ -4,7 +4,7 @@ This is a script to compile the latest nginx release from source with easyengine
 Feel free to open an issue if you have any error during the compilation.
 
 -----
-Nginx current release : **v1.13.7**
+Nginx current release : **v1.13.8**
 
 others modification :
 * ngx_coolkit
