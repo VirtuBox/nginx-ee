@@ -1,5 +1,7 @@
 #!/bin/bash
 
+NGINX_VER=1.13.8
+
 apt-get update && apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
 libgoogle-perftools-dev libperl-dev libpam0g-dev
@@ -40,9 +42,9 @@ bash <(curl -f -L -sS https://ngxpagespeed.com/install) -b /usr/local/src
 
 cd /usr/local/src/
 
-wget http://nginx.org/download/nginx-1.13.7.tar.gz
-tar -xzvf nginx-1.13.7.tar.gz
-mv nginx-1.13.7 nginx
+wget http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
+tar -xzvf nginx-${NGINX_VER}.tar.gz
+mv nginx-${NGINX_VER} nginx
 
 cd /usr/local/src/nginx/
 
