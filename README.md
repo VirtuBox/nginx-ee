@@ -1,6 +1,6 @@
 # Compile the latest nginx mainline release for EasyEngine
 
-This is a script to compile the latest nginx release from source with easyengine. It was currently tested on Ubuntu 16.04 LTS.
+This is a script to compile the latest nginx release from source with easyengine. It was currently tested on Ubuntu 16.04 LTS and Debian 8 Jessie.
 Feel free to open an issue if you have any error during the compilation.
 
 -----
@@ -18,6 +18,7 @@ others modification :
 
 **Compatible Operating System :**
 * Ubuntu 16.04 LTS
+* Debian 8 Jessie : Just run the command  `apt install libgeoip-dev libpam0g-dev libgd-dev libpcre3-dev` before launching the script
 
 -----
 
