@@ -18,7 +18,7 @@ others modification :
 
 **Compatible Operating System :**
 * Ubuntu 16.04 LTS
-* Debian 8 Jessie : Just run the command  `apt install libgeoip-dev libpam0g-dev libgd-dev libpcre3-dev` before launching the script
+* Debian 8 Jessie : Just run the command  `apt install libgeoip-dev libpam0g-dev libgd-dev libpcre3-dev libxslt1-dev` before launching the script
 
 -----
 
