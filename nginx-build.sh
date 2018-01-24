@@ -2,12 +2,18 @@
 
 NGINX_VER=1.13.8
 
+## install prerequisites 
+
 apt-get update && apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
 libgoogle-perftools-dev libperl-dev libpam0g-dev
 
+## clean previous compilation
+
 rm -rf /usr/local/src/*
-cd /usr/local/src
+cd /usr/local/src || exit
+
+## get additionals modules
 
 git clone https://github.com/FRiCKLE/ngx_cache_purge.git
 git clone https://github.com/openresty/memc-nginx-module.git
@@ -27,25 +33,33 @@ tar -zxf ngx_http_redis-0.3.8.tar.gz
 mv ngx_http_redis-0.3.8 ngx_http_redis
 
 git clone https://github.com/google/ngx_brotli.git
-cd ngx_brotli
+cd ngx_brotli || exit
 git submodule update --init --recursive
 
-cd /usr/local/src
+## get openssl 
+
+cd /usr/local/src || exit
 
 git clone https://github.com/openssl/openssl.git
-cd openssl
+cd openssl || exit
 git checkout tls1.3-draft-18
 
-cd /usr/local/src/
+cd /usr/local/src || exit
+
+## get nginx
 
 wget http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
 tar -xzvf nginx-${NGINX_VER}.tar.gz
 mv nginx-${NGINX_VER} nginx
 
-cd /usr/local/src/nginx/
+cd /usr/local/src/nginx/ || exit
+
+## apply dynamic tls records patch
 
 wget https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch
 patch -p1 < nginx__dynamic_tls_records_1.13*.patch
+
+## configuration
 
 ./configure \
  --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' \
@@ -90,12 +104,16 @@ patch -p1 < nginx__dynamic_tls_records_1.13*.patch
  --with-openssl-opt=enable-tls1_3 \
  --sbin-path=/usr/sbin/nginx 
  
-make -j $(nproc)
+ ## compilation
+ 
+make -j "$(nproc)"
 make install
+
+## restart nginx with systemd
+
 sudo systemctl unmask nginx
 sudo systemctl enable nginx
 sudo systemctl restart nginx
-
 
 
 
