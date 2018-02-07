@@ -103,4 +103,4 @@ sudo systemctl start nginx
 nginx -t && service nginx reload
 
 sudo systemctl restart nginx
-sudo apt-mark hold sw-nginx
+sudo apt-mark hold nginx-ee nginx-common
