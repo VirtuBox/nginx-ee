@@ -38,7 +38,7 @@ git checkout tls1.3-draft-18
 
 cd /usr/local/src/ || exit
 
-bash <(curl -f -L -sS https://ngxpagespeed.com/install) -b /usr/local/src
+bash <(curl -f -L -sS https://ngxpagespeed.com/install) --ngx-pagespeed-version latest-beta -b /usr/local/src
 
 cd /usr/local/src/ || exit
 
@@ -89,7 +89,7 @@ patch -p1 < nginx__dynamic_tls_records_1.13*.patch
  --add-module=/usr/local/src/set-misc-nginx-module  \
  --add-module=/usr/local/src/ngx_http_redis   \
  --add-module=/usr/local/src/ngx_brotli  \
- --add-module=/usr/local/src/ngx_pagespeed-latest-stable  \
+ --add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta  \
  --add-module=/usr/local/src/ngx_http_auth_pam_module \
  --with-openssl=/usr/local/src/openssl \
  --with-openssl-opt=enable-tls1_3 \
