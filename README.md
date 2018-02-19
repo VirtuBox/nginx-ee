@@ -1,6 +1,6 @@
 # Compile the latest nginx mainline release for EasyEngine
 
-This is a script to compile the latest nginx release from source to replace the previous nginx-ee package installed by EasyEngine. 
+Bash script to compile the latest nginx mainline release from source to replace the previous nginx-ee package installed with EasyEngine. 
 
 -----
 Nginx current release : **v1.13.8**
