@@ -13,7 +13,7 @@ other modifications :
 * nginx-dynamic-tls-records-patch_1.13.0+
 * ngx_http_auth_pam_module
 * ngx_pagespeed (optional)
-* naxsi WAF
+* naxsi WAF (optional)
 -----
 
 **Compatible Operating System :**
@@ -25,7 +25,7 @@ other modifications :
 
 -----
 
-### Usage 
+### Usage
 
 ```
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
@@ -34,21 +34,11 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 -----
 
-### Nginx configuration
-
-My current Nginx configuration is available here : [nginx.conf](https://github.com/VirtuBox/nginx-ee/blob/master/etc/nginx/nginx.conf)
-You can apply it with  : 
-```
-wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/nginx/nginx.conf
-nginx -t
-service nginx restart
-```
-
 -----
 
-### Additional configurations 
+###  Nginx configurations 
 
-* [Webp support](https://github.com/VirtuBox/nginx-ee/blob/master/doc/webp.md)
+* [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/)
 
 -----
 
