@@ -13,6 +13,7 @@ other modifications :
 * nginx-dynamic-tls-records-patch_1.13.0+
 * ngx_http_auth_pam_module
 * ngx_pagespeed (optional)
+* naxsi WAF
 -----
 
 **Compatible Operating System :**
@@ -24,17 +25,13 @@ other modifications :
 
 -----
 
-### Compile Nginx
+### Usage 
 
-Without pagespeed
 ```
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
-With pagespeed
-```
-bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build-pagespeed.sh)
-```
+![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 -----
 
 ### Nginx configuration
