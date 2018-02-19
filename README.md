@@ -1,12 +1,11 @@
 # Compile the latest nginx mainline release for EasyEngine
 
-This is a script to compile the latest nginx release from source with easyengine. It was currently tested on Ubuntu 16.04 LTS and Debian 8 Jessie.
-Feel free to open an issue if you have any error during the compilation.
+This is a script to compile the latest nginx release from source to replace the previous nginx-ee package installed by EasyEngine. 
 
 -----
 Nginx current release : **v1.13.8**
 
-others modification :
+other modifications :
 * ngx_coolkit
 * ngx_brotli
 * ngx_slowfs_cache
@@ -18,7 +17,10 @@ others modification :
 
 **Compatible Operating System :**
 * Ubuntu 16.04 LTS
-* Debian 8 Jessie : Just run the command  `apt install libgeoip-dev libpam0g-dev libgd-dev libpcre3-dev libxslt1-dev sudo` before launching the script
+* Debian 8 Jessie 
+
+**Requirements**
+* Nginx already installed by EasyEngine 
 
 -----
 
