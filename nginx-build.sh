@@ -6,7 +6,7 @@ NGINX_VER=1.13.8
 
 apt-get update && apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev
+libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev sudo
 
 ## clean previous compilation
 
