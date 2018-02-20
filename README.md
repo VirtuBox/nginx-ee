@@ -2,7 +2,7 @@
 
 Compile and install the latest nginx release with EasyEngine
 
-<div style='text-align: center;'>
+<div style="text-align: center;">
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 </div>
 
