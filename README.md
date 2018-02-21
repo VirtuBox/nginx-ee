@@ -25,7 +25,6 @@ Nginx current release : **v1.13.8**
 * ngx_brotli
 * redis2-nginx-module
 * srcache-nginx-module
-* ngx_slowfs_cache
 * ngx_http_substitutions_filter_module
 * nginx-dynamic-tls-records-patch_1.13.0+
 * Openssl 1.1.0

@@ -85,7 +85,6 @@ git clone https://github.com/openresty/redis2-nginx-module.git >> /tmp/nginx-ee.
 git clone https://github.com/openresty/srcache-nginx-module.git >> /tmp/nginx-ee.log 2>&1
 git clone https://github.com/openresty/set-misc-nginx-module.git >> /tmp/nginx-ee.log 2>&1
 git clone https://github.com/FRiCKLE/ngx_coolkit.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/FRiCKLE/ngx_slowfs_cache.git >> /tmp/nginx-ee.log 2>&1
 git clone https://github.com/sto/ngx_http_auth_pam_module.git >> /tmp/nginx-ee.log 2>&1
 
 wget https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz >> /tmp/nginx-ee.log 2>&1
