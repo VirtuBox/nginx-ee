@@ -16,7 +16,7 @@ Compile and install the latest nginx release with EasyEngine
 
 ## Additional modules 
 
-Nginx current release : **v1.13.8**
+Nginx current release : **v1.13.9**
 
 * ngx_cache_purge
 * memcached_nginx_module
