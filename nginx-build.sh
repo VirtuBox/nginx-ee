@@ -2,7 +2,7 @@
 
 # variables 
 
-NGINX_VER=1.13.9
+NGINX_VER=1.13.10
 
 # Colors
 CSI="\\033["
@@ -106,7 +106,7 @@ fi
 
 echo -ne "       Downloading brotli                     [..]\\r"
 
-git clone https://github.com/google/ngx_brotli.git >> /tmp/nginx-ee.log 2>&1
+git clone https://github.com/eustas/ngx_brotli.git >> /tmp/nginx-ee.log 2>&1
 cd ngx_brotli || exit
 git submodule update --init --recursive >> /tmp/nginx-ee.log 2>&1
 
@@ -129,7 +129,7 @@ cd /usr/local/src || exit
 
 git clone https://github.com/openssl/openssl.git >> /tmp/nginx-ee.log 2>&1
 cd openssl || exit
-git checkout tls1.3-draft-18 >> /tmp/nginx-ee.log 2>&1
+git checkout OpenSSL_1_1_1-pre3 >> /tmp/nginx-ee.log 2>&1
 
 cd /usr/local/src || exit
 
