@@ -129,7 +129,7 @@ cd /usr/local/src || exit
 
 git clone https://github.com/openssl/openssl.git >> /tmp/nginx-ee.log 2>&1
 cd openssl || exit
-git checkout OpenSSL_1_1_1-pre3 >> /tmp/nginx-ee.log 2>&1
+git checkout tls1.3-draft-18 >> /tmp/nginx-ee.log 2>&1
 
 cd /usr/local/src || exit
 
