@@ -16,18 +16,18 @@ Compile and install the latest nginx release with EasyEngine
 
 ## Additional modules 
 
-Nginx current release : **v1.13.9**
+Nginx current release : **v1.13.10**
 
 * ngx_cache_purge
 * memcached_nginx_module
 * headers-more-nginx-module
 * ngx_coolkit
-* ngx_brotli
+* ngx_brotli (brotli v1.0.2)
 * redis2-nginx-module
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
 * nginx-dynamic-tls-records-patch_1.13.0+
-* Openssl 1.1.0
+* Openssl 1.1.1
 * ngx_http_auth_pam_module
 * ngx_pagespeed (optional)
 * naxsi WAF (optional)
