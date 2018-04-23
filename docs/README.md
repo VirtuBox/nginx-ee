@@ -16,7 +16,7 @@ Compile and install the latest nginx release with EasyEngine
 
 ## Additional modules 
 
-Nginx current release : **v1.13.12**
+Nginx current release : **v1.14.0**
 
 * ngx_cache_purge
 * memcached_nginx_module
@@ -47,7 +47,7 @@ Nginx current release : **v1.13.12**
 
 ## Usage
 
-```
+```bash
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 -----

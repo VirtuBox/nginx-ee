@@ -2,7 +2,7 @@
 
 # variables 
 
-NGINX_VER=1.13.12
+NGINX_VER=1.14.0
 
 # Colors
 CSI="\\033["
