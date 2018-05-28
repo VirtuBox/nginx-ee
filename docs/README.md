@@ -62,7 +62,11 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 * add nginx configuration examples
 * add nginx stable release
 
-Published by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
+## Credits & Licence
+
+* [ipscrub nginx module](http://ipscrub.org/)
+
+Published & maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
 
 
 
