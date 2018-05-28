@@ -29,6 +29,7 @@ Nginx current release : **v1.14.0**
 * nginx-dynamic-tls-records-patch_1.13.0+
 * Openssl 1.1.1
 * ngx_http_auth_pam_module
+* [ipscrub](http://www.ipscrub.org/)
 * ngx_pagespeed (optional)
 * naxsi WAF (optional)
 -----

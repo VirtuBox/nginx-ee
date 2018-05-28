@@ -75,17 +75,22 @@ cd /usr/local/src || exit
 
 echo -ne "       Downloading additionals modules        [..]\\r"
 
-git clone https://github.com/FRiCKLE/ngx_cache_purge.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/openresty/memc-nginx-module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/simpl/ngx_devel_kit.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/openresty/headers-more-nginx-module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/openresty/echo-nginx-module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/openresty/redis2-nginx-module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/openresty/srcache-nginx-module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/openresty/set-misc-nginx-module.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/FRiCKLE/ngx_coolkit.git >> /tmp/nginx-ee.log 2>&1
-git clone https://github.com/sto/ngx_http_auth_pam_module.git >> /tmp/nginx-ee.log 2>&1
+{
+git clone https://github.com/FRiCKLE/ngx_cache_purge.git
+git clone https://github.com/openresty/memc-nginx-module.git
+git clone https://github.com/simpl/ngx_devel_kit.git
+git clone https://github.com/openresty/headers-more-nginx-module.git
+git clone https://github.com/openresty/echo-nginx-module.git
+git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
+git clone https://github.com/openresty/redis2-nginx-module.git
+git clone https://github.com/openresty/srcache-nginx-module.git
+git clone https://github.com/openresty/set-misc-nginx-module.git
+git clone https://github.com/sto/ngx_http_auth_pam_module.git
+} >> /tmp/nginx-ee.log 2>&1
+
+## ipsrcub module to anonymize user IP in nginx logs
+git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp >> /tmp/nginx-ee.log 2>&1
+cp -rf /usr/local/src/ipscrubtmp/ipscrub /usr/local/src/ipscrub >> /tmp/nginx-ee.log 2>&1
 
 wget https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz >> /tmp/nginx-ee.log 2>&1
 tar -zxf ngx_http_redis-0.3.8.tar.gz >> /tmp/nginx-ee.log 2>&1
@@ -226,7 +231,7 @@ fi
 
 ## configuration
 
-echo -ne "       Configure nginx                       [..]\\r"
+echo -ne "       Configuring nginx                       [..]\\r"
 
 ./configure \
  $ngx_naxsi \
@@ -268,6 +273,7 @@ echo -ne "       Configure nginx                       [..]\\r"
  --add-module=/usr/local/src/set-misc-nginx-module  \
  --add-module=/usr/local/src/ngx_http_redis   \
  --add-module=/usr/local/src/ngx_brotli  \
+ --add-module=/usr/local/src/ipscrub   \
  --add-module=/usr/local/src/ngx_http_auth_pam_module \
  $ngx_pagespeed \
  --with-openssl=/usr/local/src/openssl \
@@ -275,10 +281,10 @@ echo -ne "       Configure nginx                       [..]\\r"
  --sbin-path=/usr/sbin/nginx  >> /tmp/nginx-ee.log 2>&1
  
  if [ $? -eq 0 ]; then
- 			echo -ne "       Configure nginx                        [${CGREEN}OK${CEND}]\\r"
+ 			echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
  			echo -ne "\\n"
  		else
- 			echo -e "        Configure nginx      [${CRED}FAIL${CEND}]"
+ 			echo -e "        Configuring nginx    [${CRED}FAIL${CEND}]"
  			echo ""
  			echo "Please look at /tmp/nginx-ee.log"
  			echo ""
@@ -305,18 +311,20 @@ fi
 
 ## restart nginx with systemd
 
-systemctl unmask nginx >> /tmp/nginx-ee.log 2>&1
-systemctl enable nginx >> /tmp/nginx-ee.log 2>&1
-systemctl start nginx >> /tmp/nginx-ee.log 2>&1
-nginx -t >> /tmp/nginx-ee.log 2>&1
-service nginx reload >> /tmp/nginx-ee.log 2>&1
+{
+systemctl unmask sw-nginx 
+systemctl enable nginx
+systemctl start nginx 
+apt-mark hold nginx-ee nginx-common
+systemctl restart nginx
+nginx -t
+service nginx reload
+} >> /tmp/nginx-ee.log 2>&1
 
-systemctl restart nginx >> /tmp/nginx-ee.log 2>&1
-apt-mark hold nginx-ee nginx-common >> /tmp/nginx-ee.log 2>&1
 
 # We're done !
 echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"
 echo ""
 echo "       Installation log : /tmp/nginx-ee.log"
-echo ""
+
