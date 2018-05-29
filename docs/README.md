@@ -36,7 +36,8 @@ Nginx current release : **v1.14.0**
 
 ## Compatibility
 
-* Ubuntu 16.04 LTS
+* Ubuntu 16.04 LTS (Xenial)
+* Ubuntu 18.04 LTS (Bionic)
 * Debian 8 Jessie 
 
 ----
