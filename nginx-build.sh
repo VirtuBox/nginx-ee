@@ -53,7 +53,7 @@ echo -ne "       Installing dependencies               [..]\\r"
 apt-get update >> /tmp/nginx-ee.log 2>&1 
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev >> /tmp/nginx-ee.log 2>&1
+libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev >> /tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
 			echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
