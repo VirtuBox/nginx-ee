@@ -231,7 +231,7 @@ fi
 
 ## configuration
 
-echo -ne "       Configuring nginx                       [..]\\r"
+echo -ne "       Configuring nginx                      [..]\\r"
 
 ./configure \
  $ngx_naxsi \
@@ -281,7 +281,7 @@ echo -ne "       Configuring nginx                       [..]\\r"
  --sbin-path=/usr/sbin/nginx  >> /tmp/nginx-ee.log 2>&1
  
  if [ $? -eq 0 ]; then
- 			echo -ne "       Configuring nginx                     [${CGREEN}OK${CEND}]\\r"
+ 			echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
  			echo -ne "\\n"
  		else
  			echo -e "        Configuring nginx    [${CRED}FAIL${CEND}]"
