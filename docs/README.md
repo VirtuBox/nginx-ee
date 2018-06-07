@@ -16,7 +16,7 @@ Compile and install the latest nginx releases with EasyEngine
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.0**
+Nginx current mainline release : **v1.15.0**  
 Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
