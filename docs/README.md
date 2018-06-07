@@ -1,22 +1,23 @@
-# Nginx-EE 
+# Nginx-EE
 
-Compile and install the latest nginx release with EasyEngine
-
+Compile and install the latest nginx releases with EasyEngine
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
-
 -----
+
 ## Features
-* Update Nginx to the Latest mainline release 
+
+* Compile the latest Nginx Mainline or Stable Release
 * Additonal modules
 * TLS v1.3 Support
 
 -----
 
-## Additional modules 
+## Additional modules
 
-Nginx current release : **v1.14.0**
+Nginx current mainline release : **v1.15.0**
+Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
 * memcached_nginx_module
@@ -32,18 +33,20 @@ Nginx current release : **v1.14.0**
 * [ipscrub](http://www.ipscrub.org/)
 * ngx_pagespeed (optional)
 * naxsi WAF (optional)
+
 -----
 
 ## Compatibility
 
 * Ubuntu 16.04 LTS (Xenial)
 * Ubuntu 18.04 LTS (Bionic)
-* Debian 8 Jessie 
+* Debian 8 Jessie
 
 ----
 
 ## Requirements
-* Nginx already installed by EasyEngine 
+
+* Nginx already installed by EasyEngine
 
 -----
 
@@ -52,22 +55,21 @@ Nginx current release : **v1.14.0**
 ```bash
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
+
 -----
 
-##  Nginx configuration 
+## Nginx configuration
 
 * [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/)
 
 -----
+
 ## Roadmap
+
 * add nginx configuration examples
-* add nginx stable release
 
 ## Credits & Licence
 
 * [ipscrub nginx module](http://ipscrub.org/)
 
 Published & maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
-
-
-
