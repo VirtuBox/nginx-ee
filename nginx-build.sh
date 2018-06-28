@@ -72,7 +72,7 @@ fi
 
 echo -ne "       Installing dependencies               [..]\\r"
 apt-get update >> /tmp/nginx-ee.log 2>&1 
-apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
+apt-get install -y --allow-unauthenticated git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
 libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev >> /tmp/nginx-ee.log 2>&1
 
