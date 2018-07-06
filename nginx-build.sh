@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# variables 
+# variables
 
 NGINX_STABLE=1.14.0
 NGINX_MAINLINE=1.15.1
+NAXSI_VER=0.56
 
 # Colors
 CSI="\\033["
@@ -49,7 +50,7 @@ echo ""
 if   [ "$NGINX_RELEASE" = "1" ]
 then
 	NGINX_RELEASE=$NGINX_MAINLINE
-else 
+else
 	NGINX_RELEASE=$NGINX_STABLE
 fi
 
@@ -68,10 +69,10 @@ else
 	ngx_pagespeed=""
 fi
 
-## install prerequisites 
+## install prerequisites
 
 echo -ne "       Installing dependencies               [..]\\r"
-apt-get update >> /tmp/nginx-ee.log 2>&1 
+apt-get update >> /tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
 libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev >> /tmp/nginx-ee.log 2>&1
@@ -90,7 +91,7 @@ fi
 ## clean previous compilation
 
 rm -rf /usr/local/src/* >> /tmp/nginx-ee.log 2>&1
-cd /usr/local/src || exit 
+cd /usr/local/src || exit
 
 ## get additionals modules
 
@@ -115,7 +116,7 @@ cp -rf /usr/local/src/ipscrubtmp/ipscrub /usr/local/src/ipscrub >> /tmp/nginx-ee
 
 wget https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz >> /tmp/nginx-ee.log 2>&1
 tar -zxf ngx_http_redis-0.3.8.tar.gz >> /tmp/nginx-ee.log 2>&1
-mv ngx_http_redis-0.3.8 ngx_http_redis 
+mv ngx_http_redis-0.3.8 ngx_http_redis
 
 if [ $? -eq 0 ]; then
 			echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
@@ -147,7 +148,7 @@ if [ $? -eq 0 ]; then
 			exit 1
 fi
 
-## get openssl 
+## get openssl
 
 echo -ne "       Downloading openssl                    [..]\\r"
 
@@ -170,14 +171,16 @@ if [ $? -eq 0 ]; then
 			exit 1
 fi
 
-## get naxsi 
+## get naxsi
 
 if [ "$naxsi" = "y" ]
 then
   echo -ne "       Downloading naxsi                      [..]\\r"
-	git clone https://github.com/nbs-system/naxsi.git --branch http2 >> /tmp/nginx-ee.log 2>&1
+	wget -O naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/0.56.tar.gz >> /tmp/nginx-ee.log 2>&1
+  tar xvzf naxsi.tar.gz >> /tmp/nginx-ee.log 2>&1
+  mv naxsi-0.56 naxsi 
   cd /usr/local/src || exit
-  
+
   if [ $? -eq 0 ]; then
   			echo -ne "       Downloading naxsi                      [${CGREEN}OK${CEND}]\\r"
   			echo -ne "\\n"
@@ -199,7 +202,7 @@ then
   echo -ne "       Downloading pagespeed               [..]\\r"
 	bash <(curl -f -L -sS https://ngxpagespeed.com/install) --ngx-pagespeed-version latest-beta -b /usr/local/src >> /tmp/nginx-ee.log 2>&1
   cd /usr/local/src/ || exit
-  
+
   if [ $? -eq 0 ]; then
   			echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
   			echo -ne "\\n"
@@ -300,7 +303,7 @@ echo -ne "       Configuring nginx                      [..]\\r"
  --with-openssl=/usr/local/src/openssl \
  --with-openssl-opt=enable-tls1_3 \
  --sbin-path=/usr/sbin/nginx  >> /tmp/nginx-ee.log 2>&1
- 
+
  if [ $? -eq 0 ]; then
  			echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
  			echo -ne "\\n"
@@ -311,11 +314,11 @@ echo -ne "       Configuring nginx                      [..]\\r"
  			echo ""
  			exit 1
  fi
- 
+
  ## compilation
- 
+
  echo -ne "       Compile nginx                          [..]\\r"
- 
+
 make -j "$(nproc)" >> /tmp/nginx-ee.log 2>&1
 make install >> /tmp/nginx-ee.log 2>&1
 
@@ -333,9 +336,9 @@ fi
 ## restart nginx with systemd
 
 {
-systemctl unmask sw-nginx 
+systemctl unmask sw-nginx
 systemctl enable nginx
-systemctl start nginx 
+systemctl start nginx
 apt-mark hold nginx-ee nginx-common
 systemctl restart nginx
 nginx -t
@@ -348,4 +351,3 @@ echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"
 echo ""
 echo "       Installation log : /tmp/nginx-ee.log"
-
