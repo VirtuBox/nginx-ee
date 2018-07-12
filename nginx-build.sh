@@ -108,6 +108,7 @@ git clone https://github.com/openresty/redis2-nginx-module.git
 git clone https://github.com/openresty/srcache-nginx-module.git
 git clone https://github.com/openresty/set-misc-nginx-module.git
 git clone https://github.com/sto/ngx_http_auth_pam_module.git
+git clone https://github.com/vozlt/nginx-module-vts.git
 } >> /tmp/nginx-ee.log 2>&1
 
 ## ipsrcub module to anonymize user IP in nginx logs
@@ -299,6 +300,7 @@ echo -ne "       Configuring nginx                      [..]\\r"
  --add-module=/usr/local/src/ngx_brotli  \
  --add-module=/usr/local/src/ipscrub   \
  --add-module=/usr/local/src/ngx_http_auth_pam_module \
+ --add-module=/usr/local/src/nginx-module-vts \
  $ngx_pagespeed \
  --with-openssl=/usr/local/src/openssl \
  --with-openssl-opt=enable-tls1_3 \

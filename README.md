@@ -33,6 +33,7 @@ Nginx current stable release : **v1.14.0**
 * Openssl 1.1.1
 * [ipscrub](http://www.ipscrub.org/)
 * ngx_http_auth_pam_module
+* [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
 * ngx_pagespeed (optional)
 * naxsi WAF (optional)
 
