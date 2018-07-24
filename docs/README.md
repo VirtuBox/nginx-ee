@@ -16,7 +16,7 @@ Compile and install the latest nginx releases with EasyEngine
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.1**  
+Nginx current mainline release : **v1.15.2**  
 Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
@@ -31,6 +31,7 @@ Nginx current stable release : **v1.14.0**
 * Openssl 1.1.1
 * ngx_http_auth_pam_module
 * [ipscrub](http://www.ipscrub.org/)
+* [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
 * ngx_pagespeed (optional)
 * naxsi WAF (optional)
 
