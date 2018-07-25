@@ -72,13 +72,44 @@ else
     ngx_pagespeed=""
 fi
 
+# Checking lsb_release package
+if [ ! -x /usr/bin/lsb_release ]; then
+    apt-get -y install lsb-release >> /tmp/nginx-ee.log 2>&1
+fi
+
+# install gcc-7 on Ubuntu 16.04 LTS
+distro_version=$(lsb_release -sc)
+
+if [ "$distro_version" == "xenial" ]; then
+    echo -ne "       Installing gcc-7                       [..]\\r"
+    {
+        add-apt-repository ppa:jonathonf/gcc-7.1 -y
+        apt-get update
+        apt-get install gcc-7 g++-7  -y
+    } >> /tmp/nginx-ee.log 2>&1
+    
+    export CC="/usr/bin/gcc-7"
+    export CXX="/usr/bin/gc++-7"
+    if [ $? -eq 0 ]; then
+        echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
+        echo -ne "\\n"
+    else
+        echo -e "        Installing gcc-7                      [${CRED}FAIL${CEND}]"
+        echo ""
+        echo "Please look at /tmp/nginx-ee.log"
+        echo ""
+        exit 1
+    fi
+fi
+
 ## install prerequisites
 
-echo -ne "       Installing dependencies               [..]\\r"
+echo -ne "       Installing dependencies                [..]\\r"
 apt-get update >> /tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
 libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip >> /tmp/nginx-ee.log 2>&1
+
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -205,9 +236,9 @@ if [ "$pagespeed" = "y" ]
 then
     echo -ne "       Downloading pagespeed                  [..]\\r"
     {
-    wget https://ngxpagespeed.com/install
-    chmod +x install
-    ./install --ngx-pagespeed-version latest-beta -b /usr/local/src 
+        wget https://ngxpagespeed.com/install
+        chmod +x install
+        ./install --ngx-pagespeed-version latest-beta -b /usr/local/src
     } >> /tmp/nginx-ee.log 2>&1
     cd /usr/local/src/ || exit
     
