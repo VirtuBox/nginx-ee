@@ -3,8 +3,9 @@
 # variables
 
 NGINX_STABLE=1.14.0
-NGINX_MAINLINE=1.15.2
+NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o "nginx\\-[0-9.]+\\.tar[.a-z]*" | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
 NAXSI_VER=0.56
+OPENSSL_VER=OpenSSL_1_1_1-pre8
 
 # Colors
 CSI="\\033["
@@ -29,18 +30,18 @@ echo ""
 echo ""
 echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
 while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
-	read -p "Select an option [1-2]: " NGINX_RELEASE
+    read -p "Select an option [1-2]: " NGINX_RELEASE
 done
 echo ""
 echo "Do you want Ngx_Pagespeed ? (y/n)"
 while [[ $pagespeed != "y" && $pagespeed != "n" ]]; do
-	read -p "Select an option [y/n]: " pagespeed
+    read -p "Select an option [y/n]: " pagespeed
 done
 echo ""
 echo ""
 echo "Do you want NAXSI WAF (still experimental)? (y/n)"
 while [[ $naxsi != "y" && $naxsi != "n" ]]; do
-	read -p "Select an option [y/n]: " naxsi
+    read -p "Select an option [y/n]: " naxsi
 done
 echo ""
 
@@ -49,24 +50,26 @@ echo ""
 
 if   [ "$NGINX_RELEASE" = "1" ]
 then
-	NGINX_RELEASE=$NGINX_MAINLINE
+    NGINX_RELEASE=$NGINX_MAINLINE
+    #HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.0_http2-hpack.patch"
 else
-	NGINX_RELEASE=$NGINX_STABLE
+    NGINX_RELEASE=$NGINX_STABLE
+    #HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.14.0_http2-hpack.patch"
 fi
 
 
 if [ "$naxsi" = "y" ]
 then
-	ngx_naxsi="--add-module=/usr/local/src/naxsi/naxsi_src "
+    ngx_naxsi="--add-module=/usr/local/src/naxsi/naxsi_src "
 else
-	ngx_naxsi=""
+    ngx_naxsi=""
 fi
 
 if [ "$pagespeed" = "y" ]
 then
-	ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
+    ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
 else
-	ngx_pagespeed=""
+    ngx_pagespeed=""
 fi
 
 ## install prerequisites
@@ -75,17 +78,17 @@ echo -ne "       Installing dependencies               [..]\\r"
 apt-get update >> /tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev >> /tmp/nginx-ee.log 2>&1
+libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip >> /tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
-			echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
-			echo -ne "\\n"
-		else
-			echo -e "        Installing dependencies              [${CRED}FAIL${CEND}]"
-			echo ""
-			echo "Please look at /tmp/nginx-ee.log"
-			echo ""
-			exit 1
+    echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "        Installing dependencies              [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 ## clean previous compilation
@@ -98,17 +101,17 @@ cd /usr/local/src || exit
 echo -ne "       Downloading additionals modules        [..]\\r"
 
 {
-git clone https://github.com/FRiCKLE/ngx_cache_purge.git
-git clone https://github.com/openresty/memc-nginx-module.git
-git clone https://github.com/simpl/ngx_devel_kit.git
-git clone https://github.com/openresty/headers-more-nginx-module.git
-git clone https://github.com/openresty/echo-nginx-module.git
-git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
-git clone https://github.com/openresty/redis2-nginx-module.git
-git clone https://github.com/openresty/srcache-nginx-module.git
-git clone https://github.com/openresty/set-misc-nginx-module.git
-git clone https://github.com/sto/ngx_http_auth_pam_module.git
-git clone https://github.com/vozlt/nginx-module-vts.git
+    git clone https://github.com/FRiCKLE/ngx_cache_purge.git
+    git clone https://github.com/openresty/memc-nginx-module.git
+    git clone https://github.com/simpl/ngx_devel_kit.git
+    git clone https://github.com/openresty/headers-more-nginx-module.git
+    git clone https://github.com/openresty/echo-nginx-module.git
+    git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
+    git clone https://github.com/openresty/redis2-nginx-module.git
+    git clone https://github.com/openresty/srcache-nginx-module.git
+    git clone https://github.com/openresty/set-misc-nginx-module.git
+    git clone https://github.com/sto/ngx_http_auth_pam_module.git
+    git clone https://github.com/vozlt/nginx-module-vts.git
 } >> /tmp/nginx-ee.log 2>&1
 
 ## ipsrcub module to anonymize user IP in nginx logs
@@ -120,14 +123,14 @@ tar -zxf ngx_http_redis-0.3.8.tar.gz >> /tmp/nginx-ee.log 2>&1
 mv ngx_http_redis-0.3.8 ngx_http_redis
 
 if [ $? -eq 0 ]; then
-			echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
-			echo -ne "\\n"
-		else
-			echo -e "        Downloading additionals modules      [${CRED}FAIL${CEND}]"
-			echo ""
-			echo "Please look at /tmp/nginx-ee.log"
-			echo ""
-			exit 1
+    echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "        Downloading additionals modules      [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 # get brotli
@@ -139,14 +142,14 @@ cd ngx_brotli || exit
 git submodule update --init --recursive >> /tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
-			echo -ne "       Downloading brotli                     [${CGREEN}OK${CEND}]\\r"
-			echo -ne "\\n"
-		else
-			echo -e "       Downloading brotli      [${CRED}FAIL${CEND}]"
-			echo ""
-			echo "Please look at /tmp/nginx-ee.log"
-			echo ""
-			exit 1
+    echo -ne "       Downloading brotli                     [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "       Downloading brotli      [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 ## get openssl
@@ -157,42 +160,42 @@ cd /usr/local/src || exit
 
 git clone https://github.com/openssl/openssl.git >> /tmp/nginx-ee.log 2>&1
 cd openssl || exit
-git checkout tls1.3-draft-18 >> /tmp/nginx-ee.log 2>&1
+git checkout $OPENSSL_VER >> /tmp/nginx-ee.log 2>&1
 
 cd /usr/local/src || exit
 
 if [ $? -eq 0 ]; then
-			echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
-			echo -ne "\\n"
-		else
-			echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
-			echo ""
-			echo "Please look at /tmp/nginx-ee.log"
-			echo ""
-			exit 1
+    echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 ## get naxsi
 
 if [ "$naxsi" = "y" ]
 then
-  echo -ne "       Downloading naxsi                      [..]\\r"
-	wget -O naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/0.56.tar.gz >> /tmp/nginx-ee.log 2>&1
-  tar xvzf naxsi.tar.gz >> /tmp/nginx-ee.log 2>&1
-  mv naxsi-0.56 naxsi 
-  cd /usr/local/src || exit
-
-  if [ $? -eq 0 ]; then
-  			echo -ne "       Downloading naxsi                      [${CGREEN}OK${CEND}]\\r"
-  			echo -ne "\\n"
-  		else
-  			echo -e "       Downloading naxsi      [${CRED}FAIL${CEND}]"
-  			echo ""
-  			echo "Please look at /tmp/nginx-ee.log"
-  			echo ""
-  			exit 1
-  fi
-
+    echo -ne "       Downloading naxsi                      [..]\\r"
+    wget -O naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz >> /tmp/nginx-ee.log 2>&1
+    tar xvzf naxsi.tar.gz >> /tmp/nginx-ee.log 2>&1
+    mv naxsi-$NAXSI_VER naxsi
+    cd /usr/local/src || exit
+    
+    if [ $? -eq 0 ]; then
+        echo -ne "       Downloading naxsi                      [${CGREEN}OK${CEND}]\\r"
+        echo -ne "\\n"
+    else
+        echo -e "       Downloading naxsi      [${CRED}FAIL${CEND}]"
+        echo ""
+        echo "Please look at /tmp/nginx-ee.log"
+        echo ""
+        exit 1
+    fi
+    
 fi
 
 
@@ -200,20 +203,24 @@ fi
 
 if [ "$pagespeed" = "y" ]
 then
-  echo -ne "       Downloading pagespeed               [..]\\r"
-	bash <(curl -f -L -sS https://ngxpagespeed.com/install) --ngx-pagespeed-version latest-beta -b /usr/local/src >> /tmp/nginx-ee.log 2>&1
-  cd /usr/local/src/ || exit
-
-  if [ $? -eq 0 ]; then
-  			echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
-  			echo -ne "\\n"
-  		else
-  			echo -e "       Downloading pagespeed      [${CRED}FAIL${CEND}]"
-  			echo ""
-  			echo "Please look at /tmp/nginx-ee.log"
-  			echo ""
-  			exit 1
-  fi
+    echo -ne "       Downloading pagespeed                  [..]\\r"
+    {
+    wget https://ngxpagespeed.com/install
+    chmod +x install
+    ./install --ngx-pagespeed-version latest-beta -b /usr/local/src 
+    } >> /tmp/nginx-ee.log 2>&1
+    cd /usr/local/src/ || exit
+    
+    if [ $? -eq 0 ]; then
+        echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
+        echo -ne "\\n"
+    else
+        echo -e "       Downloading pagespeed                  [${CRED}FAIL${CEND}]"
+        echo ""
+        echo "Please look at /tmp/nginx-ee.log"
+        echo ""
+        exit 1
+    fi
 fi
 
 ## get nginx
@@ -226,32 +233,34 @@ mv nginx-${NGINX_RELEASE} nginx
 cd /usr/local/src/nginx/ || exit
 
 if [ $? -eq 0 ]; then
-			echo -ne "       Downloading nginx                      [${CGREEN}OK${CEND}]\\r"
-			echo -ne "\\n"
-		else
-			echo -e "       Downloading nginx      [${CRED}FAIL${CEND}]"
-			echo ""
-			echo "Please look at /tmp/nginx-ee.log"
-			echo ""
-			exit 1
+    echo -ne "       Downloading nginx                      [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "       Downloading nginx      [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 ## apply dynamic tls records patch
 
-echo -ne "      applying nginx patch                   [..]\\r"
+echo -ne "      applying nginx patches                 [..]\\r"
 
-wget https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch >> /tmp/nginx-ee.log 2>&1
-patch -p1 < nginx__dynamic_tls_records_1.13*.patch >> /tmp/nginx-ee.log 2>&1
+wget -O nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch >> /tmp/nginx-ee.log 2>&1
+patch -p1 < nginx__dynamic_tls_records.patch >> /tmp/nginx-ee.log 2>&1
+#wget -O nginx_hpack.patch $HPACK_VERSION >> /tmp/nginx-ee.log 2>&1
+#patch -p1 <  nginx_hpack.patch >> /tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
-			echo -ne "       applying nginx patch                   [${CGREEN}OK${CEND}]\\r"
-			echo -ne "\\n"
-		else
-			echo -e "        applying nginx patch      [${CRED}FAIL${CEND}]"
-			echo ""
-			echo "Please look at /tmp/nginx-ee.log"
-			echo ""
-			exit 1
+    echo -ne "       applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "        applying nginx patches                 [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 ## configuration
@@ -259,92 +268,92 @@ fi
 echo -ne "       Configuring nginx                      [..]\\r"
 
 ./configure \
- $ngx_naxsi \
- --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
- --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' \
- --prefix=/usr/share/nginx  \
- --conf-path=/etc/nginx/nginx.conf \
- --http-log-path=/var/log/nginx/access.log \
- --error-log-path=/var/log/nginx/error.log \
- --lock-path=/var/lock/nginx.lock \
- --pid-path=/run/nginx.pid \
- --http-client-body-temp-path=/var/lib/nginx/body \
- --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
- --http-proxy-temp-path=/var/lib/nginx/proxy \
- --http-scgi-temp-path=/var/lib/nginx/scgi  \
- --http-uwsgi-temp-path=/var/lib/nginx/uwsgi  \
- --with-pcre-jit  \
- --with-http_ssl_module  \
- --with-http_stub_status_module  \
- --with-http_realip_module  \
- --with-http_auth_request_module  \
- --with-http_addition_module  \
- --with-http_geoip_module  \
- --with-http_gzip_static_module  \
- --with-http_image_filter_module  \
- --with-http_v2_module  \
- --with-http_sub_module  \
- --with-http_xslt_module  \
- --with-file-aio \
- --with-threads  \
- --add-module=/usr/local/src/ngx_cache_purge  \
- --add-module=/usr/local/src/memc-nginx-module \
- --add-module=/usr/local/src/ngx_devel_kit  \
- --add-module=/usr/local/src/headers-more-nginx-module \
- --add-module=/usr/local/src/echo-nginx-module  \
- --add-module=/usr/local/src/ngx_http_substitutions_filter_module  \
- --add-module=/usr/local/src/redis2-nginx-module  \
- --add-module=/usr/local/src/srcache-nginx-module  \
- --add-module=/usr/local/src/set-misc-nginx-module  \
- --add-module=/usr/local/src/ngx_http_redis   \
- --add-module=/usr/local/src/ngx_brotli  \
- --add-module=/usr/local/src/ipscrub   \
- --add-module=/usr/local/src/ngx_http_auth_pam_module \
- --add-module=/usr/local/src/nginx-module-vts \
- $ngx_pagespeed \
- --with-openssl=/usr/local/src/openssl \
- --with-openssl-opt=enable-tls1_3 \
- --sbin-path=/usr/sbin/nginx  >> /tmp/nginx-ee.log 2>&1
+$ngx_naxsi \
+--with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' \
+--with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+--prefix=/usr/share/nginx  \
+--conf-path=/etc/nginx/nginx.conf \
+--http-log-path=/var/log/nginx/access.log \
+--error-log-path=/var/log/nginx/error.log \
+--lock-path=/var/lock/nginx.lock \
+--pid-path=/run/nginx.pid \
+--http-client-body-temp-path=/var/lib/nginx/body \
+--http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+--http-proxy-temp-path=/var/lib/nginx/proxy \
+--http-scgi-temp-path=/var/lib/nginx/scgi  \
+--http-uwsgi-temp-path=/var/lib/nginx/uwsgi  \
+--with-pcre-jit  \
+--with-http_ssl_module  \
+--with-http_stub_status_module  \
+--with-http_realip_module  \
+--with-http_auth_request_module  \
+--with-http_addition_module  \
+--with-http_geoip_module  \
+--with-http_gzip_static_module  \
+--with-http_image_filter_module  \
+--with-http_v2_module  \
+--with-http_sub_module  \
+--with-http_xslt_module  \
+--with-file-aio \
+--with-threads  \
+--add-module=/usr/local/src/ngx_cache_purge  \
+--add-module=/usr/local/src/memc-nginx-module \
+--add-module=/usr/local/src/ngx_devel_kit  \
+--add-module=/usr/local/src/headers-more-nginx-module \
+--add-module=/usr/local/src/echo-nginx-module  \
+--add-module=/usr/local/src/ngx_http_substitutions_filter_module  \
+--add-module=/usr/local/src/redis2-nginx-module  \
+--add-module=/usr/local/src/srcache-nginx-module  \
+--add-module=/usr/local/src/set-misc-nginx-module  \
+--add-module=/usr/local/src/ngx_http_redis   \
+--add-module=/usr/local/src/ngx_brotli  \
+--add-module=/usr/local/src/ipscrub   \
+--add-module=/usr/local/src/ngx_http_auth_pam_module \
+--add-module=/usr/local/src/nginx-module-vts \
+$ngx_pagespeed \
+--with-openssl=/usr/local/src/openssl \
+--with-openssl-opt=enable-tls1_3 \
+--sbin-path=/usr/sbin/nginx  >> /tmp/nginx-ee.log 2>&1
 
- if [ $? -eq 0 ]; then
- 			echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
- 			echo -ne "\\n"
- 		else
- 			echo -e "        Configuring nginx    [${CRED}FAIL${CEND}]"
- 			echo ""
- 			echo "Please look at /tmp/nginx-ee.log"
- 			echo ""
- 			exit 1
- fi
+if [ $? -eq 0 ]; then
+    echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "        Configuring nginx    [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
+fi
 
- ## compilation
+## compilation
 
- echo -ne "       Compile nginx                          [..]\\r"
+echo -ne "       Compile nginx                          [..]\\r"
 
 make -j "$(nproc)" >> /tmp/nginx-ee.log 2>&1
 make install >> /tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
-     echo -ne "       Compile nginx                          [${CGREEN}OK${CEND}]\\r"
-     echo -ne "\\n"
-   else
-     echo -e "        Compile nginx      [${CRED}FAIL${CEND}]"
-     echo ""
-     echo "Please look at /tmp/nginx-ee.log"
-     echo ""
-     exit 1
+    echo -ne "       Compile nginx                          [${CGREEN}OK${CEND}]\\r"
+    echo -ne "\\n"
+else
+    echo -e "        Compile nginx      [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
 fi
 
 ## restart nginx with systemd
 
 {
-systemctl unmask sw-nginx
-systemctl enable nginx
-systemctl start nginx
-apt-mark hold nginx-ee nginx-common
-systemctl restart nginx
-nginx -t
-service nginx reload
+    systemctl unmask nginx
+    systemctl enable nginx
+    systemctl start nginx
+    apt-mark hold nginx-ee nginx-common
+    systemctl restart nginx
+    nginx -t
+    service nginx reload
 } >> /tmp/nginx-ee.log 2>&1
 
 

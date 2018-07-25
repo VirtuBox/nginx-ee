@@ -10,7 +10,7 @@ Compile and install the latest nginx releases with EasyEngine
 
 * Compile the latest Nginx Mainline or Stable Release
 * Additonal modules
-* TLS v1.3 Support
+* TLS v1.3 draft28
 
 -----
 
