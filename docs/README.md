@@ -4,7 +4,7 @@ Compile and install the latest nginx releases with EasyEngine
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
------
+---
 
 ## Features
 
@@ -12,7 +12,7 @@ Compile and install the latest nginx releases with EasyEngine
 * Additonal modules
 * TLS v1.3 draft28
 
------
+---
 
 ## Additional modules
 
@@ -32,10 +32,14 @@ Nginx current stable release : **v1.14.0**
 * ngx_http_auth_pam_module
 * [ipscrub](http://www.ipscrub.org/)
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
-* ngx_pagespeed (optional)
-* naxsi WAF (optional)
 
------
+optional modules :
+
+* ngx_pagespeed
+* naxsi WAF
+* [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
+
+---
 
 ## Compatibility
 
@@ -43,13 +47,13 @@ Nginx current stable release : **v1.14.0**
 * Ubuntu 18.04 LTS (Bionic)
 * Debian 8 Jessie
 
-----
+---
 
 ## Requirements
 
 * Nginx already installed by EasyEngine
 
------
+---
 
 ## Usage
 
@@ -57,13 +61,13 @@ Nginx current stable release : **v1.14.0**
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
------
+---
 
 ## Nginx configuration
 
 * [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/)
 
------
+---
 
 ## Roadmap
 
