@@ -51,7 +51,6 @@ while [[ $PAGESPEED != "y" && $PAGESPEED != "n" ]]; do
     read -p "Select an option [y/n]: " PAGESPEED
 done
 echo ""
-echo ""
 echo "Do you want NAXSI WAF (still experimental)? (y/n)"
 while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
     read -p "Select an option [y/n]: " NAXSI
