@@ -128,7 +128,7 @@ fi
 ## clean previous compilation
 
 cd $DIR_SRC || exit
-rm -rf ./*.tar.gz
+rm -rf ./\*.tar.gz ipscrubtmp ipscrub
 
 ## get additionals modules
 
@@ -195,26 +195,20 @@ echo -ne "       Downloading additionals modules        [..]\\r"
     else
         { git clone https://github.com/vozlt/nginx-module-vts.git; }
     fi
-} >> /tmp/nginx-ee.log 2>&1
-
-cd $DIR_SRC || exit
-
-## ipsrcub module to anonymize user IP in nginx logs
-{
-    rm -rf ipscrubtmp ipscrub
     git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
     cp -rf $DIR_SRC/ipscrubtmp/ipscrub $DIR_SRC/ipscrub
 } >> /tmp/nginx-ee.log 2>&1
 
-{
-    
-    cd $DIR_SRC || exit
-    
-    if [ ! -d $DIR_SRC/ngx_http_redis ]; then
+cd $DIR_SRC || exit
+
+if [ ! -d $DIR_SRC/ngx_http_redis ]; then
+    {
         wget https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz
+        tar -xzf ngx_http_redis-0.3.8.tar.gz
         mv ngx_http_redis-0.3.8 ngx_http_redis
-    fi
-} >> /tmp/nginx-ee.log 2>&1
+    } >> /tmp/nginx-ee.log 2>&1
+fi
+
 
 if [ $? -eq 0 ]; then
     echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
@@ -338,7 +332,7 @@ fi
 cd $DIR_SRC || exit
 echo -ne "       Downloading nginx                      [..]\\r"
 if [ -d $DIR_SRC/nginx ]; then
-    rm -rf $DIR_SRC/nginx nginx-*
+    rm -rf $DIR_SRC/nginx
 fi
 wget http://nginx.org/download/nginx-${NGINX_RELEASE}.tar.gz >> /tmp/nginx-ee.log 2>&1
 tar -xzvf nginx-${NGINX_RELEASE}.tar.gz >> /tmp/nginx-ee.log 2>&1
