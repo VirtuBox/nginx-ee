@@ -57,6 +57,12 @@ while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
     read -p "Select an option [y/n]: " NAXSI
 done
 echo ""
+echo "Do you want RTMP streaming module ?"
+while [[ $RTMP != "y" && $RTMP != "n" ]]; do
+    read -p "Select an option [y/n]: " RTMP
+done
+echo ""
+
 
 ##################################
 # Set nginx release and modules 
@@ -83,6 +89,14 @@ then
     ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
 else
     ngx_pagespeed=""
+fi
+
+if [ "$RTMP" = "y" ]; then
+    nginx_cc_opt=( [index]=--with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+    ngx_rtmp="--add-module=/usr/local/src/nginx-rtmp-module "
+else
+    ngx_rtmp=""
+	nginx_cc_opt=( [index]=--with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
 fi
 
 ##################################
@@ -140,6 +154,37 @@ if [ "$distro_version" == "xenial" ]; then
             echo ""
             exit 1
         fi
+    fi
+fi
+
+##################################
+# Install ffmpeg for rtmp module
+##################################
+
+
+
+if [ "$RTMP" = "y" ]; then
+    echo -ne "       Installing FFMPEG for RMTP module      [..]\\r"
+    {
+	if [ "$distro_version" == "xenial" ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
+            add-apt-repository ppa:jonathonf/ffmpeg-4 -y
+            apt-get update
+            apt-get install ffmpeg -y
+        fi
+    else
+        apt-get install ffmpeg -y
+    fi
+	} >>/tmp/nginx-ee.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -ne "       Installing FFMPEG for RMTP module      [${CGREEN}OK${CEND}]\\r"
+        echo -ne "\\n"
+    else
+        echo -e "       Installing FFMPEG for RMTP module      [${CRED}FAIL${CEND}]"
+        echo ""
+        echo "Please look at /tmp/nginx-ee.log"
+        echo ""
+        exit 1
     fi
 fi
 
@@ -227,7 +272,13 @@ echo -ne "       Downloading additionals modules        [..]\\r"
         wget https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz
         tar -xzf ngx_http_redis-0.3.8.tar.gz
         mv ngx_http_redis-0.3.8 ngx_http_redis
-    
+    fi
+        if [ "$RTMP" = "y" ]; then
+        if [ -d $DIR_SRC/nginx-rtmp-module ]; then
+            { git -C $DIR_SRC/nginx-rtmp-module pull origin master; }
+        else
+            { git clone https://github.com/arut/nginx-rtmp-module.git; }
+        fi
     fi
     # ipscrub module
     git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
@@ -422,6 +473,7 @@ echo -ne "       Configuring nginx                      [..]\\r"
 
 ./configure \
 $ngx_naxsi \
+"${nginx_cc_opt[@]}" \
 --with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' \
 --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
 --prefix=/usr/share/nginx  \
@@ -464,6 +516,7 @@ $ngx_naxsi \
 --add-module=/usr/local/src/ngx_http_auth_pam_module \
 --add-module=/usr/local/src/nginx-module-vts \
 $ngx_pagespeed \
+$ngx_rtmp \
 --with-openssl=/usr/local/src/openssl \
 --with-openssl-opt=enable-tls1_3 \
 --sbin-path=/usr/sbin/nginx  >> /tmp/nginx-ee.log 2>&1
