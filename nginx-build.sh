@@ -474,7 +474,6 @@ echo -ne "       Configuring nginx                      [..]\\r"
 ./configure \
 $ngx_naxsi \
 "${nginx_cc_opt[@]}" \
---with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' \
 --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
 --prefix=/usr/share/nginx  \
 --conf-path=/etc/nginx/nginx.conf \
