@@ -68,9 +68,11 @@ echo ""
 
 if [ "$NGINX_RELEASE" = "1" ]; then
 	NGINX_RELEASE=$NGINX_MAINLINE
+	GCC_RELEASE=8
 	#HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.0_http2-hpack.patch"
 else
 	NGINX_RELEASE=$NGINX_STABLE
+	GCC_RELEASE=7
 	#HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.14.0_http2-hpack.patch"
 fi
 
@@ -129,7 +131,7 @@ fi
 # install gcc-7
 distro_version=$(lsb_release -sc)
 
-if [ "$NGINX_RELEASE" = "1" ]; then
+if [ "$GCC_RELEASE" = "8" ]; then
 	if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
 		if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list ]; then
 			echo -ne "       Installing gcc-8                       [..]\\r"
