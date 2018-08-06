@@ -1,6 +1,6 @@
 # Nginx-EE
 
-Compile and install the latest nginx releases with EasyEngine
+Compile and install the latest nginx releases from source with additional modules
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
@@ -11,8 +11,9 @@ Compile and install the latest nginx releases with EasyEngine
 ## Features
 
 * Compile the latest Nginx Mainline or Stable Release
+* Replace previously installed Nginx package
 * Additonal modules
-* TLS v1.3 draft28
+* TLS v1.3 support (draft28)
 
 ---
 
@@ -53,7 +54,7 @@ optional modules :
 
 ## Requirements
 
-* Nginx already installed with EasyEngine
+* Nginx installed with **EasyEngine** or from **Ubuntu main APT repository**
 
 ---
 
@@ -65,15 +66,18 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 
 ---
 
-## Nginx configuration
+## Nginx configurations
 
-* [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/)
+* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server/tree/master/etc/nginx)
 
 ---
 
 ## Roadmap
 
-* add nginx configuration examples
+* [x] Add choice between stable & mainline release
+* [x] Add Nginx configuration examples
+* [ ] Add Cloudflare HPACK patch
+* [ ] Install Nginx from source without Nginx package installed
 
 ## Credits & Licence
 

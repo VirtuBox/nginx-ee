@@ -106,7 +106,7 @@ echo -ne "       Installing dependencies               [..]\\r"
 apt-get update >> /tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip >> /tmp/nginx-ee.log 2>&1
+libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip curl gnupg2 >> /tmp/nginx-ee.log 2>&1
 
 
 if [ $? -eq 0 ]; then
@@ -132,22 +132,23 @@ fi
 # install gcc-7 
 distro_version=$(lsb_release -sc)
 
-if [ "$distro_version" == "xenial" ]; then
-    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-7_1-xenial.list ]; then
-        echo -ne "       Installing gcc-7                      [..]\\r"
+if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
+    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list ]; then
+        echo -ne "       Installing gcc-8                      [..]\\r"
         {
-            add-apt-repository ppa:jonathonf/gcc-7.1 -y
+            apt-get install software-properties-common -y
+            add-apt-repository ppa:jonathonf/gcc-8.1 -y
             apt-get update
-            apt-get install gcc-7 g++-7  -y
+            apt-get install gcc-8 g++-8  -y
         } >> /tmp/nginx-ee.log 2>&1
         
-        export CC="/usr/bin/gcc-7"
-        export CXX="/usr/bin/gc++-7"
+        export CC="/usr/bin/gcc-8"
+        export CXX="/usr/bin/gc++-8"
         if [ $? -eq 0 ]; then
-            echo -ne "       Installing gcc-7                      [${CGREEN}OK${CEND}]\\r"
+            echo -ne "       Installing gcc-8                      [${CGREEN}OK${CEND}]\\r"
             echo -ne "\\n"
         else
-            echo -e "        Installing gcc-7                      [${CRED}FAIL${CEND}]"
+            echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
             echo ""
             echo "Please look at /tmp/nginx-ee.log"
             echo ""
@@ -167,6 +168,7 @@ if [ "$RTMP" = "y" ]; then
     {
 	if [ "$distro_version" == "xenial" ]; then
         if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
+            apt-get install software-properties-common -y
             add-apt-repository ppa:jonathonf/ffmpeg-4 -y
             apt-get update
             apt-get install ffmpeg -y
