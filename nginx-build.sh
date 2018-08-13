@@ -32,6 +32,19 @@ clear
 
 echo "" >/tmp/nginx-ee.log
 
+while [[ $# -gt 0 ]]; do
+    arg="$1"
+    case $arg in
+        -p|--pagespeed)  PAGESPEED="y"; shift;;
+        -n|--naxsi)   NAXSI="y"; shift;;
+        -r|--rtmp)   RTMP="y"; shift;;
+        -m|--mainline)   NGINX_RELEASE=1; shift;;
+        -s|--stable)   NGINX_RELEASE=2; shift;;
+        *)
+    esac
+    shift
+done
+
 ##################################
 # Installation menu
 ##################################
@@ -39,27 +52,34 @@ echo "" >/tmp/nginx-ee.log
 echo ""
 echo "Welcome to the nginx-ee bash script."
 echo ""
-
+if [ -z  $NGINX_RELEASE ]; then
 echo ""
 echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
 while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
 	read -p "Select an option [1-2]: " NGINX_RELEASE
 done
+fi
+if [ -z  $PAGESPEED ]; then
 echo ""
 echo "Do you want Ngx_Pagespeed ? (y/n)"
 while [[ $PAGESPEED != "y" && $PAGESPEED != "n" ]]; do
 	read -p "Select an option [y/n]: " PAGESPEED
 done
+fi
+if [ -z  $NAXSI ]; then
 echo ""
 echo "Do you want NAXSI WAF (still experimental)? (y/n)"
 while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
 	read -p "Select an option [y/n]: " NAXSI
 done
+fi
+if [ -z  $RTMP ]; then
 echo ""
 echo "Do you want RTMP streaming module ?"
 while [[ $RTMP != "y" && $RTMP != "n" ]]; do
 	read -p "Select an option [y/n]: " RTMP
 done
+fi
 echo ""
 
 ##################################
@@ -67,12 +87,10 @@ echo ""
 ##################################
 
 if [ "$NGINX_RELEASE" = "1" ]; then
-	NGINX_RELEASE=$NGINX_MAINLINE
-	GCC_RELEASE=8
+	NGINX_VER=$NGINX_MAINLINE
 	#HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.0_http2-hpack.patch"
 else
-	NGINX_RELEASE=$NGINX_STABLE
-	GCC_RELEASE=7
+	NGINX_VER=$NGINX_STABLE
 	#HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.14.0_http2-hpack.patch"
 fi
 
@@ -131,7 +149,7 @@ fi
 # install gcc-7
 distro_version=$(lsb_release -sc)
 
-if [ "$GCC_RELEASE" = "8" ]; then
+if [ "$NGINX_RELEASE" = "1" ]; then
 	if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
 		if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list ]; then
 			echo -ne "       Installing gcc-8                       [..]\\r"
@@ -417,10 +435,10 @@ if [ "$PAGESPEED" = "y" ]; then
 	echo -ne "       Downloading pagespeed                  [..]\\r"
 
 	{
-		rm -rf incubator-pagespeed-ngx-latest-beta install
-		wget https://ngxpagespeed.com/install
-		chmod +x install
-		./install --ngx-pagespeed-version latest-beta -b $DIR_SRC
+		rm -rf incubator-pagespeed-ngx-latest-beta build_ngx_pagespeed.sh
+		wget https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
+		chmod +x build_ngx_pagespeed.sh
+		./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b $DIR_SRC
 	} >>/tmp/nginx-ee.log 2>&1
 
 	if [ $? -eq 0 ]; then
@@ -445,9 +463,9 @@ if [ -d $DIR_SRC/nginx ]; then
 	rm -rf $DIR_SRC/nginx
 fi
 {
-	wget http://nginx.org/download/nginx-${NGINX_RELEASE}.tar.gz
-	tar -xzf nginx-${NGINX_RELEASE}.tar.gz
-	mv nginx-${NGINX_RELEASE} nginx
+	wget http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
+	tar -xzf nginx-${NGINX_VER}.tar.gz
+	mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
 cd $DIR_SRC/nginx/ || exit
