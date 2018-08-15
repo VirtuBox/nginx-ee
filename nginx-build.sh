@@ -435,7 +435,7 @@ if [ "$PAGESPEED" = "y" ]; then
 	echo -ne "       Downloading pagespeed                  [..]\\r"
 
 	{
-		rm -rf incubator-pagespeed-ngx-latest-beta build_ngx_pagespeed.sh
+		rm -rf incubator-pagespeed-ngx-latest-beta build_ngx_pagespeed.sh install
 		wget https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
 		chmod +x build_ngx_pagespeed.sh
 		./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b $DIR_SRC
