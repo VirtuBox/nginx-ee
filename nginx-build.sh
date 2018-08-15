@@ -136,6 +136,19 @@ else
 fi
 
 ##################################
+# Check if nginx folder exist
+##################################
+
+if [ ! -d /etc/nginx ]; then
+
+mkdir -p /etc/nginx/{conf.d,common,sites-available,sites-enabled}
+
+wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/nginx/nginx.conf
+wget -O /etc/nginx/sites-available/default https://raw.githubusercontent.com/VirtuBox/ubuntu-nginx-web-server/master/etc/nginx/sites-available/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+
+##################################
 # Install gcc7 or gcc8 from PPA
 ##################################
 # gcc7 for nginx stable on Ubuntu 16.04 LTS
