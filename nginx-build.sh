@@ -226,6 +226,11 @@ else
             fi
         fi
     fi
+    if [ "$distro_version" == "bionic" ]; then
+        export CC="/usr/bin/gcc-7"
+        export CXX="/usr/bin/gc++-7"
+    fi
+
 fi
 
 ##################################
