@@ -556,7 +556,7 @@ fi
 echo -ne '       Configuring nginx                      [..]\r'
 
 ./configure \
-    $ngx_naxsi
+$ngx_naxsi \
 "${nginx_cc_opt[@]}" \
 --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share/nginx \
