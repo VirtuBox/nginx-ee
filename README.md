@@ -12,14 +12,14 @@ Compile and install the latest nginx releases from source with additional module
 
 * Compile the latest Nginx Mainline or Stable Release
 * Replace previously installed Nginx package
-* Additonal modules
+* Support Additonal modules
 * TLS v1.3 support (draft28)
 
 ---
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.2**  
+Nginx current mainline release : **v1.15.2**
 Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
@@ -31,7 +31,7 @@ Nginx current stable release : **v1.14.0**
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
 * nginx-dynamic-tls-records-patch_1.13.0+
-* Openssl 1.1.1
+* Openssl 1.1.1 (OpenSSL_1_1_1-pre9)
 * [ipscrub](http://www.ipscrub.org/)
 * ngx_http_auth_pam_module
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
@@ -77,7 +77,11 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 * [x] Add choice between stable & mainline release
 * [x] Add Nginx configuration examples
 * [ ] Add Cloudflare HPACK patch
-* [ ] Install Nginx from source without Nginx package installed
+* [ ] Add support for servers without EasyEngine
+* [ ] Add non-interactive installation
+* [ ] Add automated update detection
+
+
 
 ## Credits & Licence
 

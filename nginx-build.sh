@@ -20,7 +20,7 @@ fi
 ##################################
 
 NAXSI_VER=0.56
-OPENSSL_VER=OpenSSL_1_1_1-pre8
+OPENSSL_VER=OpenSSL_1_1_1-pre9
 DIR_SRC=/usr/local/src
 NGINX_STABLE=1.14.0
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o "nginx\\-[0-9.]+\\.tar[.a-z]*" | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
@@ -35,8 +35,6 @@ CGREEN="${CSI}1;32m"
 ##################################
 # Initial check & cleanup
 ##################################
-
-
 
 # clean previous install log
 
@@ -133,7 +131,7 @@ echo -ne "       Installing dependencies               [..]\\r"
 apt-get update >>/tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip curl gnupg2 >>/tmp/nginx-ee.log 2>&1
+libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip gnupg gnupg2 >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
