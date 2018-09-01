@@ -139,6 +139,7 @@ else
     nginx_cc_opt=( [index]=--with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
 fi
 
+
 ##################################
 # Install dependencies
 ##################################
@@ -188,9 +189,9 @@ fi
 # install gcc-7
 distro_version=$(lsb_release -sc)
 
-if [ "$NGINX_RELEASE" = "1" ] && [ "$RTMP" = "n" ]; then
-    if [ "$distro_version" == "xenial" ] || [ "$distro_version" == "bionic" ]; then
-        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ]; then
+if [[ "$NGINX_RELEASE" = "1" && "$RTMP" = "n" ]]; then
+    if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
+        if [[ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list && ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ]]; then
             echo -ne '       Installing gcc-8                       [..]\r'
             {
                 apt-get install software-properties-common -y
@@ -211,6 +212,9 @@ if [ "$NGINX_RELEASE" = "1" ] && [ "$RTMP" = "n" ]; then
                 echo ""
                 exit 1
             fi
+        else
+            export CC="/usr/bin/gcc-8"
+            export CXX="/usr/bin/gc++-8"
         fi
     fi
 else
@@ -223,9 +227,6 @@ else
                 apt-get update
                 apt-get install gcc-7 g++-7 -y
             } >>/tmp/nginx-ee.log 2>&1
-
-            export CC="/usr/bin/gcc-7"
-            export CXX="/usr/bin/gc++-7"
             if [ $? -eq 0 ]; then
                 echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
                 echo -ne '\n'
@@ -237,8 +238,9 @@ else
                 exit 1
             fi
         fi
-    fi
-    if [ "$distro_version" == "bionic" ]; then
+        export CC="/usr/bin/gcc-7"
+        export CXX="/usr/bin/gc++-7"
+    elif [ "$distro_version" == "bionic" ]; then
         export CC="/usr/bin/gcc-7"
         export CXX="/usr/bin/gc++-7"
     fi
@@ -556,9 +558,9 @@ fi
 echo -ne '       Configuring nginx                      [..]\r'
 
 ./configure \
-$ngx_naxsi \
-"${nginx_cc_opt[@]}" \
---with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    $ngx_naxsi \
+    "${nginx_cc_opt[@]}" \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
