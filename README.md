@@ -13,13 +13,13 @@ Compile and install the latest nginx releases from source with additional module
 * Compile the latest Nginx Mainline or Stable Release
 * Replace previously installed Nginx package
 * Support Additonal modules
-* TLS v1.3 support (draft28)
+* TLS v1.3 support
 
 ---
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.2**
+Nginx current mainline release : **v1.15.3**
 Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
@@ -31,7 +31,7 @@ Nginx current stable release : **v1.14.0**
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
 * nginx-dynamic-tls-records-patch_1.13.0+
-* Openssl 1.1.1 (OpenSSL_1_1_1-pre9)
+* Openssl 1.1.1
 * [ipscrub](http://www.ipscrub.org/)
 * ngx_http_auth_pam_module
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
@@ -62,6 +62,26 @@ optional modules :
 
 ```bash
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+```
+
+---
+
+## Troubleshooting
+
+Error message ERR_SSL_VERSION_OR_CIPHER_MISMATCH :
+
+Update nginx ssl_ciphers in /etc/nginx/nginx.conf
+
+**TLSv1.2 + TLSv1.3**
+
+```nginx
+ssl_ciphers 'TLS13+AESGCM+AES128:EECDH+AES128';
+```
+
+**TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3**
+
+```nginx
+ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
 ```
 
 ---
