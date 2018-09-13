@@ -421,7 +421,7 @@ cd $DIR_SRC || exit
 		{ git clone https://github.com/hakasenyang/openssl-patch.git; }
 	fi
 	cd $DIR_SRC/openssl || exit
-	patch -p1 <../openssl-patch/openssl-equal-pre10_ciphers.patch
+	patch -p1 <../openssl-patch/openssl-equal-1.1.1_ciphers.patch
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
