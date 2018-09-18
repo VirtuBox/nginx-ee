@@ -184,7 +184,7 @@ fi
 # install gcc-7
 distro_version=$(lsb_release -sc)
 
-if [[ "$NGINX_RELEASE" == "1" && "$RTMP" == "n" ]]; then
+if [[ "$NGINX_RELEASE" == "1" && "$RTMP" !== "y" ]]; then
     if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
         if [[ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list && ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ]]; then
             echo -ne '       Installing gcc-8                       [..]\r'
