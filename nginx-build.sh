@@ -22,6 +22,7 @@ NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
 NGINX_STABLE=1.14.0
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
+NGINX_CURRENT=$(nginx -v 2>&1 | awk -F "/" '{print $2}' | grep 1.15)
 
 
 # Colors
@@ -39,35 +40,31 @@ CGREEN="${CSI}1;32m"
 echo "" >/tmp/nginx-ee.log
 
 while [[ $# -gt 0 ]]; do
-	arg="$1"
-	case $arg in
-	-p | --pagespeed)
-		PAGESPEED="y"
-		shift
-		;;
-	-n | --naxsi)
-		NAXSI="y"
-		shift
-		;;
-	-r | --rtmp)
-		RTMP="y"
-		shift
-		;;
-	-m | --mainline)
-		NGINX_RELEASE=1
-		shift
-		;;
-	-s | --stable)
-		NGINX_RELEASE=2
-		shift
-		;;
-	-u | --update)
-		NGINX_RELEASE=2
-		shift
-		;;
-	*) ;;
-	esac
-	shift
+    arg="$1"
+    case $arg in
+        --pagespeed)
+            PAGESPEED="y"
+            shift
+        ;;
+        --naxsi)
+            NAXSI="y"
+            shift
+        ;;
+        --rtmp)
+            RTMP="y"
+            shift
+        ;;
+        --latest | --mainline)
+            NGINX_RELEASE=1
+            shift
+        ;;
+        --stable)
+            NGINX_RELEASE=2
+            shift
+        ;;
+        *) ;;
+    esac
+    shift
 done
 
 ##################################
@@ -78,34 +75,33 @@ echo ""
 echo "Welcome to the nginx-ee bash script."
 echo ""
 if [ -z $NGINX_RELEASE ]; then
-	echo ""
-	echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
-	while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
-		read -p "Select an option [1-2]: " NGINX_RELEASE
-	done
+    echo ""
+    echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
+    while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
+        read -p "Select an option [1-2]: " NGINX_RELEASE
+    done
+
+    echo ""
+    echo "Do you want Ngx_Pagespeed ? (y/n)"
+    while [[ $PAGESPEED != "y" && $PAGESPEED != "n" ]]; do
+        read -p "Select an option [y/n]: " PAGESPEED
+    done
+
+    echo ""
+    echo "Do you want NAXSI WAF (still experimental)? (y/n)"
+    while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
+        read -p "Select an option [y/n]: " NAXSI
+    done
+
+    echo ""
+    echo "Do you want RTMP streaming module ?"
+    while [[ $RTMP != "y" && $RTMP != "n" ]]; do
+        read -p "Select an option [y/n]: " RTMP
+    done
+    echo ""
 fi
-if [ -z $PAGESPEED ]; then
-	echo ""
-	echo "Do you want Ngx_Pagespeed ? (y/n)"
-	while [[ $PAGESPEED != "y" && $PAGESPEED != "n" ]]; do
-		read -p "Select an option [y/n]: " PAGESPEED
-	done
-fi
-if [ -z $NAXSI ]; then
-	echo ""
-	echo "Do you want NAXSI WAF (still experimental)? (y/n)"
-	while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
-		read -p "Select an option [y/n]: " NAXSI
-	done
-fi
-if [ -z $RTMP ]; then
-	echo ""
-	echo "Do you want RTMP streaming module ?"
-	while [[ $RTMP != "y" && $RTMP != "n" ]]; do
-		read -p "Select an option [y/n]: " RTMP
-	done
-fi
-echo ""
+
+
 
 ##################################
 # Set nginx release and modules
@@ -189,27 +185,27 @@ fi
 distro_version=$(lsb_release -sc)
 
 if [[ "$NGINX_RELEASE" == "1" && "$RTMP" == "n" ]]; then
-	if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
-		if [[ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list && ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ]]; then
-			echo -ne '       Installing gcc-8                       [..]\r'
-			{
-				apt-get install software-properties-common -y
-				add-apt-repository ppa:jonathonf/gcc-8.1 -y
-				apt-get update
-				apt-get install gcc-8 g++-8 -y
-			} >>/tmp/nginx-ee.log 2>&1
-			if [ $? -eq 0 ]; then
-				echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
-				echo -ne '\n'
-			else
-				echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-				echo ""
-				echo "Please look at /tmp/nginx-ee.log"
-				echo ""
-				exit 1
-			fi
-		fi
-	fi
+    if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
+        if [[ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list && ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ]]; then
+            echo -ne '       Installing gcc-8                       [..]\r'
+            {
+                apt-get install software-properties-common -y
+                add-apt-repository ppa:jonathonf/gcc-8.1 -y
+                apt-get update
+                apt-get install gcc-8 g++-8 -y
+            } >>/tmp/nginx-ee.log 2>&1
+            if [ $? -eq 0 ]; then
+                echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+                echo -ne '\n'
+            else
+                echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+                echo ""
+                echo "Please look at /tmp/nginx-ee.log"
+                echo ""
+                exit 1
+            fi
+        fi
+    fi
 else
 	if [ "$distro_version" == "xenial" ]; then
 		if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-7_1-xenial.list ]; then
@@ -660,5 +656,7 @@ sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-
 # We're done !
 echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"
+echo ""
+echo ""
 echo ""
 echo "       Installation log : /tmp/nginx-ee.log"
