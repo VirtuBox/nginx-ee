@@ -544,7 +544,7 @@ fi
 echo -ne '       Configuring nginx                      [..]\r'
 
 if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
-	if [[ "$NGINX_RELEASE" == "1" && "$RTMP" == "n" ]]; then
+	if [[ "$NGINX_RELEASE" == "1" && "$RTMP" !== "y" ]]; then
 		export CC="/usr/bin/gcc-8"
 		export CXX="/usr/bin/gc++-8"
 	else
