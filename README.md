@@ -1,6 +1,6 @@
 # Nginx-EE
 
-Compile and install the latest nginx releases from source with additional modules
+Compile and install the latest nginx releases from source with additional modules with EasyEngine and Plesk
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
@@ -46,31 +46,66 @@ optional modules :
 
 ## Compatibility
 
+Operating system :
+
 * Ubuntu 16.04 LTS (Xenial)
 * Ubuntu 18.04 LTS (Bionic)
 * Debian 8 Jessie
+
+Plesk :
+
+* 17.5
+* 17.8.11
+* 17.9.x
 
 ---
 
 ## Requirements
 
-* Nginx installed with **EasyEngine** or from **Ubuntu main APT repository**
+* Nginx installed by **EasyEngine** or **Plesk Onyx** or from **Debian/Ubuntu APT Repository**
 
 ---
 
 ## Usage
 
+### Interactive install
+
 ```bash
 bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
+
+### Non interactive install
+
+```bash
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) [options] ...
+```
+
+#### Options available
+
+Nginx release (required) :
+* `--mainline` : compile nginx mainline release
+* `--stable` : compile nginx stable release
+
+Additional modules (optional)
+* `--pagespeed` : compile nginx with ngx_pagespeed module
+* `--naxsi` : compile nginx with naxsi
+* `--rtmp` : compile nginx with rtmp module
+
+### Example
+
+```bash
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
+```
+
+This command will compile the latest nginx mainline release with ngx_pagespeed module
 
 ---
 
 ## Troubleshooting
 
-Error message ERR_SSL_VERSION_OR_CIPHER_MISMATCH :
+TLS v1.3 do not work or browser show error message `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` :
 
-Update nginx ssl_ciphers in /etc/nginx/nginx.conf
+Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/etc/nginx/conf.d/ssl.conf` for Plesk servers
 
 **TLSv1.2 + TLSv1.3**
 
@@ -98,9 +133,9 @@ ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA2
 * [x] Add Nginx configuration examples
 * [ ] Add Cloudflare HPACK patch
 * [ ] Add support for servers without EasyEngine
-* [ ] Add non-interactive installation
+* [x] Add non-interactive installation
 * [ ] Add automated update detection
-
+* [x] Add support for Plesk servers
 
 
 ## Credits & Licence
