@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# Nginx-ee Bash script
+# compile the latest nginx release from source with EasyEngine, Plesk or from scratch
+#
+# Version 3.0 - 2019-09-19
+# Published & maintained by VirtuBox - https://virtubox.net
+#
+# Sources :
+# https://github.com/VirtuBox/nginx-ee
+#
 
 # Check if user is root
 if [ "$(id -u)" != "0" ]; then
@@ -22,8 +32,9 @@ NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
 NGINX_STABLE=1.14.0
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
-NGINX_CURRENT=$(nginx -v 2>&1 | awk -F "/" '{print $2}' | grep 1.15)
-
+if [ ! -x /usr/sbin/nginx ]; then
+    NGINX_CURRENT=$(nginx -v 2>&1 | awk -F "/" '{print $2}' | grep 1.15)
+fi
 
 # Colors
 CSI='\033['
@@ -38,6 +49,24 @@ CGREEN="${CSI}1;32m"
 # clean previous install log
 
 echo "" >/tmp/nginx-ee.log
+
+# detect Plesk
+if [ -d /etc/psa ]; then
+    NGINX_PLESK=1
+else
+    NGINX_PLESK=0
+fi
+
+# detect no nginx
+if [ ! -d /etc/nginx ]; then
+    NGINX_FROM_SCRATCH=1
+else
+    NGINX_FROM_SCRATCH=0
+fi
+
+##################################
+# Parse script arguments
+##################################
 
 while [[ $# -gt 0 ]]; do
     arg="$1"
@@ -74,6 +103,8 @@ done
 echo ""
 echo "Welcome to the nginx-ee bash script."
 echo ""
+
+# interactive
 if [ -z $NGINX_RELEASE ]; then
     echo ""
     echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
@@ -160,29 +191,27 @@ fi
 # Checking install type
 ##################################
 
-if [ ! -d /etc/nginx ]; then
+if [ $NGINX_FROM_SCRATCH = "1" ]; then
 
-    mkdir -p /etc/nginx/{conf.d,common,sites-available,sites-enabled}
+    git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
     mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
-    chown -R www-data:root /var/lib/nginx/*
+    mkdir -p /var/run/nginx-cache
+    mkdir -p /var/cache/nginx
+    chown -R www-data:root /var/lib/nginx/* /var/cache/nginx /var/run/nginx-cache
 
     mkdir -p /var/www/html
 
+    {
 
-{
-    wget -qO /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/nginx/nginx.conf
-    wget -qO /etc/nginx/sites-available/default https://raw.githubusercontent.com/VirtuBox/ubuntu-nginx-web-server/master/etc/nginx/sites-available/default
-    wget -qO /etc/nginx/conf.d/upstream.conf https://virtubox.github.io/ubuntu-nginx-web-server/files/etc/nginx/conf.d/upstream.conf
-    wget -qO /etc/nginx/common/acl.conf https://raw.githubusercontent.com/VirtuBox/ubuntu-nginx-web-server/master/etc/nginx/common/acl.conf
-    wget -qO /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
-    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+        wget -qO /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
+        ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-    if [ ! -f /etc/systemd/system/multi-user.target.wants/nginx.service ] && [ ! -f /lib/systemd/system/nginx.service ]; then
-    wget -qO /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
-    systemctl enable nginx
-    fi
+        if [ ! -f /etc/systemd/system/multi-user.target.wants/nginx.service ] && [ ! -f /lib/systemd/system/nginx.service ]; then
+            wget -qO /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
+            systemctl enable nginx
+        fi
 
-} >>/tmp/nginx-ee.log 2>&1
+    } >>/tmp/nginx-ee.log 2>&1
 
 fi
 
@@ -284,7 +313,7 @@ fi
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
-rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub
+rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub $DIR_SRC/openssl
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -369,7 +398,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
             git clone https://github.com/arut/nginx-rtmp-module.git;
         fi
     fi
-    if [ ! -d /etc/psa ]; then
+    if [ $NGINX_PLESK = "0" ]; then
         # ipscrub module
         git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
         cp -rf $DIR_SRC/ipscrubtmp/ipscrub $DIR_SRC/ipscrub
@@ -423,9 +452,6 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 cd $DIR_SRC || exit
 {
-    if [ -d $DIR_SRC/openssl ]; then
-        rm -rf $DIR_SRC/openssl
-    fi
     git clone https://github.com/openssl/openssl.git
     if [ -d $DIR_SRC/openssl-patch ]; then
         { git -C $DIR_SRC/openssl-patch pull origin master; }
@@ -569,7 +595,7 @@ if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
     fi
 fi
 
-if [ ! -d /etc/psa ]; then
+if [ $NGINX_PLESK = "0" ]; then
 
     ./configure \
     $ngx_naxsi \
@@ -713,27 +739,52 @@ fi
 # replace old TLS v1.3 ciphers suite
 
 
-if [ ! -d /etc/psa ]; then
-sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
+if [ $NGINX_PLESK = "0" ] && [ $NGINX_FROM_SCRATCH = "0" ]; then
+
     {
+        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
+
         apt-mark hold nginx-ee nginx-common
-        systemctl unmask nginx
-        systemctl enable nginx.service
-        systemctl start nginx.service
-        systemctl restart nginx
-        nginx -t
-        service nginx reload
+
     } >>/tmp/nginx-ee.log 2>&1
-else
-sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/conf.d/ssl.conf
+
+    elif [ $NGINX_PLESK = "1" ]; then
     {
-        systemctl unmask nginx
+        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/conf.d/ssl.conf
+
         apt-mark hold sw-nginx
-        systemctl enable nginx
-        systemctl start nginx
-        systemctl restart nginx
     } >>/tmp/nginx-ee.log 2>&1
 fi
+
+{
+    systemctl unmask nginx
+    systemctl enable nginx
+
+} >>/tmp/nginx-ee.log 2>&1
+
+echo -ne '       Checking nginx configuration           [..]\r'
+
+VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
+if [ -z "$VERIFY_NGINX_CONFIG" ]; then
+    {
+        systemctl start nginx
+        systemctl restart nginx
+    } >>/tmp/nginx-ee.log
+fi
+
+if [ $? -eq 0 ]; then
+    echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
+    echo -ne '\n'
+else
+    echo -e "       Checking nginx configuration           [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
+fi
+
+
+
 # We're done !
 echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"

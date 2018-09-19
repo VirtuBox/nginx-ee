@@ -44,16 +44,16 @@ optional modules :
 
 ## Compatibility
 
-Operating system :
+### Operating System
 
-* Ubuntu 16.04 LTS (Xenial)
 * Ubuntu 18.04 LTS (Bionic)
-* Debian 8 Jessie
+* Ubuntu 16.04 LTS (Xenial)
+* Debian 8 (Jessie)
 
-Plesk :
+### Plesk releases
 
-* 17.5
-* 17.8.11
+* 17.5.x
+* 17.8.x
 * 17.9.x
 
 ---

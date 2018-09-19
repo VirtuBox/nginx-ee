@@ -1,18 +1,17 @@
 # Nginx-EE
 
-Compile and install the latest nginx releases from source with additional modules with EasyEngine and Plesk
+## Compile and install the latest nginx releases from source with additional modules with EasyEngine, Plesk Onyx or from scratch
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
-
-## nginx-ee [Github page](https://virtubox.github.io/nginx-ee/) now available
 
 ---
 
 ## Features
 
 * Compile the latest Nginx Mainline or Stable Release
-* Replace previously installed Nginx package
-* Support Additonal modules
+* Install Nginx or replace Nginx package previously installed
+* Additonal modules
+* Brotli Support
 * TLS v1.3 support
 
 ---
@@ -46,23 +45,17 @@ optional modules :
 
 ## Compatibility
 
-Operating system :
+### Operating System
 
-* Ubuntu 16.04 LTS (Xenial)
 * Ubuntu 18.04 LTS (Bionic)
-* Debian 8 Jessie
+* Ubuntu 16.04 LTS (Xenial)
+* Debian 8 (Jessie)
 
-Plesk :
+### Plesk releases
 
-* 17.5
-* 17.8.11
+* 17.5.x
+* 17.8.x
 * 17.9.x
-
----
-
-## Requirements
-
-* Nginx installed by **EasyEngine** or **Plesk Onyx** or from **Debian/Ubuntu APT Repository**
 
 ---
 
@@ -83,11 +76,13 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 #### Options available
 
 Nginx release (required) :
+
 * `--mainline` : compile nginx mainline release
 * `--stable` : compile nginx stable release
 
 Additional modules (optional)
-* `--pagespeed` : compile nginx with ngx_pagespeed module
+
+* `-pagespeed`: compile nginx with ngx_pagespeed module
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 
@@ -107,16 +102,35 @@ TLS v1.3 do not work or browser show error message `ERR_SSL_VERSION_OR_CIPHER_MI
 
 Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/etc/nginx/conf.d/ssl.conf` for Plesk servers
 
-**TLSv1.2 + TLSv1.3**
+### TLSv1.2 + TLSv1.3
 
 ```nginx
-ssl_ciphers 'TLS13+AESGCM+AES128:EECDH+AES128';
+    ##
+    # SSL Settings
+    ##
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'TLS13+AESGCM+AES128:EECDH+AES128';
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1
 ```
 
-**TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3**
+### TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3
 
 ```nginx
-ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+    ##
+    # SSL Settings
+    ##
+    # intermediate configuration. tweak to your needs.
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
 ```
 
 ---
@@ -132,11 +146,10 @@ ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA2
 * [x] Add choice between stable & mainline release
 * [x] Add Nginx configuration examples
 * [ ] Add Cloudflare HPACK patch
-* [ ] Add support for servers without EasyEngine
+* [x] Add support for servers without EasyEngine
 * [x] Add non-interactive installation
 * [ ] Add automated update detection
 * [x] Add support for Plesk servers
-
 
 ## Credits & Licence
 
