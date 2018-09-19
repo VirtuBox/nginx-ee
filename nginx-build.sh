@@ -163,10 +163,26 @@ fi
 if [ ! -d /etc/nginx ]; then
 
     mkdir -p /etc/nginx/{conf.d,common,sites-available,sites-enabled}
+    mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
+    chown -R www-data:root /var/lib/nginx/*
 
-    wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/nginx/nginx.conf
-    wget -O /etc/nginx/sites-available/default https://raw.githubusercontent.com/VirtuBox/ubuntu-nginx-web-server/master/etc/nginx/sites-available/default
+    mkdir -p /var/www/html
+
+
+{
+    wget -qO /etc/nginx/nginx.conf https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/nginx/nginx.conf
+    wget -qO /etc/nginx/sites-available/default https://raw.githubusercontent.com/VirtuBox/ubuntu-nginx-web-server/master/etc/nginx/sites-available/default
+    wget -qO /etc/nginx/conf.d/upstream.conf https://virtubox.github.io/ubuntu-nginx-web-server/files/etc/nginx/conf.d/upstream.conf
+    wget -qO /etc/nginx/common/acl.conf https://raw.githubusercontent.com/VirtuBox/ubuntu-nginx-web-server/master/etc/nginx/common/acl.conf
+    wget -qO /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
     ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+    if [ ! -f /etc/systemd/system/multi-user.target.wants/nginx.service ] && [ ! -f /lib/systemd/system/nginx.service ]; then
+    wget -qO /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
+    systemctl enable nginx
+    fi
+
+} >>/tmp/nginx-ee.log 2>&1
 
 fi
 
