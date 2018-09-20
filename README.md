@@ -137,6 +137,7 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
 
 ## Nginx configurations
 
+* [Wiki](https://github.com/VirtuBox/nginx-ee/wiki)
 * [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server/tree/master/etc/nginx)
 
 ---
