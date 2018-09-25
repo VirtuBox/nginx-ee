@@ -563,23 +563,27 @@ fi
 # Apply Nginx patches
 ##################################
 
-#echo -ne '       Applying nginx patches                 [..]\r'
+echo -ne '       Applying nginx patches                 [..]\r'
 
-#wget -O nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
-#patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
+if [ $NGINX_RELEASE = "1" ]; then
+wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.3%2B.patch >>/tmp/nginx-ee.log 2>&1
+else
+wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
+fi
+patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
 #wget -O nginx_hpack.patch $HPACK_VERSION >> /tmp/nginx-ee.log 2>&1
 #patch -p1 <  nginx_hpack.patch >> /tmp/nginx-ee.log 2>&1
 
-#if [ $? -eq 0 ]; then
-#    echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
-#    echo -ne '\n'
-#else
-#    echo -e "       Applying nginx patches                 [${CRED}FAIL${CEND}]"
-#    echo ""
-#    echo "Please look at /tmp/nginx-ee.log"
-#    echo ""
-#    exit 1
-#fi
+if [ $? -eq 0 ]; then
+    echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
+    echo -ne '\n'
+else
+    echo -e "       Applying nginx patches                 [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
+fi
 
 ##################################
 # Configure Nginx

@@ -28,6 +28,7 @@ Nginx current stable release : **v1.14.0**
 * ngx_brotli
 * redis2-nginx-module
 * srcache-nginx-module
+* [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
 * ngx_http_substitutions_filter_module
 * Openssl 1.1.1
 * [ipscrub](http://www.ipscrub.org/)
