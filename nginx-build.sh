@@ -35,6 +35,7 @@ NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o '
 if [ ! -x /usr/sbin/nginx ]; then
     NGINX_CURRENT=$(nginx -v 2>&1 | awk -F "/" '{print $2}' | grep 1.15)
 fi
+OPENSSL_VER=OpenSSL_1_1_1
 
 # Colors
 CSI='\033['
@@ -453,6 +454,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 cd $DIR_SRC || exit
 {
     git clone https://github.com/openssl/openssl.git
+    git -C $DIR_SRC/openssl checkout $OPENSSL_VER
     if [ -d $DIR_SRC/openssl-patch ]; then
         { git -C $DIR_SRC/openssl-patch pull origin master; }
     else
