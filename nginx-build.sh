@@ -773,8 +773,9 @@ echo -ne '       Checking nginx configuration           [..]\r'
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
     {
+        systemctl enable nginx
         systemctl start nginx
-        systemctl restart nginx
+        service nginx reload
     } >>/tmp/nginx-ee.log
 fi
 
