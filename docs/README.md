@@ -18,7 +18,7 @@
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.3**
+Nginx current mainline release : **v1.15.4**
 Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
@@ -37,7 +37,7 @@ Nginx current stable release : **v1.14.0**
 
 optional modules :
 
-* ngx_pagespeed
+* ngx_pagespeed (latest-beta or latest-stable)
 * naxsi WAF
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
 
@@ -82,7 +82,8 @@ Nginx release (required) :
 
 Additional modules (optional)
 
-* `-pagespeed`: compile nginx with ngx_pagespeed module
+* `--pagespeed`: compile nginx with ngx_pagespeed latest-stable
+* `--pagespeed-beta`: compile nginx with ngx_pagespeed latest-beta
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 

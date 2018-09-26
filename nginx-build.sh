@@ -3,7 +3,7 @@
 # Nginx-ee Bash script
 # compile the latest nginx release from source with EasyEngine, Plesk or from scratch
 #
-# Version 3.0 - 2019-09-19
+# Version 3.1 - 2018-09-26
 # Published & maintained by VirtuBox - https://virtubox.net
 #
 # Sources :
@@ -54,6 +54,7 @@ echo "" >/tmp/nginx-ee.log
 # detect Plesk
 if [ -d /etc/psa ]; then
     NGINX_PLESK=1
+    echo "Plesk installation detected"
 else
     NGINX_PLESK=0
 fi
@@ -65,6 +66,13 @@ else
     NGINX_FROM_SCRATCH=0
 fi
 
+if [ ! -d /etc/ee ]; then
+    echo "EasyEngine installation detected"
+    NGINX_EASYENGINE=1
+else
+    NGINX_EASYENGINE=0
+fi
+
 ##################################
 # Parse script arguments
 ##################################
@@ -74,6 +82,11 @@ while [[ $# -gt 0 ]]; do
     case $arg in
         --pagespeed)
             PAGESPEED="y"
+            shift
+        ;;
+        --pagespeed-beta)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="1"
             shift
         ;;
         --naxsi)
@@ -118,7 +131,13 @@ if [ -z $NGINX_RELEASE ]; then
     while [[ $PAGESPEED != "y" && $PAGESPEED != "n" ]]; do
         read -p "Select an option [y/n]: " PAGESPEED
     done
-
+    echo ""
+    if [ "$PAGESPEED" = "y" ]; then
+        echo "Do you want to build the latest Pagespeed Beta [1] or Stable [2] Release ?"
+        while [[ $PAGESPEED_RELEASE != "1" && $PAGESPEED_RELEASE != "2" ]]; do
+            read -p "Select an option [1-2]: " PAGESPEED_RELEASE
+        done
+    fi
     echo ""
     echo "Do you want NAXSI WAF (still experimental)? (y/n)"
     while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
@@ -154,7 +173,11 @@ else
 fi
 
 if [ "$PAGESPEED" = "y" ]; then
-    ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
+    if [ "$PAGESPEED_RELEASE" = "1" ]; then
+        ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
+    else
+        ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
+    fi
 else
     ngx_pagespeed=""
 fi
@@ -486,7 +509,7 @@ if [ "$NAXSI" = "y" ]; then
         if [ -d $DIR_SRC/naxsi ]; then
             rm -rf $DIR_SRC/naxsi
         fi
-        wget -O naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz
+        wget -qO naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz
         tar xvzf naxsi.tar.gz
         mv naxsi-$NAXSI_VER naxsi
     } >>/tmp/nginx-ee.log 2>&1
@@ -513,10 +536,14 @@ if [ "$PAGESPEED" = "y" ]; then
     echo -ne '       Downloading pagespeed                  [..]\r'
 
     {
-        rm -rf incubator-pagespeed-ngx-latest-beta build_ngx_pagespeed.sh install
-        wget https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
+        rm -rf incubator-pagespeed-* build_ngx_pagespeed.sh install
+        wget -qO build_ngx_pagespeed.sh https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
         chmod +x build_ngx_pagespeed.sh
-        ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b $DIR_SRC
+        if [ "$PAGESPEED_RELEASE" = "1" ]; then
+            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b $DIR_SRC
+        else
+            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b $DIR_SRC
+        fi
     } >>/tmp/nginx-ee.log 2>&1
 
     if [ $? -eq 0 ]; then
@@ -541,8 +568,8 @@ if [ -d $DIR_SRC/nginx ]; then
     rm -rf $DIR_SRC/nginx
 fi
 {
-    wget http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
-    tar -xzf nginx-${NGINX_VER}.tar.gz
+    wget -qO nginx.tar.gz http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
+    tar -xzf nginx.tar.gz
     mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -566,9 +593,9 @@ fi
 echo -ne '       Applying nginx patches                 [..]\r'
 
 if [ $NGINX_RELEASE = "1" ]; then
-wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.3%2B.patch >>/tmp/nginx-ee.log 2>&1
+    wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.3%2B.patch >>/tmp/nginx-ee.log 2>&1
 else
-wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
+    wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/cujanovic/nginx-dynamic-tls-records-patch/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
 fi
 patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
 #wget -O nginx_hpack.patch $HPACK_VERSION >> /tmp/nginx-ee.log 2>&1
@@ -702,7 +729,7 @@ else
     $ngx_rtmp \
     --with-openssl=/usr/local/src/openssl \
     --with-openssl-opt=enable-tls1_3 \
-    --sbin-path=/usr/sbin/nginx >>nginx-ee.log 2>&1
+    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 fi
 
 if [ $? -eq 0 ]; then
@@ -742,23 +769,20 @@ fi
 # Perform final tasks
 ##################################
 
-# replace old TLS v1.3 ciphers suite
 
 
-if [ $NGINX_PLESK = "0" ] && [ $NGINX_FROM_SCRATCH = "0" ]; then
 
+if [ $NGINX_PLESK = "1" ]; then
+
+    # block sw-nginx package updates from APT repository
+    apt-mark hold sw-nginx >>/tmp/nginx-ee.log 2>&1
+
+    elif [ $NGINX_EASYENGINE = "1" ]; then
     {
-        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
-
+        # replace old TLS v1.3 ciphers suite
+        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/'  /etc/nginx/nginx.conf
         apt-mark hold nginx-ee nginx-common
 
-    } >>/tmp/nginx-ee.log 2>&1
-
-    elif [ $NGINX_PLESK = "1" ]; then
-    {
-        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/conf.d/ssl.conf
-
-        apt-mark hold sw-nginx
     } >>/tmp/nginx-ee.log 2>&1
 fi
 
@@ -770,28 +794,22 @@ fi
 
 echo -ne '       Checking nginx configuration           [..]\r'
 
+# check if nginx -t do not return errors
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
     {
         systemctl enable nginx
         systemctl start nginx
         service nginx reload
-    } >>/tmp/nginx-ee.log
-fi
-
-if [ $? -eq 0 ]; then
+    } >>/tmp/nginx-ee.log 2>&1
     echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
     echo -e "       Checking nginx configuration           [${CRED}FAIL${CEND}]"
     echo ""
-    echo "Please look at /tmp/nginx-ee.log"
+    echo "Please look at /tmp/nginx-ee.log or use the command nginx -t to find the issue"
     echo ""
-    exit 1
 fi
-
-
-
 # We're done !
 echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"
