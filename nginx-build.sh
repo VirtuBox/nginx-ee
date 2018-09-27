@@ -66,7 +66,8 @@ else
     NGINX_FROM_SCRATCH=0
 fi
 
-if [ ! -d /etc/ee ]; then
+# detect easyengine
+if [ -d /etc/ee ]; then
     echo "EasyEngine installation detected"
     NGINX_EASYENGINE=1
 else
@@ -798,9 +799,11 @@ echo -ne '       Checking nginx configuration           [..]\r'
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
     {
+        # make sure nginx.service is enable
         systemctl enable nginx
-        systemctl start nginx
-        service nginx reload
+        # stop nginx to apply new service settings
+        service nginx stop
+        service nginx start
     } >>/tmp/nginx-ee.log 2>&1
     echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
