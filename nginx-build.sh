@@ -79,32 +79,32 @@ fi
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
-        --pagespeed)
-            PAGESPEED="y"
-            shift
+    --pagespeed)
+        PAGESPEED="y"
+        shift
         ;;
-        --pagespeed-beta)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="1"
-            shift
+    --pagespeed-beta)
+        PAGESPEED="y"
+        PAGESPEED_RELEASE="1"
+        shift
         ;;
-        --naxsi)
-            NAXSI="y"
-            shift
+    --naxsi)
+        NAXSI="y"
+        shift
         ;;
-        --rtmp)
-            RTMP="y"
-            shift
+    --rtmp)
+        RTMP="y"
+        shift
         ;;
-        --latest | --mainline)
-            NGINX_RELEASE=1
-            shift
+    --latest | --mainline)
+        NGINX_RELEASE=1
+        shift
         ;;
-        --stable)
-            NGINX_RELEASE=2
-            shift
+    --stable)
+        NGINX_RELEASE=2
+        shift
         ;;
-        *) ;;
+    *) ;;
     esac
     shift
 done
@@ -119,7 +119,7 @@ echo ""
 
 # interactive
 if [ -z $NGINX_RELEASE ]; then
-clear
+    clear
     echo ""
     echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
     while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
@@ -151,8 +151,6 @@ clear
     done
     echo ""
 fi
-
-
 
 ##################################
 # Set nginx release and modules
@@ -198,7 +196,7 @@ echo -ne '       Installing dependencies               [..]\r'
 apt-get update >>/tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip gnupg gnupg2 >>/tmp/nginx-ee.log 2>&1
+libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip gnupg gnupg2 pigz >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -337,89 +335,88 @@ fi
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
-rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub $DIR_SRC/openssl
+rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub $DIR_SRC/openssl $DIR_SRC/ngx_brotli
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
 {
     # cache_purge module
     if [ -d $DIR_SRC/ngx_cache_purge ]; then
-        git -C $DIR_SRC/ngx_cache_purge pull origin master;
+        git -C $DIR_SRC/ngx_cache_purge pull origin master
     else
-        git clone https://github.com/FRiCKLE/ngx_cache_purge.git;
+        git clone https://github.com/FRiCKLE/ngx_cache_purge.git
     fi
     # memcached module
     if [ -d $DIR_SRC/memc-nginx-module ]; then
-        git -C $DIR_SRC/memc-nginx-module pull origin master;
+        git -C $DIR_SRC/memc-nginx-module pull origin master
     else
-        git clone https://github.com/openresty/memc-nginx-module.git;
+        git clone https://github.com/openresty/memc-nginx-module.git
     fi
     # devel kit
     if [ -d $DIR_SRC/ngx_devel_kit ]; then
-        git -C $DIR_SRC/ngx_devel_kit pull origin master;
+        git -C $DIR_SRC/ngx_devel_kit pull origin master
     else
-        git clone https://github.com/simpl/ngx_devel_kit.git;
+        git clone https://github.com/simpl/ngx_devel_kit.git
     fi
     # headers-more module
     if [ -d $DIR_SRC/headers-more-nginx-module ]; then
-        git -C $DIR_SRC/headers-more-nginx-module pull origin master;
+        git -C $DIR_SRC/headers-more-nginx-module pull origin master
     else
-        git clone https://github.com/openresty/headers-more-nginx-module.git;
+        git clone https://github.com/openresty/headers-more-nginx-module.git
     fi
     # echo module
     if [ -d $DIR_SRC/echo-nginx-module ]; then
-        git -C $DIR_SRC/echo-nginx-module pull origin master;
+        git -C $DIR_SRC/echo-nginx-module pull origin master
     else
-        git clone https://github.com/openresty/echo-nginx-module.git;
+        git clone https://github.com/openresty/echo-nginx-module.git
     fi
     # http_substitutions_filter module
     if [ -d $DIR_SRC/ngx_http_substitutions_filter_module ]; then
-        git -C $DIR_SRC/ngx_http_substitutions_filter_module pull origin master;
+        git -C $DIR_SRC/ngx_http_substitutions_filter_module pull origin master
     else
-        git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git;
+        git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
     fi
     # redis2 module
     if [ -d $DIR_SRC/redis2-nginx-module ]; then
-        git -C $DIR_SRC/redis2-nginx-module pull origin master;
+        git -C $DIR_SRC/redis2-nginx-module pull origin master
     else
-        git clone https://github.com/openresty/redis2-nginx-module.git;
+        git clone https://github.com/openresty/redis2-nginx-module.git
     fi
     # srcache module
     if [ -d $DIR_SRC/srcache-nginx-module ]; then
-        git -C $DIR_SRC/srcache-nginx-module pull origin master;
+        git -C $DIR_SRC/srcache-nginx-module pull origin master
     else
-        git clone https://github.com/openresty/srcache-nginx-module.git;
+        git clone https://github.com/openresty/srcache-nginx-module.git
     fi
     # set-misc module
     if [ -d $DIR_SRC/set-misc-nginx-module ]; then
-        git -C $DIR_SRC/set-misc-nginx-module pull origin master;
+        git -C $DIR_SRC/set-misc-nginx-module pull origin master
     else
-        git clone https://github.com/openresty/set-misc-nginx-module.git;
+        git clone https://github.com/openresty/set-misc-nginx-module.git
     fi
     # auth_pam module
     if [ -d $DIR_SRC/ngx_http_auth_pam_module ]; then
-        git -C $DIR_SRC/ngx_http_auth_pam_module pull origin master;
+        git -C $DIR_SRC/ngx_http_auth_pam_module pull origin master
     else
-        git clone https://github.com/sto/ngx_http_auth_pam_module.git;
+        git clone https://github.com/sto/ngx_http_auth_pam_module.git
     fi
     # nginx-vts module
     if [ -d $DIR_SRC/nginx-module-vts ]; then
-        git -C $DIR_SRC/nginx-module-vts pull origin master;
+        git -C $DIR_SRC/nginx-module-vts pull origin master
     else
-        git clone https://github.com/vozlt/nginx-module-vts.git;
+        git clone https://github.com/vozlt/nginx-module-vts.git
     fi
     # http redis module
     if [ ! -d $DIR_SRC/ngx_http_redis ]; then
-
-        wget https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz
-        tar -xzf ngx_http_redis-0.3.8.tar.gz
+        wget -qO ngx_http_redis.tar.gz https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz
+        tar -I pigz -xf ngx_http_redis.tar.gz
         mv ngx_http_redis-0.3.8 ngx_http_redis
     fi
     if [ "$RTMP" = "y" ]; then
         if [ -d $DIR_SRC/nginx-rtmp-module ]; then
-            git -C $DIR_SRC/nginx-rtmp-module pull origin master;
+            git -C $DIR_SRC/nginx-rtmp-module pull origin master
         else
-            git clone https://github.com/arut/nginx-rtmp-module.git;
+            git clone https://github.com/arut/nginx-rtmp-module.git
         fi
     fi
     if [ $NGINX_PLESK = "0" ]; then
@@ -448,11 +445,7 @@ cd $DIR_SRC || exit
 
 echo -ne '       Downloading brotli                     [..]\r'
 {
-    if [ -d $DIR_SRC/ngx_brotli ]; then
-        { git -C $DIR_SRC/ngx_brotli pull origin master; }
-    else
-        { git clone https://github.com/google/ngx_brotli.git; }
-    fi
+    git clone https://github.com/eustas/ngx_brotli
     cd ngx_brotli || exit
     git submodule update --init --recursive
 } >>/tmp/nginx-ee.log 2>&1
@@ -510,7 +503,7 @@ if [ "$NAXSI" = "y" ]; then
             rm -rf $DIR_SRC/naxsi
         fi
         wget -qO naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz
-        tar xvzf naxsi.tar.gz
+        tar -I pigz -xf naxsi.tar.gz
         mv naxsi-$NAXSI_VER naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -569,7 +562,7 @@ if [ -d $DIR_SRC/nginx ]; then
 fi
 {
     wget -qO nginx.tar.gz http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
-    tar -xzf nginx.tar.gz
+    tar -I pigz -xf nginx.tar.gz
     mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -598,8 +591,6 @@ else
     wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
 fi
 patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
-#wget -O nginx_hpack.patch $HPACK_VERSION >> /tmp/nginx-ee.log 2>&1
-#patch -p1 <  nginx_hpack.patch >> /tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
@@ -631,105 +622,105 @@ fi
 if [ $NGINX_PLESK = "0" ]; then
 
     ./configure \
-    $ngx_naxsi \
-    "${nginx_cc_opt[@]}" \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
-    --prefix=/usr/share/nginx \
-    --conf-path=/etc/nginx/nginx.conf \
-    --http-log-path=/var/log/nginx/access.log \
-    --error-log-path=/var/log/nginx/error.log \
-    --lock-path=/var/lock/nginx.lock \
-    --pid-path=/var/run/nginx.pid \
-    --http-client-body-temp-path=/var/lib/nginx/body \
-    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
-    --http-proxy-temp-path=/var/lib/nginx/proxy \
-    --http-scgi-temp-path=/var/lib/nginx/scgi \
-    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
-    --with-pcre-jit \
-    --with-http_ssl_module \
-    --with-http_stub_status_module \
-    --with-http_realip_module \
-    --with-http_auth_request_module \
-    --with-http_addition_module \
-    --with-http_geoip_module \
-    --with-http_gzip_static_module \
-    --with-http_image_filter_module \
-    --with-http_v2_module \
-    --with-http_sub_module \
-    --with-http_xslt_module \
-    --with-file-aio \
-    --with-threads \
-    --add-module=/usr/local/src/ngx_cache_purge \
-    --add-module=/usr/local/src/memc-nginx-module \
-    --add-module=/usr/local/src/ngx_devel_kit \
-    --add-module=/usr/local/src/headers-more-nginx-module \
-    --add-module=/usr/local/src/echo-nginx-module \
-    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-    --add-module=/usr/local/src/redis2-nginx-module \
-    --add-module=/usr/local/src/srcache-nginx-module \
-    --add-module=/usr/local/src/set-misc-nginx-module \
-    --add-module=/usr/local/src/ngx_http_redis \
-    --add-module=/usr/local/src/ngx_brotli \
-    --add-module=/usr/local/src/ipscrub \
-    --add-module=/usr/local/src/ngx_http_auth_pam_module \
-    --add-module=/usr/local/src/nginx-module-vts \
-    $ngx_pagespeed \
-    $ngx_rtmp \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt=enable-tls1_3 \
-    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+        $ngx_naxsi \
+        "${nginx_cc_opt[@]}" \
+        --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+        --prefix=/usr/share/nginx \
+        --conf-path=/etc/nginx/nginx.conf \
+        --http-log-path=/var/log/nginx/access.log \
+        --error-log-path=/var/log/nginx/error.log \
+        --lock-path=/var/lock/nginx.lock \
+        --pid-path=/var/run/nginx.pid \
+        --http-client-body-temp-path=/var/lib/nginx/body \
+        --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+        --http-proxy-temp-path=/var/lib/nginx/proxy \
+        --http-scgi-temp-path=/var/lib/nginx/scgi \
+        --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+        --with-pcre-jit \
+        --with-http_ssl_module \
+        --with-http_stub_status_module \
+        --with-http_realip_module \
+        --with-http_auth_request_module \
+        --with-http_addition_module \
+        --with-http_geoip_module \
+        --with-http_gzip_static_module \
+        --with-http_image_filter_module \
+        --with-http_v2_module \
+        --with-http_sub_module \
+        --with-http_xslt_module \
+        --with-file-aio \
+        --with-threads \
+        --add-module=/usr/local/src/ngx_cache_purge \
+        --add-module=/usr/local/src/memc-nginx-module \
+        --add-module=/usr/local/src/ngx_devel_kit \
+        --add-module=/usr/local/src/headers-more-nginx-module \
+        --add-module=/usr/local/src/echo-nginx-module \
+        --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+        --add-module=/usr/local/src/redis2-nginx-module \
+        --add-module=/usr/local/src/srcache-nginx-module \
+        --add-module=/usr/local/src/set-misc-nginx-module \
+        --add-module=/usr/local/src/ngx_http_redis \
+        --add-module=/usr/local/src/ngx_brotli \
+        --add-module=/usr/local/src/ipscrub \
+        --add-module=/usr/local/src/ngx_http_auth_pam_module \
+        --add-module=/usr/local/src/nginx-module-vts \
+        $ngx_pagespeed \
+        $ngx_rtmp \
+        --with-openssl=/usr/local/src/openssl \
+        --with-openssl-opt=enable-tls1_3 \
+        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 else
 
     ./configure \
-    $ngx_naxsi \
-    "${nginx_cc_opt[@]}" \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
-    --prefix=/etc/nginx \
-    --conf-path=/etc/nginx/nginx.conf \
-    --http-log-path=/var/log/nginx/access.log \
-    --error-log-path=/var/log/nginx/error.log \
-    --lock-path=/var/lock/nginx.lock \
-    --pid-path=/var/run/nginx.pid \
-    --http-client-body-temp-path=/var/lib/nginx/body \
-    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
-    --http-proxy-temp-path=/var/lib/nginx/proxy \
-    --http-scgi-temp-path=/var/lib/nginx/scgi \
-    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
-    --user=nginx \
-    --group=nginx \
-    --with-pcre-jit \
-    --with-http_ssl_module \
-    --with-http_stub_status_module \
-    --with-http_realip_module \
-    --with-http_auth_request_module \
-    --with-http_addition_module \
-    --with-http_geoip_module \
-    --with-http_gzip_static_module \
-    --with-http_image_filter_module \
-    --with-http_v2_module \
-    --with-http_sub_module \
-    --with-http_xslt_module \
-    --with-file-aio \
-    --with-threads \
-    --add-module=/usr/local/src/ngx_cache_purge \
-    --add-module=/usr/local/src/memc-nginx-module \
-    --add-module=/usr/local/src/ngx_devel_kit \
-    --add-module=/usr/local/src/headers-more-nginx-module \
-    --add-module=/usr/local/src/echo-nginx-module \
-    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-    --add-module=/usr/local/src/redis2-nginx-module \
-    --add-module=/usr/local/src/srcache-nginx-module \
-    --add-module=/usr/local/src/set-misc-nginx-module \
-    --add-module=/usr/local/src/ngx_http_redis \
-    --add-module=/usr/local/src/ngx_brotli \
-    --add-module=/usr/local/src/ngx_http_auth_pam_module \
-    --add-module=/usr/local/src/nginx-module-vts \
-    $ngx_pagespeed \
-    $ngx_rtmp \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt=enable-tls1_3 \
-    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+        $ngx_naxsi \
+        "${nginx_cc_opt[@]}" \
+        --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+        --prefix=/etc/nginx \
+        --conf-path=/etc/nginx/nginx.conf \
+        --http-log-path=/var/log/nginx/access.log \
+        --error-log-path=/var/log/nginx/error.log \
+        --lock-path=/var/lock/nginx.lock \
+        --pid-path=/var/run/nginx.pid \
+        --http-client-body-temp-path=/var/lib/nginx/body \
+        --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+        --http-proxy-temp-path=/var/lib/nginx/proxy \
+        --http-scgi-temp-path=/var/lib/nginx/scgi \
+        --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+        --user=nginx \
+        --group=nginx \
+        --with-pcre-jit \
+        --with-http_ssl_module \
+        --with-http_stub_status_module \
+        --with-http_realip_module \
+        --with-http_auth_request_module \
+        --with-http_addition_module \
+        --with-http_geoip_module \
+        --with-http_gzip_static_module \
+        --with-http_image_filter_module \
+        --with-http_v2_module \
+        --with-http_sub_module \
+        --with-http_xslt_module \
+        --with-file-aio \
+        --with-threads \
+        --add-module=/usr/local/src/ngx_cache_purge \
+        --add-module=/usr/local/src/memc-nginx-module \
+        --add-module=/usr/local/src/ngx_devel_kit \
+        --add-module=/usr/local/src/headers-more-nginx-module \
+        --add-module=/usr/local/src/echo-nginx-module \
+        --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+        --add-module=/usr/local/src/redis2-nginx-module \
+        --add-module=/usr/local/src/srcache-nginx-module \
+        --add-module=/usr/local/src/set-misc-nginx-module \
+        --add-module=/usr/local/src/ngx_http_redis \
+        --add-module=/usr/local/src/ngx_brotli \
+        --add-module=/usr/local/src/ngx_http_auth_pam_module \
+        --add-module=/usr/local/src/nginx-module-vts \
+        $ngx_pagespeed \
+        $ngx_rtmp \
+        --with-openssl=/usr/local/src/openssl \
+        --with-openssl-opt=enable-tls1_3 \
+        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 fi
 
 if [ $? -eq 0 ]; then
@@ -769,18 +760,15 @@ fi
 # Perform final tasks
 ##################################
 
-
-
-
 if [ $NGINX_PLESK = "1" ]; then
 
     # block sw-nginx package updates from APT repository
     apt-mark hold sw-nginx >>/tmp/nginx-ee.log 2>&1
 
-    elif [ $NGINX_EASYENGINE = "1" ]; then
+elif [ $NGINX_EASYENGINE = "1" ]; then
     {
         # replace old TLS v1.3 ciphers suite
-        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/'  /etc/nginx/nginx.conf
+        sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
         apt-mark hold nginx-ee nginx-common
 
     } >>/tmp/nginx-ee.log 2>&1

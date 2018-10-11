@@ -18,14 +18,14 @@
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.4**
+Nginx current mainline release : **v1.15.5**
 Nginx current stable release : **v1.14.0**
 
 * ngx_cache_purge
 * memcached_nginx_module
 * headers-more-nginx-module
 * ngx_coolkit
-* ngx_brotli
+* [ngx_brotli](https://github.com/eustas/ngx_brotli)
 * redis2-nginx-module
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
