@@ -16,8 +16,6 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-clear
-
 # check if curl is installed
 
 if [ ! -x /usr/bin/curl ]; then
@@ -121,6 +119,7 @@ echo ""
 
 # interactive
 if [ -z $NGINX_RELEASE ]; then
+clear
     echo ""
     echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
     while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
