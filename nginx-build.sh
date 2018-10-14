@@ -79,32 +79,32 @@ fi
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
-    --pagespeed)
-        PAGESPEED="y"
-        shift
+        --pagespeed)
+            PAGESPEED="y"
+            shift
         ;;
-    --pagespeed-beta)
-        PAGESPEED="y"
-        PAGESPEED_RELEASE="1"
-        shift
+        --pagespeed-beta)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="1"
+            shift
         ;;
-    --naxsi)
-        NAXSI="y"
-        shift
+        --naxsi)
+            NAXSI="y"
+            shift
         ;;
-    --rtmp)
-        RTMP="y"
-        shift
+        --rtmp)
+            RTMP="y"
+            shift
         ;;
-    --latest | --mainline)
-        NGINX_RELEASE=1
-        shift
+        --latest | --mainline)
+            NGINX_RELEASE=1
+            shift
         ;;
-    --stable)
-        NGINX_RELEASE=2
-        shift
+        --stable)
+            NGINX_RELEASE=2
+            shift
         ;;
-    *) ;;
+        *) ;;
     esac
     shift
 done
@@ -158,34 +158,32 @@ fi
 
 if [ "$NGINX_RELEASE" = "1" ]; then
     NGINX_VER=$NGINX_MAINLINE
-    #HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.0_http2-hpack.patch"
 else
     NGINX_VER=$NGINX_STABLE
-    #HPACK_VERSION="https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.14.0_http2-hpack.patch"
 fi
 
 if [ "$NAXSI" = "y" ]; then
-    ngx_naxsi="--add-module=/usr/local/src/naxsi/naxsi_src "
+    NGX_NAXSI="--add-module=/usr/local/src/naxsi/naxsi_src "
 else
-    ngx_naxsi=""
+    NGX_NAXSI=""
 fi
 
 if [ "$PAGESPEED" = "y" ]; then
     if [ "$PAGESPEED_RELEASE" = "1" ]; then
-        ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
+        NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
     else
-        ngx_pagespeed="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
+        NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
     fi
 else
-    ngx_pagespeed=""
+    NGX_PAGESPEED=""
 fi
 
 if [ "$RTMP" = "y" ]; then
-    nginx_cc_opt=([index]=--with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2')
-    ngx_rtmp="--add-module=/usr/local/src/nginx-rtmp-module "
+    NGINX_CC_OPT="--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2'"
+    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
 else
-    ngx_rtmp=""
-    nginx_cc_opt=([index]=--with-cc-opt='-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2')
+    NGX_RTMP=""
+    NGINX_CC_OPT=([index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2')
 fi
 
 ##################################
@@ -193,10 +191,12 @@ fi
 ##################################
 
 echo -ne '       Installing dependencies               [..]\r'
-apt-get update >>/tmp/nginx-ee.log 2>&1
-apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
-libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev \
-libgoogle-perftools-dev libperl-dev libpam0g-dev libxslt1-dev libbsd-dev zip unzip gnupg gnupg2 pigz >>/tmp/nginx-ee.log 2>&1
+sudo apt-get update >>/tmp/nginx-ee.log 2>&1
+sudo apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
+libpcre3 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
+libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev  software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
+libcurl4-openssl-dev libgoogle-perftools-dev libperl-dev libpam0g-dev libbsd-dev zip unzip gnupg gnupg2 pigz libluajit-5.1-common \
+libluajit-5.1-dev libmhash-dev libatomic-ops-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache curl debhelper dh-systemd libxml2  >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -245,43 +245,57 @@ fi
 
 # Checking lsb_release package
 if [ ! -x /usr/bin/lsb_release ]; then
-    apt-get -y install lsb-release >>/tmp/nginx-ee.log 2>&1
+    sudo apt-get -y install lsb-release >>/tmp/nginx-ee.log 2>&1
 fi
 
 # install gcc-7
 distro_version=$(lsb_release -sc)
 
-if [[ "$NGINX_RELEASE" == "1" && "$RTMP" != "y" ]]; then
-    if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
-        if [[ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list && ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ]]; then
+if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
+    if [  "$distro_version" == "bionic" ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-bionic.list ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-bionic.list ]; then
             echo -ne '       Installing gcc-8                       [..]\r'
             {
-                apt-get install software-properties-common -y
-                add-apt-repository ppa:jonathonf/gcc-8.1 -y
-                apt-get update
-                apt-get install gcc-8 g++-8 -y
+                sudo add-apt-repository -y ppa:jonathonf/gcc-8.1
+                sudo add-apt-repository -y ppa:jonathonf/gcc
+                sudo apt-get update
+                sudo apt-get install gcc-8 g++-8 -y
+                sudo update-alternatives --remove-all gcc
+                sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
             } >>/tmp/nginx-ee.log 2>&1
-            if [ $? -eq 0 ]; then
-                echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
-                echo -ne '\n'
-            else
-                echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-                echo ""
-                echo "Please look at /tmp/nginx-ee.log"
-                echo ""
-                exit 1
-            fi
         fi
+        elif [ "$distro_version" == "xenial" ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
+            echo -ne '       Installing gcc-8                       [..]\r'
+            sudo add-apt-repository -y ppa:jonathonf/gcc-8.1
+            sudo add-apt-repository -y ppa:jonathonf/gcc
+            sudo apt-get update
+            sudo apt-get install gcc-8 g++-8 -y
+            sudo update-alternatives --remove-all gcc
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+        fi
+    fi
+    if [ $? -eq 0 ]; then
+        echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
+        echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+        echo ""
+        echo "Please look at /tmp/nginx-ee.log"
+        echo ""
+        exit 1
     fi
 else
     if [ "$distro_version" == "xenial" ]; then
-        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-7_1-xenial.list ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-7_1-xenial.list ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
             echo -ne '       Installing gcc-7                       [..]\r'
             {
-                apt-get install software-properties-common -y
-                add-apt-repository ppa:jonathonf/gcc-7.1 -y
-                apt-get update
-                apt-get install gcc-7 g++-7 -y
+                sudo add-apt-repository -y ppa:jonathonf/gcc-7.1
+                sudo add-apt-repository -y ppa:jonathonf/gcc
+                sduo apt-get update -y
+                sudo apt-get install gcc-7 g++-7 -y
+                sudo update-alternatives --remove-all gcc
+                sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
             } >>/tmp/nginx-ee.log 2>&1
             if [ $? -eq 0 ]; then
                 echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
@@ -307,13 +321,12 @@ if [ "$RTMP" = "y" ]; then
     {
         if [ "$distro_version" == "xenial" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
-                apt-get install software-properties-common -y
-                add-apt-repository ppa:jonathonf/ffmpeg-4 -y
-                apt-get update
-                apt-get install ffmpeg -y
+                sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
+                sudo apt-get update
+                sudo apt-get install ffmpeg -y
             fi
         else
-            apt-get install ffmpeg -y
+            sudo apt-get install ffmpeg -y
         fi
     } >>/tmp/nginx-ee.log 2>&1
     if [ $? -eq 0 ]; then
@@ -335,7 +348,7 @@ fi
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
-rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub $DIR_SRC/openssl $DIR_SRC/ngx_brotli
+rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub $DIR_SRC/openssl $DIR_SRC/ngx_brotli $DIR_SRC/pcre $DIR_SRC/zlib
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -438,6 +451,85 @@ else
 fi
 
 ##################################
+# Download zlib
+##################################
+
+cd $DIR_SRC || exit
+
+echo -ne '       Downloading zlib                       [..]\r'
+
+{
+cd /usr/local/src || exit 1
+wget -qO zlib.tar.gz http://zlib.net/zlib-1.2.11.tar.gz
+tar -zxf zlib.tar.gz
+mv zlib-1.2.11 zlib
+}
+
+if [ $? -eq 0 ]; then
+    echo -ne "       Downloading zlib                       [${CGREEN}OK${CEND}]\\r"
+    echo -ne '\n'
+else
+    echo -e "       Downloading zlib                       [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
+fi
+
+##################################
+# Download zlib
+##################################
+
+cd $DIR_SRC || exit
+
+echo -ne '       Downloading pcre                       [..]\r'
+
+{
+
+sudo wget -qO pcre.tar.gz https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz
+sudo tar -xvzf pcre.tar.gz
+mv pcre-8.42 pcre
+
+cd $DIR_SRC/pcre || exit 1
+./configure --prefix=/usr \
+--enable-utf8 \
+--enable-unicode-properties \
+--enable-pcre16 \
+--enable-pcre32 \
+--enable-pcregrep-libz \
+--enable-pcregrep-libbz2 \
+--enable-pcretest-libreadline \
+--enable-jit
+
+sudo make -j "$(nproc)"
+sudo make install
+mv -v /usr/lib/libpcre.so.* /lib
+ln -sfv ../../lib/$(readlink /usr/lib/libpcre.so) /usr/lib/libpcre.so
+
+} >>/tmp/nginx-ee.log 2>&1
+
+if [ $? -eq 0 ]; then
+    echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
+    echo -ne '\n'
+else
+    echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
+    echo ""
+    echo "Please look at /tmp/nginx-ee.log"
+    echo ""
+    exit 1
+fi
+
+##################################
+# Install Jemalloc
+##################################
+
+{
+touch /etc/ld.so.preload
+echo "/usr/lib/x86_64-linux-gnu/libjemalloc.so" | sudo tee --append /etc/ld.so.preload
+} >>/tmp/nginx-ee.log 2>&1
+
+
+##################################
 # Download ngx_broti
 ##################################
 
@@ -446,7 +538,7 @@ cd $DIR_SRC || exit
 echo -ne '       Downloading brotli                     [..]\r'
 {
     git clone https://github.com/eustas/ngx_brotli
-    cd ngx_brotli || exit
+    cd ngx_brotli || exit 1
     git submodule update --init --recursive
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -469,15 +561,14 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 cd $DIR_SRC || exit
 {
-    git clone https://github.com/openssl/openssl.git
-    git -C $DIR_SRC/openssl checkout $OPENSSL_VER
-    if [ -d $DIR_SRC/openssl-patch ]; then
-        { git -C $DIR_SRC/openssl-patch pull origin master; }
-    else
-        { git clone https://github.com/hakasenyang/openssl-patch.git; }
-    fi
-    cd $DIR_SRC/openssl || exit
-    patch -p1 <../openssl-patch/openssl-equal-1.1.1_ciphers.patch
+    sudo wget -qO openssl.tar.gz https://www.openssl.org/source/openssl-1.1.1.tar.gz
+    sudo tar -xzf openssl.tar.gz
+    mv openssl-1.1.1 openssl
+    cd $DIR_SRC/openssl || exit 1
+    curl -s https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.1.patch | patch -p1
+    curl -s https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-reset-tls1.3-ciphers-SSL_CTX_set_ssl_version.patch | patch -p1
+    curl -s https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-sni-fix-delay-sig-algs.patch | patch -p1
+
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
@@ -566,7 +657,7 @@ fi
     mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
-cd $DIR_SRC/nginx/ || exit
+cd $DIR_SRC/nginx || exit
 
 if [ $? -eq 0 ]; then
     echo -ne "       Downloading nginx                      [${CGREEN}OK${CEND}]\\r"
@@ -586,11 +677,16 @@ fi
 echo -ne '       Applying nginx patches                 [..]\r'
 
 if [ $NGINX_RELEASE = "1" ]; then
-    wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch >>/tmp/nginx-ee.log 2>&1
+    {
+        curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
+        curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
+        curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+    }>>/tmp/nginx-ee.log 2>&1
+    #wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch >>/tmp/nginx-ee.log 2>&1
 else
     wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
 fi
-patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
+#patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
@@ -622,105 +718,116 @@ fi
 if [ $NGINX_PLESK = "0" ]; then
 
     ./configure \
-        $ngx_naxsi \
-        "${nginx_cc_opt[@]}" \
-        --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
-        --prefix=/usr/share/nginx \
-        --conf-path=/etc/nginx/nginx.conf \
-        --http-log-path=/var/log/nginx/access.log \
-        --error-log-path=/var/log/nginx/error.log \
-        --lock-path=/var/lock/nginx.lock \
-        --pid-path=/var/run/nginx.pid \
-        --http-client-body-temp-path=/var/lib/nginx/body \
-        --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
-        --http-proxy-temp-path=/var/lib/nginx/proxy \
-        --http-scgi-temp-path=/var/lib/nginx/scgi \
-        --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
-        --with-pcre-jit \
-        --with-http_ssl_module \
-        --with-http_stub_status_module \
-        --with-http_realip_module \
-        --with-http_auth_request_module \
-        --with-http_addition_module \
-        --with-http_geoip_module \
-        --with-http_gzip_static_module \
-        --with-http_image_filter_module \
-        --with-http_v2_module \
-        --with-http_sub_module \
-        --with-http_xslt_module \
-        --with-file-aio \
-        --with-threads \
-        --add-module=/usr/local/src/ngx_cache_purge \
-        --add-module=/usr/local/src/memc-nginx-module \
-        --add-module=/usr/local/src/ngx_devel_kit \
-        --add-module=/usr/local/src/headers-more-nginx-module \
-        --add-module=/usr/local/src/echo-nginx-module \
-        --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-        --add-module=/usr/local/src/redis2-nginx-module \
-        --add-module=/usr/local/src/srcache-nginx-module \
-        --add-module=/usr/local/src/set-misc-nginx-module \
-        --add-module=/usr/local/src/ngx_http_redis \
-        --add-module=/usr/local/src/ngx_brotli \
-        --add-module=/usr/local/src/ipscrub \
-        --add-module=/usr/local/src/ngx_http_auth_pam_module \
-        --add-module=/usr/local/src/nginx-module-vts \
-        $ngx_pagespeed \
-        $ngx_rtmp \
-        --with-openssl=/usr/local/src/openssl \
-        --with-openssl-opt=enable-tls1_3 \
-        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+    $NGX_NAXSI \
+    "${NGINX_CC_OPT[@]}" \
+    --with-ld-opt='-ljemalloc -Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    --prefix=/usr/share/nginx \
+    --conf-path=/etc/nginx/nginx.conf \
+    --http-log-path=/var/log/nginx/access.log \
+    --error-log-path=/var/log/nginx/error.log \
+    --lock-path=/var/lock/nginx.lock \
+    --pid-path=/var/run/nginx.pid \
+    --http-client-body-temp-path=/var/lib/nginx/body \
+    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+    --http-proxy-temp-path=/var/lib/nginx/proxy \
+    --without-http_uwsgi_module \
+    --without-mail_imap_module \
+    --without-http_browser_module \
+    --without-http_scgi_module \
+    --without-http_split_clients_module \
+    --without-http_ssi_module \
+    --without-http_userid_module \
+    --without-mail_pop3_module \
+    --without-mail_smtp_module \
+    --with-pcre=/usr/local/src/pcre \
+    --with-pcre-jit \
+    --with-http_ssl_module \
+    --with-http_stub_status_module \
+    --with-http_realip_module \
+    --with-http_auth_request_module \
+    --with-http_addition_module \
+    --with-http_v2_hpack_enc \
+    --with-http_geoip_module \
+    --with-http_gunzip_module \
+    --with-http_gzip_static_module \
+    --with-http_image_filter_module \
+    --with-http_v2_module \
+    --with-http_sub_module \
+    --with-http_xslt_module \
+    --with-file-aio \
+    --with-threads \
+    --with-zlib=/usr/local/src/zlib \
+    --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/memc-nginx-module \
+    --add-module=/usr/local/src/ngx_devel_kit \
+    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/echo-nginx-module \
+    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+    --add-module=/usr/local/src/redis2-nginx-module \
+    --add-module=/usr/local/src/srcache-nginx-module \
+    --add-module=/usr/local/src/set-misc-nginx-module \
+    --add-module=/usr/local/src/ngx_http_redis \
+    --add-module=/usr/local/src/ngx_brotli \
+    --add-module=/usr/local/src/ipscrub \
+    --add-module=/usr/local/src/ngx_http_auth_pam_module \
+    --add-module=/usr/local/src/nginx-module-vts \
+    $NGX_PAGESPEED \
+    $NGX_RTMP \
+    --with-openssl=/usr/local/src/openssl \
+    --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3 no-nextprotoneg no-psk no-srp no-ssl2 no-ssl3 no-weak-ssl-ciphers zlib -ljemalloc -march=native -Wl,-flto' \
+    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 else
 
     ./configure \
-        $ngx_naxsi \
-        "${nginx_cc_opt[@]}" \
-        --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
-        --prefix=/etc/nginx \
-        --conf-path=/etc/nginx/nginx.conf \
-        --http-log-path=/var/log/nginx/access.log \
-        --error-log-path=/var/log/nginx/error.log \
-        --lock-path=/var/lock/nginx.lock \
-        --pid-path=/var/run/nginx.pid \
-        --http-client-body-temp-path=/var/lib/nginx/body \
-        --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
-        --http-proxy-temp-path=/var/lib/nginx/proxy \
-        --http-scgi-temp-path=/var/lib/nginx/scgi \
-        --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
-        --user=nginx \
-        --group=nginx \
-        --with-pcre-jit \
-        --with-http_ssl_module \
-        --with-http_stub_status_module \
-        --with-http_realip_module \
-        --with-http_auth_request_module \
-        --with-http_addition_module \
-        --with-http_geoip_module \
-        --with-http_gzip_static_module \
-        --with-http_image_filter_module \
-        --with-http_v2_module \
-        --with-http_sub_module \
-        --with-http_xslt_module \
-        --with-file-aio \
-        --with-threads \
-        --add-module=/usr/local/src/ngx_cache_purge \
-        --add-module=/usr/local/src/memc-nginx-module \
-        --add-module=/usr/local/src/ngx_devel_kit \
-        --add-module=/usr/local/src/headers-more-nginx-module \
-        --add-module=/usr/local/src/echo-nginx-module \
-        --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-        --add-module=/usr/local/src/redis2-nginx-module \
-        --add-module=/usr/local/src/srcache-nginx-module \
-        --add-module=/usr/local/src/set-misc-nginx-module \
-        --add-module=/usr/local/src/ngx_http_redis \
-        --add-module=/usr/local/src/ngx_brotli \
-        --add-module=/usr/local/src/ngx_http_auth_pam_module \
-        --add-module=/usr/local/src/nginx-module-vts \
-        $ngx_pagespeed \
-        $ngx_rtmp \
-        --with-openssl=/usr/local/src/openssl \
-        --with-openssl-opt=enable-tls1_3 \
-        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+    $ngx_naxsi \
+    "${nginx_cc_opt[@]}" \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    --prefix=/etc/nginx \
+    --conf-path=/etc/nginx/nginx.conf \
+    --http-log-path=/var/log/nginx/access.log \
+    --error-log-path=/var/log/nginx/error.log \
+    --lock-path=/var/lock/nginx.lock \
+    --pid-path=/var/run/nginx.pid \
+    --http-client-body-temp-path=/var/lib/nginx/body \
+    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+    --http-proxy-temp-path=/var/lib/nginx/proxy \
+    --http-scgi-temp-path=/var/lib/nginx/scgi \
+    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+    --user=nginx \
+    --group=nginx \
+    --with-pcre-jit \
+    --with-http_ssl_module \
+    --with-http_stub_status_module \
+    --with-http_realip_module \
+    --with-http_auth_request_module \
+    --with-http_addition_module \
+    --with-http_geoip_module \
+    --with-http_gzip_static_module \
+    --with-http_image_filter_module \
+    --with-http_v2_module \
+    --with-http_sub_module \
+    --with-http_xslt_module \
+    --with-file-aio \
+    --with-threads \
+    --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/memc-nginx-module \
+    --add-module=/usr/local/src/ngx_devel_kit \
+    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/echo-nginx-module \
+    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+    --add-module=/usr/local/src/redis2-nginx-module \
+    --add-module=/usr/local/src/srcache-nginx-module \
+    --add-module=/usr/local/src/set-misc-nginx-module \
+    --add-module=/usr/local/src/ngx_http_redis \
+    --add-module=/usr/local/src/ngx_brotli \
+    --add-module=/usr/local/src/ngx_http_auth_pam_module \
+    --add-module=/usr/local/src/nginx-module-vts \
+    $ngx_pagespeed \
+    $ngx_rtmp \
+    --with-openssl=/usr/local/src/openssl \
+    --with-openssl-opt=enable-tls1_3 \
+    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 fi
 
 if [ $? -eq 0 ]; then
@@ -743,6 +850,7 @@ echo -ne '       Compiling nginx                        [..]\r'
 {
     make -j "$(nproc)"
     make install
+
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
@@ -765,7 +873,7 @@ if [ $NGINX_PLESK = "1" ]; then
     # block sw-nginx package updates from APT repository
     apt-mark hold sw-nginx >>/tmp/nginx-ee.log 2>&1
 
-elif [ $NGINX_EASYENGINE = "1" ]; then
+    elif [ $NGINX_EASYENGINE = "1" ]; then
     {
         # replace old TLS v1.3 ciphers suite
         sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
