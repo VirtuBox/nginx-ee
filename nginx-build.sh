@@ -33,7 +33,6 @@ NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o '
 if [ ! -x /usr/sbin/nginx ]; then
     NGINX_CURRENT=$(nginx -v 2>&1 | awk -F "/" '{print $2}' | grep 1.15)
 fi
-OPENSSL_VER=OpenSSL_1_1_1
 
 # Colors
 CSI='\033['
@@ -179,12 +178,14 @@ else
 fi
 
 if [ "$RTMP" = "y" ]; then
-    NGINX_CC_OPT="--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2'"
+    NGINX_CC_OPT="--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' "
     NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
+    elif [ "$RMTP" != "y" ] && [ "$NGINX_RELEASE" != "1" ]; then
+    NGX_RTMP=""
+    NGINX_CC_OPT="--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' "
 else
     NGX_RTMP=""
-    NGINX_CC_OPT=([index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2')
-    --with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' --with-ld-opt='-ljemalloc -Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now'
+    NGINX_CC_OPT="--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' "
 fi
 
 ##################################
@@ -349,7 +350,7 @@ fi
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
-rm -rf $DIR_SRC/*.tar.gz $DIR_SRC/nginx-1.* ipscrubtmp ipscrub $DIR_SRC/openssl $DIR_SRC/ngx_brotli $DIR_SRC/pcre $DIR_SRC/zlib
+rm -rf $DIR_SRC/{*.tar.gz,nginx-1.*,ipscrubtmp,ipscrub,openssl,openssl-*,/ngx_brotli,pcre,zlib}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -422,8 +423,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
     fi
     # http redis module
     if [ ! -d $DIR_SRC/ngx_http_redis ]; then
-        wget -qO ngx_http_redis.tar.gz https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz
-        tar -I pigz -xf ngx_http_redis.tar.gz
+        sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | tar zxf - -C $DIR_SRC
         mv ngx_http_redis-0.3.8 ngx_http_redis
     fi
     if [ "$RTMP" = "y" ]; then
@@ -461,8 +461,7 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 {
     cd /usr/local/src || exit 1
-    wget -qO zlib.tar.gz http://zlib.net/zlib-1.2.11.tar.gz
-    tar -zxf zlib.tar.gz
+    sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | tar zxf - -C $DIR_SRC
     mv zlib-1.2.11 zlib
 }
 
@@ -483,31 +482,37 @@ fi
 
 cd $DIR_SRC || exit
 
-echo -ne '       Downloading pcre                       [..]\r'
 
-{
 
-    sudo wget -qO pcre.tar.gz https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz
-    sudo tar -xvzf pcre.tar.gz
-    mv pcre-8.42 pcre
+if [ ! -x /usr/bin/pcretest ]; then
+    PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
+    if [ "$PCRE_VERSION" != "8.42" ]; then
+        echo -ne '       Downloading pcre                       [..]\r'
+        {
+            sudo wget -qO pcre.tar.gz https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz
+            sudo tar -xvzf pcre.tar.gz
+            mv pcre-8.42 pcre
 
-    cd $DIR_SRC/pcre || exit 1
-    ./configure --prefix=/usr \
-    --enable-utf8 \
-    --enable-unicode-properties \
-    --enable-pcre16 \
-    --enable-pcre32 \
-    --enable-pcregrep-libz \
-    --enable-pcregrep-libbz2 \
-    --enable-pcretest-libreadline \
-    --enable-jit
+            cd $DIR_SRC/pcre || exit 1
+            ./configure --prefix=/usr \
+            --enable-utf8 \
+            --enable-unicode-properties \
+            --enable-pcre16 \
+            --enable-pcre32 \
+            --enable-pcregrep-libz \
+            --enable-pcregrep-libbz2 \
+            --enable-pcretest-libreadline \
+            --enable-jit
 
-    sudo make -j "$(nproc)"
-    sudo make install
-    mv -v /usr/lib/libpcre.so.* /lib
-    ln -sfv ../../lib/$(readlink /usr/lib/libpcre.so) /usr/lib/libpcre.so
+            sudo make -j "$(nproc)"
+            sudo make install
+            mv -v /usr/lib/libpcre.so.* /lib
+            ln -sfv ../../lib/$(readlink /usr/lib/libpcre.so) /usr/lib/libpcre.so
+        } >>/tmp/nginx-ee.log 2>&1
+    fi
+fi
 
-} >>/tmp/nginx-ee.log 2>&1
+
 
 if [ $? -eq 0 ]; then
     echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
@@ -562,8 +567,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 cd $DIR_SRC || exit
 {
-    sudo wget -qO openssl.tar.gz https://www.openssl.org/source/openssl-1.1.1.tar.gz
-    sudo tar -xzf openssl.tar.gz
+    sudo curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | tar zxf - -C $DIR_SRC
     mv openssl-1.1.1 openssl
     cd $DIR_SRC/openssl || exit 1
     curl -s https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.1.patch | patch -p1
@@ -594,8 +598,7 @@ if [ "$NAXSI" = "y" ]; then
         if [ -d $DIR_SRC/naxsi ]; then
             rm -rf $DIR_SRC/naxsi
         fi
-        wget -qO naxsi.tar.gz https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz
-        tar -I pigz -xf naxsi.tar.gz
+        curl -sL https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz | tar zxf - -C $DIR_SRC
         mv naxsi-$NAXSI_VER naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -653,8 +656,7 @@ if [ -d $DIR_SRC/nginx ]; then
     rm -rf $DIR_SRC/nginx
 fi
 {
-    wget -qO nginx.tar.gz http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
-    tar -I pigz -xf nginx.tar.gz
+    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | tar zxf - -C $DIR_SRC
     mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -685,7 +687,7 @@ if [ $NGINX_RELEASE = "1" ]; then
     }>>/tmp/nginx-ee.log 2>&1
     #wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch >>/tmp/nginx-ee.log 2>&1
 else
-    wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch >>/tmp/nginx-ee.log 2>&1
+    curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 #patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
 
@@ -720,7 +722,7 @@ if [ $NGINX_PLESK = "0" ]; then
 
     ./configure \
     $NGX_NAXSI \
-    "${NGINX_CC_OPT[@]}" \
+    $NGINX_CC_OPT \
     --with-ld-opt='-ljemalloc -Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share/nginx \
     --conf-path=/etc/nginx/nginx.conf \
@@ -740,7 +742,6 @@ if [ $NGINX_PLESK = "0" ]; then
     --without-http_userid_module \
     --without-mail_pop3_module \
     --without-mail_smtp_module \
-    --with-pcre=/usr/local/src/pcre \
     --with-pcre-jit \
     --with-http_ssl_module \
     --with-http_stub_status_module \
