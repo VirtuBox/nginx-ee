@@ -193,12 +193,12 @@ fi
 ##################################
 
 echo -ne '       Installing dependencies               [..]\r'
-sudo apt-get update >>/tmp/nginx-ee.log 2>&1
-sudo apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
+apt-get update >>/tmp/nginx-ee.log 2>&1
+apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
 libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev  software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
 libcurl4-openssl-dev libgoogle-perftools-dev libperl-dev libpam0g-dev libbsd-dev zip unzip gnupg gnupg2 pigz libluajit-5.1-common \
-libluajit-5.1-dev libmhash-dev libatomic-ops-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache curl debhelper dh-systemd libxml2  >>/tmp/nginx-ee.log 2>&1
+libluajit-5.1-dev libmhash-dev libatomic-ops-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache curl debhelper dh-systemd libxml2 >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -463,6 +463,7 @@ echo -ne '       Downloading zlib                       [..]\r'
     cd /usr/local/src || exit 1
     sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | tar zxf - -C $DIR_SRC
     mv zlib-1.2.11 zlib
+
 }
 
 if [ $? -eq 0 ]; then
@@ -756,7 +757,6 @@ if [ $NGINX_PLESK = "0" ]; then
     --with-http_image_filter_module \
     --with-http_v2_module \
     --with-http_sub_module \
-    --with-http_xslt_module \
     --with-file-aio \
     --with-threads \
     --with-zlib=/usr/local/src/zlib \
