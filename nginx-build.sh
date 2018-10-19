@@ -178,14 +178,14 @@ else
 fi
 
 if [ "$RTMP" = "y" ]; then
-    NGINX_CC_OPT="--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' "
+    NGINX_CC_OPT=( [index]=--with-cc-opt=' -m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
     NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
     elif [ "$RMTP" != "y" ] && [ "$NGINX_RELEASE" != "1" ]; then
     NGX_RTMP=""
-    NGINX_CC_OPT="--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' "
+    NGINX_CC_OPT=( [index]=--with-cc-opt=' -m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
 else
     NGX_RTMP=""
-    NGINX_CC_OPT="--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' "
+    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' )
 fi
 
 ##################################
@@ -722,8 +722,8 @@ if [ $NGINX_PLESK = "0" ]; then
 
     ./configure \
     $NGX_NAXSI \
-    $NGINX_CC_OPT \
-    --with-ld-opt='-ljemalloc -Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    "${NGINX_CC_OPT[@]}" \
+    --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,--as-needed' \
     --prefix=/usr/share/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -733,6 +733,7 @@ if [ $NGINX_PLESK = "0" ]; then
     --http-client-body-temp-path=/var/lib/nginx/body \
     --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
     --http-proxy-temp-path=/var/lib/nginx/proxy \
+    --build=nginx-ee \
     --without-http_uwsgi_module \
     --without-mail_imap_module \
     --without-http_browser_module \
@@ -783,8 +784,8 @@ else
 
     ./configure \
     $ngx_naxsi \
-    "${nginx_cc_opt[@]}" \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    "${NGINX_CC_OPT[@]}" \
+    --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,--as-needed' \
     --prefix=/etc/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -796,6 +797,7 @@ else
     --http-proxy-temp-path=/var/lib/nginx/proxy \
     --http-scgi-temp-path=/var/lib/nginx/scgi \
     --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+    --build=nginx-ee \
     --user=nginx \
     --group=nginx \
     --with-pcre-jit \
@@ -828,7 +830,8 @@ else
     $ngx_pagespeed \
     $ngx_rtmp \
     --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt=enable-tls1_3 \
+    --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
+    --with-zlib=/usr/local/src/zlib \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 fi
 
