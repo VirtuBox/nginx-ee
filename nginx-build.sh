@@ -157,8 +157,10 @@ fi
 
 if [ "$NGINX_RELEASE" = "1" ]; then
     NGINX_VER=$NGINX_MAINLINE
+    NGX_HPACK="--with-http_v2_hpack_enc"
 else
     NGINX_VER=$NGINX_STABLE
+    NGX_HPACK=""
 fi
 
 if [ "$NAXSI" = "y" ]; then
@@ -177,15 +179,15 @@ else
     NGX_PAGESPEED=""
 fi
 
-if [ "$RTMP" = "y" ]; then
-    NGINX_CC_OPT=( [index]=--with-cc-opt=' -m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
-    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
-    elif [ "$RMTP" != "y" ] && [ "$NGINX_RELEASE" != "1" ]; then
-    NGX_RTMP=""
-    NGINX_CC_OPT=( [index]=--with-cc-opt=' -m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
-else
+if [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "1" ]; then
     NGX_RTMP=""
     NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' )
+elif [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "2" ]; then
+    NGX_RTMP=""
+    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
+else
+    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
 fi
 
 ##################################
@@ -719,13 +721,13 @@ if [[ "$distro_version" == "xenial" || "$distro_version" == "bionic" ]]; then
     fi
 fi
 
-if [ $NGINX_PLESK = "0" ]; then
+if [ "$NGINX_PLESK" = "0" ]; then
 
     ./configure \
-    $NGX_NAXSI \
+    ${NGX_NAXSI} \
     "${NGINX_CC_OPT[@]}" \
     --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,--as-needed' \
-    --prefix=/usr/share/nginx \
+    --prefix=/usr/share \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
     --error-log-path=/var/log/nginx/error.log \
@@ -734,11 +736,11 @@ if [ $NGINX_PLESK = "0" ]; then
     --http-client-body-temp-path=/var/lib/nginx/body \
     --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
     --http-proxy-temp-path=/var/lib/nginx/proxy \
-    --build=nginx-ee \
+    --modules-path=/usr/share/nginx/modules \
+    --build='VirtuBox Nginx-ee' \
     --without-http_uwsgi_module \
     --without-mail_imap_module \
     --without-http_browser_module \
-    --without-http_scgi_module \
     --without-http_split_clients_module \
     --without-http_ssi_module \
     --without-http_userid_module \
@@ -750,7 +752,7 @@ if [ $NGINX_PLESK = "0" ]; then
     --with-http_realip_module \
     --with-http_auth_request_module \
     --with-http_addition_module \
-    --with-http_v2_hpack_enc \
+    ${NGX_HPACK} \
     --with-http_geoip_module \
     --with-http_gunzip_module \
     --with-http_gzip_static_module \
@@ -761,32 +763,32 @@ if [ $NGINX_PLESK = "0" ]; then
     --with-threads \
     --with-zlib=/usr/local/src/zlib \
     --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/headers-more-nginx-module \
     --add-module=/usr/local/src/memc-nginx-module \
     --add-module=/usr/local/src/ngx_devel_kit \
-    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/ngx_brotli \
     --add-module=/usr/local/src/echo-nginx-module \
     --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
     --add-module=/usr/local/src/redis2-nginx-module \
     --add-module=/usr/local/src/srcache-nginx-module \
     --add-module=/usr/local/src/set-misc-nginx-module \
     --add-module=/usr/local/src/ngx_http_redis \
-    --add-module=/usr/local/src/ngx_brotli \
     --add-module=/usr/local/src/ipscrub \
     --add-module=/usr/local/src/ngx_http_auth_pam_module \
     --add-module=/usr/local/src/nginx-module-vts \
-    $NGX_PAGESPEED \
-    $NGX_RTMP \
+    ${NGX_PAGESPEED} \
+    ${NGX_RTMP} \
     --with-openssl=/usr/local/src/openssl \
     --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
-else
+    else
 
     ./configure \
-    $ngx_naxsi \
+    ${NGX_NAXSI} \
     "${NGINX_CC_OPT[@]}" \
     --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,--as-needed' \
-    --prefix=/etc/nginx \
+    --prefix=/usr/share \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
     --error-log-path=/var/log/nginx/error.log \
@@ -797,12 +799,22 @@ else
     --http-proxy-temp-path=/var/lib/nginx/proxy \
     --http-scgi-temp-path=/var/lib/nginx/scgi \
     --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
-    --build=nginx-ee \
+    --modules-path=/usr/share/nginx/modules \
+    --build='VirtuBox Nginx-ee' \
+    --without-http_uwsgi_module \
+    --without-mail_imap_module \
+    --without-http_browser_module \
+    --without-http_split_clients_module \
+    --without-http_ssi_module \
+    --without-http_userid_module \
+    --without-mail_pop3_module \
+    --without-mail_smtp_module \
     --user=nginx \
     --group=nginx \
     --with-pcre-jit \
     --with-http_ssl_module \
     --with-http_stub_status_module \
+    --with-http_dav_module \
     --with-http_realip_module \
     --with-http_auth_request_module \
     --with-http_addition_module \
@@ -811,13 +823,12 @@ else
     --with-http_image_filter_module \
     --with-http_v2_module \
     --with-http_sub_module \
-    --with-http_xslt_module \
     --with-file-aio \
     --with-threads \
     --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/headers-more-nginx-module \
     --add-module=/usr/local/src/memc-nginx-module \
     --add-module=/usr/local/src/ngx_devel_kit \
-    --add-module=/usr/local/src/headers-more-nginx-module \
     --add-module=/usr/local/src/echo-nginx-module \
     --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
     --add-module=/usr/local/src/redis2-nginx-module \
@@ -827,8 +838,8 @@ else
     --add-module=/usr/local/src/ngx_brotli \
     --add-module=/usr/local/src/ngx_http_auth_pam_module \
     --add-module=/usr/local/src/nginx-module-vts \
-    $ngx_pagespeed \
-    $ngx_rtmp \
+    ${NGX_PAGESPEED} \
+    ${NGX_RTMP} \
     --with-openssl=/usr/local/src/openssl \
     --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
     --with-zlib=/usr/local/src/zlib \
@@ -891,6 +902,7 @@ fi
     systemctl unmask nginx
     systemctl enable nginx
 
+
 } >>/tmp/nginx-ee.log 2>&1
 
 echo -ne '       Checking nginx configuration           [..]\r'
@@ -899,11 +911,8 @@ echo -ne '       Checking nginx configuration           [..]\r'
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
     {
-        # make sure nginx.service is enable
-        systemctl enable nginx
-        # stop nginx to apply new service settings
-        service nginx stop
-        service nginx start
+    systemctl stop nginx
+    systemctl start nginx
     } >>/tmp/nginx-ee.log 2>&1
     echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
