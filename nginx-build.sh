@@ -727,7 +727,7 @@ if [ "$NGINX_PLESK" = "0" ]; then
     ./configure \
     ${NGX_NAXSI} \
     "${NGINX_CC_OPT[@]}" \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -788,7 +788,7 @@ else
     ./configure \
     ${NGX_NAXSI} \
     "${NGINX_CC_OPT[@]}" \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
