@@ -51,25 +51,33 @@ echo "" >/tmp/nginx-ee.log
 # detect Plesk
 if [ -d /etc/psa ]; then
     NGINX_PLESK=1
+    NGINX_EASYENGINE=0
+    NGINX_FROM_SCRATCH=0
     echo "Plesk installation detected"
 else
     NGINX_PLESK=0
 fi
 
-# detect no nginx
-if [ ! -d /etc/nginx ]; then
-    NGINX_FROM_SCRATCH=1
-else
-    NGINX_FROM_SCRATCH=0
-fi
 
 # detect easyengine
 if [ -d /etc/ee ]; then
     echo "EasyEngine installation detected"
     NGINX_EASYENGINE=1
+    # detect no nginx
 else
     NGINX_EASYENGINE=0
 fi
+
+
+if [ ! -d /etc/psa ] && [ ! -d /etc/ee ] && [ ! -d /etc/nginx ]; then
+    NGINX_FROM_SCRATCH=1
+    echo "No Plesk or EasyEngine installation detected"
+else
+    NGINX_FROM_SCRATCH=0
+fi
+
+
+
 
 ##################################
 # Parse script arguments
@@ -158,9 +166,23 @@ fi
 if [ "$NGINX_RELEASE" = "1" ]; then
     NGINX_VER=$NGINX_MAINLINE
     NGX_HPACK="--with-http_v2_hpack_enc"
+    if [ "$RTMP" = "y" ]; then
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+        NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
+    else
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' )
+        NGX_RTMP=""
+    fi
 else
     NGINX_VER=$NGINX_STABLE
     NGX_HPACK=""
+    if [ "$RTMP" = "y" ]; then
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+        NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
+    else
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
+        NGX_RTMP=""
+    fi
 fi
 
 if [ "$NAXSI" = "y" ]; then
@@ -179,16 +201,6 @@ else
     NGX_PAGESPEED=""
 fi
 
-if [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "1" ]; then
-    NGX_RTMP=""
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' )
-    elif [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "2" ]; then
-    NGX_RTMP=""
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
-else
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
-    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
-fi
 
 ##################################
 # Install dependencies
@@ -217,7 +229,7 @@ fi
 # Checking install type
 ##################################
 
-if [ $NGINX_FROM_SCRATCH = "1" ]; then
+if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
 
     git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
     mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
@@ -234,7 +246,7 @@ if [ $NGINX_FROM_SCRATCH = "1" ]; then
 
         if [ ! -f /etc/systemd/system/multi-user.target.wants/nginx.service ] && [ ! -f /lib/systemd/system/nginx.service ]; then
             wget -qO /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
-            systemctl enable nginx
+            systemctl enable nginx.service
         fi
 
     } >>/tmp/nginx-ee.log 2>&1
@@ -267,6 +279,16 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
                 sudo update-alternatives --remove-all gcc
                 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
             } >>/tmp/nginx-ee.log 2>&1
+            if [ $? -eq 0 ]; then
+                echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+                echo -ne '\n'
+            else
+                echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+                echo ""
+                echo "Please look at /tmp/nginx-ee.log"
+                echo ""
+                exit 1
+            fi
         fi
         elif [ "$distro_version" == "xenial" ]; then
         if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-8_1-xenial.list ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
@@ -277,17 +299,17 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
             sudo apt-get install gcc-8 g++-8 -y
             sudo update-alternatives --remove-all gcc
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            if [ $? -eq 0 ]; then
+                echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+                echo -ne '\n'
+            else
+                echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+                echo ""
+                echo "Please look at /tmp/nginx-ee.log"
+                echo ""
+                exit 1
+            fi
         fi
-    fi
-    if [ $? -eq 0 ]; then
-        echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
-        echo -ne '\n'
-    else
-        echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-        echo ""
-        echo "Please look at /tmp/nginx-ee.log"
-        echo ""
-        exit 1
     fi
 else
     if [ "$distro_version" == "xenial" ]; then
@@ -313,7 +335,6 @@ else
             fi
         fi
     fi
-
 fi
 
 ##################################
@@ -352,7 +373,7 @@ fi
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
-rm -rf $DIR_SRC/{*.tar.gz,nginx-1.*,ipscrubtmp,ipscrub,openssl,openssl-*,/ngx_brotli,pcre,zlib}
+rm -rf $DIR_SRC/{*.tar.gz,nginx-1.*,ipscrubtmp,ipscrub,openssl,openssl-*,ngx_brotli,pcre,zlib}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -483,9 +504,7 @@ fi
 # Download zlib
 ##################################
 
-cd $DIR_SRC || exit
-
-
+cd $DIR_SRC || exit 1
 
 if [ ! -x /usr/bin/pcretest ]; then
     PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
@@ -512,21 +531,21 @@ if [ ! -x /usr/bin/pcretest ]; then
             mv -v /usr/lib/libpcre.so.* /lib
             ln -sfv ../../lib/$(readlink /usr/lib/libpcre.so) /usr/lib/libpcre.so
         } >>/tmp/nginx-ee.log 2>&1
+        if [ $? -eq 0 ]; then
+            echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
+            echo -ne '\n'
+        else
+            echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
+            echo ""
+            echo "Please look at /tmp/nginx-ee.log"
+            echo ""
+            exit 1
+        fi
     fi
 fi
 
 
 
-if [ $? -eq 0 ]; then
-    echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
-    echo -ne '\n'
-else
-    echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
-    exit 1
-fi
 
 ##################################
 # Install Jemalloc
@@ -595,7 +614,7 @@ fi
 # Download Naxsi
 ##################################
 
-cd $DIR_SRC || exit
+cd $DIR_SRC || exit 1
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
@@ -623,7 +642,7 @@ fi
 # Download Pagespeed
 ##################################
 
-cd $DIR_SRC || exit
+cd $DIR_SRC || exit 1
 if [ "$PAGESPEED" = "y" ]; then
     echo -ne '       Downloading pagespeed                  [..]\r'
 
@@ -654,7 +673,7 @@ fi
 # Download Nginx
 ##################################
 
-cd $DIR_SRC || exit
+cd $DIR_SRC || exit  1
 echo -ne '       Downloading nginx                      [..]\r'
 if [ -d $DIR_SRC/nginx ]; then
     rm -rf $DIR_SRC/nginx
@@ -819,6 +838,7 @@ else
     --with-http_realip_module \
     --with-http_auth_request_module \
     --with-http_addition_module \
+    ${NGX_HPACK} \
     --with-http_geoip_module \
     --with-http_gzip_static_module \
     --with-http_image_filter_module \
