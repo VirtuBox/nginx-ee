@@ -13,6 +13,7 @@
 * Additonal modules
 * Brotli Support
 * TLS v1.3 support
+* Cloudflare HPACK (for Mainline release only)
 
 ---
 
@@ -147,7 +148,7 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
 
 * [x] Add choice between stable & mainline release
 * [x] Add Nginx configuration examples
-* [ ] Add Cloudflare HPACK patch
+* [x] Add Cloudflare HPACK patch
 * [x] Add support for servers without EasyEngine
 * [x] Add non-interactive installation
 * [ ] Add automated update detection
