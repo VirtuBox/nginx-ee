@@ -182,7 +182,7 @@ fi
 if [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "1" ]; then
     NGX_RTMP=""
     NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -O3 -g -march=native -mtune=native -fcode-hoisting -flto -fstack-protector-strong -fuse-ld=gold -Werror=format-security -Wformat -Wimplicit-fallthrough=0 -Wno-cast-function-type -Wno-deprecated-declarations -Wno-error=strict-aliasing --param=ssp-buffer-size=4 -Wp,-D_FORTIFY_SOURCE=2' )
-elif [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "2" ]; then
+    elif [ "$RTMP" != "y" ] && [ "$NGINX_RELEASE" = "2" ]; then
     NGX_RTMP=""
     NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2' )
 else
@@ -532,10 +532,10 @@ fi
 # Install Jemalloc
 ##################################
 
-{
-    touch /etc/ld.so.preload
-    echo "/usr/lib/x86_64-linux-gnu/libjemalloc.so" | sudo tee --append /etc/ld.so.preload
-} >>/tmp/nginx-ee.log 2>&1
+
+#    touch /etc/ld.so.preload
+#    echo "/usr/lib/x86_64-linux-gnu/libjemalloc.so" | sudo tee --append /etc/ld.so.preload
+#} >>/tmp/nginx-ee.log 2>&1
 
 
 ##################################
@@ -573,10 +573,11 @@ cd $DIR_SRC || exit
     sudo curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | tar zxf - -C $DIR_SRC
     mv openssl-1.1.1 openssl
     cd $DIR_SRC/openssl || exit 1
-    curl -s https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.1.patch | patch -p1
-    curl -s https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-reset-tls1.3-ciphers-SSL_CTX_set_ssl_version.patch | patch -p1
-    curl -s https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-sni-fix-delay-sig-algs.patch | patch -p1
-
+    curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.1.patch | patch -p1
+    curl https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-reset-tls1.3-ciphers-SSL_CTX_set_ssl_version.patch | patch -p1
+    curl https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-sni-fix-delay-sig-algs.patch | patch -p1
+    curl https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/openssl/OpenSSL-1.1.1-fix-ocsp-memleak.patch | patch -p1
+    curl https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/openssl/OpenSSL-1.1.1-safer-mem-cleanup.patch | patch -p1
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
@@ -726,7 +727,7 @@ if [ "$NGINX_PLESK" = "0" ]; then
     ./configure \
     ${NGX_NAXSI} \
     "${NGINX_CC_OPT[@]}" \
-    --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,--as-needed' \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -782,12 +783,12 @@ if [ "$NGINX_PLESK" = "0" ]; then
     --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
-    else
+else
 
     ./configure \
     ${NGX_NAXSI} \
     "${NGINX_CC_OPT[@]}" \
-    --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,--as-needed' \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -fPIE -pie -Wl,-z,relro -Wl,-z,now' \
     --prefix=/usr/share \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -911,8 +912,8 @@ echo -ne '       Checking nginx configuration           [..]\r'
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
     {
-    systemctl stop nginx
-    systemctl start nginx
+        systemctl stop nginx
+        systemctl start nginx
     } >>/tmp/nginx-ee.log 2>&1
     echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
