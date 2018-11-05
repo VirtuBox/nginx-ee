@@ -116,7 +116,7 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
     ssl_session_cache shared:SSL:50m;
     ssl_session_timeout 1d;
     ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1
+    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
 ```
 
 ### TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3
