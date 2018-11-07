@@ -586,7 +586,7 @@ cd $DIR_SRC || exit 1
     curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | tar zxf - -C $DIR_SRC
     mv openssl-1.1.1 openssl
     cd $DIR_SRC/openssl  || exit 1
-} >> /tmp/nginx-ee.log
+} >> /tmp/nginx-ee.log 2>&1
 
 {
     # apply openssl ciphers patch
@@ -704,16 +704,16 @@ fi
 echo -ne '       Applying nginx patches                 [..]\r'
 
 if [ "$NGINX_RELEASE" = "1" ]; then
-
+{
     curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
     curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
     curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+} >>/tmp/nginx-ee.log 2>&1
 
-    #wget -qO nginx__dynamic_tls_records.patch https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch >>/tmp/nginx-ee.log 2>&1
 else
-    curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1
+    curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1  >>/tmp/nginx-ee.log 2>&1
 fi
-#patch -p1 <nginx__dynamic_tls_records.patch >>/tmp/nginx-ee.log 2>&1
+
 
 if [ $? -eq 0 ]; then
     echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
@@ -910,10 +910,10 @@ echo -ne '       Checking nginx configuration           [..]\r'
 # check if nginx -t do not return errors
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-    #   {
-    #systemctl stop nginx
-    #systemctl start nginx
-    #   } >>/tmp/nginx-ee.log 2>&1
+       {
+    systemctl stop nginx
+    systemctl start nginx
+       } >>/tmp/nginx-ee.log 2>&1
     echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
