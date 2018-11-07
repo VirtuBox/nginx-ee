@@ -877,7 +877,7 @@ fi
 ##################################
 
 [ ! -f /etc/apt/preferences.d/nginx-block ] && {
-    if [ $NGINX_PLESK = "1" ]; then
+    if [ "$NGINX_PLESK" = "1" ]; then
         {
             # block sw-nginx package updates from APT repository
             echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
