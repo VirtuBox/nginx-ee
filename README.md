@@ -19,8 +19,8 @@
 
 ## Additional modules
 
-Nginx current mainline release : **v1.15.5**
-Nginx current stable release : **v1.14.0**
+Nginx current mainline release : **v1.15.6**
+Nginx current stable release : **v1.14.1**
 
 * ngx_cache_purge
 * memcached_nginx_module
