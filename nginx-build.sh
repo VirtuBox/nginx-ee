@@ -885,16 +885,18 @@ fi
             echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
             apt-mark unhold sw-nginx
         } >> /tmp/nginx-ee.log
-    else
-
+    elif [ "$NGINX_EASYENGINE" = "1" ]; then
         # replace old TLS v1.3 ciphers suite
         {
             sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
-
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
             apt-mark unhold nginx-ee nginx-common
         } >> /tmp/nginx-ee.log
-
+        else
+        {
+        echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
+        apt-mark unhold nginx nginx-full nginx-common
+        }
     fi
 }
 
