@@ -50,7 +50,7 @@ optional modules :
 
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
-* Debian 8 (Jessie)
+* Debian 8 (Deprecated)
 
 ### Plesk releases
 

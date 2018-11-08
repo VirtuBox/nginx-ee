@@ -732,12 +732,14 @@ fi
 
 echo -ne '       Configuring nginx                      [..]\r'
 
-if [[ "$NGINX_RELEASE" == "1" && "$RTMP" != "y" ]]; then
+if [ "$distro_version" = "xenial" ] || [ "$distro_version" = "bionic" ]; then
+if [ "$NGINX_RELEASE" = "1" ] && [ "$RTMP" != "y" ]; then
     export CC="/usr/bin/gcc-8"
     export CXX="/usr/bin/gc++-8"
 else
     export CC="/usr/bin/gcc-7"
     export CXX="/usr/bin/gc++-7"
+fi
 fi
 
 NGINX_BUILD_OPTIONS="--prefix=/usr/share \
