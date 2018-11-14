@@ -153,9 +153,15 @@ bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngi
 
 #### Override list of third-party modules built by default with nginx-ee
 
+You can add/remove additional third-party modules compiled with nginx-ee.
+Here an example to add the nginx module mod_zip :
+
 ```bash
-# choose modules you want to build
-# This is the list of third-party modules built by default with nginx-ee
+# clone the module repository into /usr/local/src
+git clone https://github.com/evanmiller/mod_zip.git /usr/local/src/mod_zip
+
+# add the module to the modules list using the variable OVERRIDE_NGINX_ADDITIONAL_MODULES
+# This is the list of third-party modules built by default with nginx-ee + mod_zip module
 export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/echo-nginx-module \
     --add-module=/usr/local/src/headers-more-nginx-module \
     --add-module=/usr/local/src/ngx_cache_purge \
@@ -169,8 +175,8 @@ export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/echo-nginx
     --add-module=/usr/local/src/set-misc-nginx-module \
     --add-module=/usr/local/src/ngx_http_auth_pam_module \
     --add-module=/usr/local/src/nginx-module-vts \
-    --add-module=/usr/local/src/ipscrubtmp/ipscrub"
-
+    --add-module=/usr/local/src/ipscrubtmp/ipscrub \
+    --add-module=/usr/local/src/mod_zip" # add mod_zip module at the end of the list
 
 # compile nginx-ee with the modules previously selected
 bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
