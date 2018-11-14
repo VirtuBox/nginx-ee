@@ -652,7 +652,7 @@ echo -ne '       Downloading nginx                      [..]\r'
     rm -rf $DIR_SRC/nginx
 }
 {
-    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar -xzf - -C $DIR_SRC
+    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C $DIR_SRC
     mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
