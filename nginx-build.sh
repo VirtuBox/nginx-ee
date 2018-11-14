@@ -648,12 +648,9 @@ fi
 
 cd $DIR_SRC || exit  1
 echo -ne '       Downloading nginx                      [..]\r'
-[ -d $DIR_SRC/nginx ] && {
-    rm -rf $DIR_SRC/nginx
-}
 {
     curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C $DIR_SRC
-    mv nginx-${NGINX_VER} nginx
+    mv $DIR_SRC/nginx-${NGINX_VER} $DIR_SRC/nginx
 } >>/tmp/nginx-ee.log 2>&1
 
 cd $DIR_SRC/nginx || exit
