@@ -1,14 +1,17 @@
 #!/bin/bash
+#----------------------------------------------------------------------------
+#  Nginx-ee - Automated Nginx compilation from source
+#----------------------------------------------------------------------------
 #
-# Nginx-ee Bash script
-# compile the latest nginx release from source with EasyEngine, Plesk or from scratch
+# Website:       https://virtubox.net
+# GitHub:        https://github.com/VirtuBox/nginx-ee
+# Author:        VirtuBox
+# License:       M.I.T
+#----------------------------------------------------------------------------
 #
-# Version 3.1 - 2018-09-26
-# Published & maintained by VirtuBox - https://virtubox.net
+# Version 3.3 - 2018-11-14
 #
-# Sources :
-# https://github.com/VirtuBox/nginx-ee
-#
+#----------------------------------------------------------------------------
 
 # Check if user is root
 [ "$(id -u)" != "0" ] && {
@@ -115,77 +118,75 @@ echo "Welcome to the nginx-ee bash script."
 echo ""
 
 # interactive
-if [ -z $NGINX_RELEASE ]; then
+if [ -z "$NGINX_RELEASE" ]; then
     clear
-    echo ""
-    echo "Do you want to compile the latest Nginx Mainline [1] or Stable [2] Release ?"
+    echo -e '\nDo you want to compile the latest Nginx [1] Mainline or [2] Stable Release ?'
     while [[ $NGINX_RELEASE != "1" && $NGINX_RELEASE != "2" ]]; do
         read -p "Select an option [1-2]: " NGINX_RELEASE
     done
 
-    echo ""
-    echo "Do you want Ngx_Pagespeed ? (y/n)"
+    echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
     while [[ $PAGESPEED != "y" && $PAGESPEED != "n" ]]; do
         read -p "Select an option [y/n]: " PAGESPEED
     done
-    echo ""
     if [ "$PAGESPEED" = "y" ]; then
-        echo "Do you prefer to build the latest Pagespeed Beta [1] or Stable [2] Release ?"
+        echo -e '\nDo you prefer the latest Pagespeed [1] Beta or [2] Stable Release ?'
         while [[ $PAGESPEED_RELEASE != "1" && $PAGESPEED_RELEASE != "2" ]]; do
             read -p "Select an option [1-2]: " PAGESPEED_RELEASE
         done
     fi
-    echo ""
-    echo "Do you want NAXSI WAF (still experimental)? (y/n)"
+    echo -e '\nDo you want NAXSI WAF (still experimental)? (y/n)'
     while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
         read -p "Select an option [y/n]: " NAXSI
     done
 
-    echo ""
-    echo "Do you want RTMP streaming module ?"
+    echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ $RTMP != "y" && $RTMP != "n" ]]; do
         read -p "Select an option [y/n]: " RTMP
     done
     echo ""
+
+    echo -e '\nDoyou want memcached, http-redis & redis2 module ? (y/n)'
+    while [[ $REDIS_ASK != "y" && $REDIS_ASK != "n" ]]; do
+        read -p "Select an option [y/n]: " REDIS_ASK
+    done
+
+    ##################################
+    # Set nginx release and modules
+    ##################################
+
+
+    if [ "$NGINX_RELEASE" = "1" ]; then
+        NGINX_VER=$NGINX_MAINLINE
+        NGX_HPACK="--with-http_v2_hpack_enc"
+    else
+        NGINX_VER=$NGINX_STABLE
+        NGX_HPACK=""
+    fi
+
+    if [ "$RTMP" = "y" ]; then
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+        NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
+    else
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
+        NGX_RTMP=""
+    fi
+
+    if [ "$NAXSI" = "y" ]; then
+        NGX_NAXSI="--add-module=/usr/local/src/naxsi/naxsi_src "
+    else
+        NGX_NAXSI=""
+    fi
+
+
+    if [ "$PAGESPEED_RELEASE" = "1" ]; then
+        NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
+        elif [ "$PAGESPEED_RELEASE" = "2" ]; then
+        NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
+    else
+        NGX_PAGESPEED=""
+    fi
 fi
-
-##################################
-# Set nginx release and modules
-##################################
-
-
-if [ "$NGINX_RELEASE" = "1" ]; then
-    NGINX_VER=$NGINX_MAINLINE
-    NGX_HPACK="--with-http_v2_hpack_enc"
-else
-    NGINX_VER=$NGINX_STABLE
-    NGX_HPACK=""
-fi
-
-if [ "$RTMP" = "y" ]; then
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
-    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
-else
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
-    NGX_RTMP=""
-fi
-
-if [ "$NAXSI" = "y" ]; then
-    NGX_NAXSI="--add-module=/usr/local/src/naxsi/naxsi_src "
-else
-    NGX_NAXSI=""
-fi
-
-
-if [ "$PAGESPEED_RELEASE" = "1" ]; then
-    NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
-    elif [ "$PAGESPEED_RELEASE" = "2" ]; then
-    NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
-else
-    NGX_PAGESPEED=""
-fi
-
-
 ##################################
 # Install dependencies
 ##################################
@@ -203,9 +204,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "        Installing dependencies              [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -291,9 +290,7 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
             echo -ne '\n'
         else
             echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-            echo ""
-            echo "Please look at /tmp/nginx-ee.log"
-            echo ""
+            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
 
@@ -311,9 +308,7 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
             echo -ne '\n'
         else
             echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-            echo ""
-            echo "Please look at /tmp/nginx-ee.log"
-            echo ""
+            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
     fi
@@ -333,9 +328,7 @@ else
             echo -ne '\n'
         else
             echo -e "        Installing gcc-7                      [${CRED}FAIL${CEND}]"
-            echo ""
-            echo "Please look at /tmp/nginx-ee.log"
-            echo ""
+            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
     fi
@@ -363,9 +356,7 @@ if [ "$RTMP" = "y" ]; then
         echo -ne '\n'
     else
         echo -e "       Installing FFMPEG for RMTP module      [${CRED}FAIL${CEND}]"
-        echo ""
-        echo "Please look at /tmp/nginx-ee.log"
-        echo ""
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
 fi
@@ -475,9 +466,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "        Downloading additionals modules      [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -501,9 +490,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "       Downloading zlib                       [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -543,9 +530,7 @@ if [ ! -x /usr/bin/pcretest ]; then
             echo -ne '\n'
         else
             echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
-            echo ""
-            echo "Please look at /tmp/nginx-ee.log"
-            echo ""
+            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
     fi
@@ -569,9 +554,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "       Downloading brotli      [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -605,9 +588,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -631,9 +612,7 @@ if [ "$NAXSI" = "y" ]; then
         echo -ne '\n'
     else
         echo -e "       Downloading naxsi      [${CRED}FAIL${CEND}]"
-        echo ""
-        echo "Please look at /tmp/nginx-ee.log"
-        echo ""
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
 
@@ -663,9 +642,7 @@ if [ "$PAGESPEED" = "y" ]; then
         echo -ne '\n'
     else
         echo -e "       Downloading pagespeed                  [${CRED}FAIL${CEND}]"
-        echo ""
-        echo "Please look at /tmp/nginx-ee.log"
-        echo ""
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
 fi
@@ -691,9 +668,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "       Downloading nginx      [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -720,9 +695,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "       Applying nginx patches                 [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -733,13 +706,13 @@ fi
 echo -ne '       Configuring nginx                      [..]\r'
 
 if [ "$distro_version" = "xenial" ] || [ "$distro_version" = "bionic" ]; then
-if [ "$NGINX_RELEASE" = "1" ] && [ "$RTMP" != "y" ]; then
-    export CC="/usr/bin/gcc-8"
-    export CXX="/usr/bin/gc++-8"
-else
-    export CC="/usr/bin/gcc-7"
-    export CXX="/usr/bin/gc++-7"
-fi
+    if [ "$NGINX_RELEASE" = "1" ] && [ "$RTMP" != "y" ]; then
+        export CC="/usr/bin/gcc-8"
+        export CXX="/usr/bin/gc++-8"
+    else
+        export CC="/usr/bin/gcc-7"
+        export CXX="/usr/bin/gc++-7"
+    fi
 fi
 
 NGINX_BUILD_OPTIONS="--prefix=/usr/share \
@@ -768,40 +741,47 @@ NGINX_PLESK_BUILD="--prefix=/usr/share \
 --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 --modules-path=/usr/share/nginx/modules"
 
-NGINX_INCLUDED_MODULES="--without-http_uwsgi_module \
---without-mail_imap_module \
---without-mail_pop3_module \
---without-mail_smtp_module \
---with-pcre-jit \
---with-http_ssl_module \
---with-http_stub_status_module \
---with-http_realip_module \
---with-http_auth_request_module \
---with-http_addition_module \
---with-http_geoip_module \
---with-http_gzip_static_module \
---with-http_image_filter_module \
---with-http_v2_module \
---with-http_mp4_module \
---with-http_sub_module \
---with-file-aio \
---with-threads"
+if [ -z "$OVERRIDE_NGINX_MODULES" ]; then
+    NGINX_INCLUDED_MODULES="--without-http_uwsgi_module \
+    --without-mail_imap_module \
+    --without-mail_pop3_module \
+    --without-mail_smtp_module \
+    --with-http_ssl_module \
+    --with-http_stub_status_module \
+    --with-http_realip_module \
+    --with-http_auth_request_module \
+    --with-http_addition_module \
+    --with-http_geoip_module \
+    --with-http_gzip_static_module \
+    --with-http_image_filter_module \
+    --with-http_v2_module \
+    --with-http_mp4_module \
+    --with-http_sub_module \
+    --with-file-aio \
+    --with-threads"
+else
+    NGINX_INCLUDED_MODULES="$OVERRIDE_NGINX_MODULES"
+fi
 
-NGINX_THIRD_MODULES="--with-zlib=/usr/local/src/zlib \
---add-module=/usr/local/src/ngx_cache_purge \
---add-module=/usr/local/src/headers-more-nginx-module \
---add-module=/usr/local/src/memc-nginx-module \
---add-module=/usr/local/src/ngx_devel_kit \
---add-module=/usr/local/src/ngx_brotli \
---add-module=/usr/local/src/echo-nginx-module \
---add-module=/usr/local/src/ngx_http_substitutions_filter_module \
---add-module=/usr/local/src/redis2-nginx-module \
---add-module=/usr/local/src/srcache-nginx-module \
---add-module=/usr/local/src/set-misc-nginx-module \
---add-module=/usr/local/src/ngx_http_redis \
---add-module=/usr/local/src/ngx_http_auth_pam_module \
---add-module=/usr/local/src/nginx-module-vts \
---add-module=/usr/local/src/ipscrubtmp/ipscrub"
+
+if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
+    NGINX_THIRD_MODULES="--add-module=/usr/local/src/echo-nginx-module \
+    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/ngx_brotli \
+    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+    --add-module=/usr/local/src/srcache-nginx-module \
+    --add-module=/usr/local/src/ngx_http_redis \
+    --add-module=/usr/local/src/redis2-nginx-module \
+    --add-module=/usr/local/src/memc-nginx-module \
+    --add-module=/usr/local/src/ngx_devel_kit \
+    --add-module=/usr/local/src/set-misc-nginx-module \
+    --add-module=/usr/local/src/ngx_http_auth_pam_module \
+    --add-module=/usr/local/src/nginx-module-vts \
+    --add-module=/usr/local/src/ipscrubtmp/ipscrub"
+else
+    NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
+fi
 
 if [ "$NGINX_PLESK" = "0" ]; then
 
@@ -813,9 +793,11 @@ if [ "$NGINX_PLESK" = "0" ]; then
     --build='VirtuBox Nginx-ee' \
     ${NGINX_INCLUDED_MODULES} \
     ${NGINX_THIRD_MODULES} \
-    ${NGX_HPACK}
+    ${NGX_HPACK} \
     ${NGX_PAGESPEED} \
     ${NGX_RTMP} \
+    --with-pcre-jit \
+    --with-zlib=/usr/local/src/zlib \
     --with-openssl=/usr/local/src/openssl \
     --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
@@ -845,9 +827,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "        Configuring nginx    [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -868,9 +848,7 @@ if [ $? -eq 0 ]; then
     echo -ne '\n'
 else
     echo -e "        Compile nginx      [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log"
-    echo ""
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
 
@@ -885,17 +863,17 @@ fi
             echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
             apt-mark unhold sw-nginx
         } >> /tmp/nginx-ee.log
-    elif [ "$NGINX_EASYENGINE" = "1" ]; then
+        elif [ "$NGINX_EASYENGINE" = "1" ]; then
         # replace old TLS v1.3 ciphers suite
         {
             sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
             apt-mark unhold nginx-ee nginx-common
         } >> /tmp/nginx-ee.log
-        else
+    else
         {
-        echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
-        apt-mark unhold nginx nginx-full nginx-common
+            echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
+            apt-mark unhold nginx nginx-full nginx-common
         }
     fi
 }
@@ -923,14 +901,9 @@ if [ -z "$VERIFY_NGINX_CONFIG" ]; then
     echo -ne '\n'
 else
     echo -e "       Checking nginx configuration           [${CRED}FAIL${CEND}]"
-    echo ""
-    echo "Please look at /tmp/nginx-ee.log or use the command nginx -t to find the issue"
-    echo ""
+    echo -e '\nPlease look at /tmp/nginx-ee.log or use the command nginx -t to find the issue\n'
 fi
 # We're done !
 echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"
-echo ""
-echo ""
-echo ""
-echo "       Installation log : /tmp/nginx-ee.log"
+echo -e '\n       Installation log : /tmp/nginx-ee.log\n'

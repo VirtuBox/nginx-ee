@@ -10,24 +10,22 @@
 
 * Compile the latest Nginx Mainline or Stable Release
 * Install Nginx or replace Nginx package previously installed
-* Additonal modules
+* Nginx official modules selection
+* Nginx Third-party Additonal selection
 * Brotli Support
-* TLS v1.3 support
+* TLS v1.3 support (Final)
 * Cloudflare HPACK (for Mainline release only)
 
 ---
 
-## Additional modules
+## Additional Third-party modules
 
 Nginx current mainline release : **v1.15.6**
 Nginx current stable release : **v1.14.1**
 
 * ngx_cache_purge
-* memcached_nginx_module
 * headers-more-nginx-module
-* ngx_coolkit
 * [ngx_brotli](https://github.com/eustas/ngx_brotli)
-* redis2-nginx-module
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
@@ -38,9 +36,11 @@ Nginx current stable release : **v1.14.1**
 
 optional modules :
 
-* ngx_pagespeed (latest-beta or latest-stable)
-* naxsi WAF
+* [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx) (latest-beta or latest-stable)
+* [naxsi WAF](https://github.com/nbs-system/naxsi)
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
+* redis2-nginx-module
+* memcached_nginx_module
 
 ---
 
@@ -61,6 +61,21 @@ optional modules :
 ---
 
 ## Usage
+
+<!-- TOC -->
+   - [Interactive install](#interactive-install)
+   - [Non interactive install](#non-interactive-install)
+     - [Options available](#options-available)
+   - [Nginx modules](#nginx-modules)
+     - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
+     - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
+   - [Troubleshooting](#troubleshooting)
+     - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
+     - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
+   - [Nginx configurations](#nginx-configurations)
+   - [Roadmap](#roadmap)
+
+<!-- /TOC -->
 
 ### Interactive install
 
@@ -88,15 +103,78 @@ Additional modules (optional)
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 
-### Example
+Example :
+
+Compile Nginx mailine release with pagespeed stable
 
 ```bash
 bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
 ```
 
-This command will compile the latest nginx mainline release with ngx_pagespeed module
+### Nginx modules
 
----
+You can choose Nginx official modules and third-party modules you want to compile with Nginx-ee.
+The list of official modules built by default and optional modules is available on [Nginx Docs](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#modules-built-by-default)
+
+To override **official modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_MODULES** before launching nginx-ee script.
+
+To override **third-party modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_ADDITIONAL_MODULES** before laucnhing nginx-ee script.
+If you want to add a third-party module, you will have to download its source in `/usr/local/src` before launching the compilation.
+
+Examples :
+
+#### Override list of modules built by default with nginx-ee
+
+```bash
+# choose modules you want to build
+# This is the list of modules built by default with nginx-ee
+export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
+    --without-mail_imap_module \
+    --without-mail_pop3_module \
+    --without-mail_smtp_module \
+    --with-http_ssl_module \
+    --with-http_stub_status_module \
+    --with-http_realip_module \
+    --with-http_auth_request_module \
+    --with-http_addition_module \
+    --with-http_geoip_module \
+    --with-http_gzip_static_module \
+    --with-http_image_filter_module \
+    --with-http_v2_module \
+    --with-http_mp4_module \
+    --with-http_sub_module \
+    --with-file-aio \
+    --with-threads"
+
+
+# compile nginx-ee with the modules previously selected
+bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+```
+
+#### Override list of third-party modules built by default with nginx-ee
+
+```bash
+# choose modules you want to build
+# This is the list of third-party modules built by default with nginx-ee
+export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/echo-nginx-module \
+    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/ngx_brotli \
+    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+    --add-module=/usr/local/src/srcache-nginx-module \
+    --add-module=/usr/local/src/ngx_http_redis \
+    --add-module=/usr/local/src/redis2-nginx-module \
+    --add-module=/usr/local/src/memc-nginx-module \
+    --add-module=/usr/local/src/ngx_devel_kit \
+    --add-module=/usr/local/src/set-misc-nginx-module \
+    --add-module=/usr/local/src/ngx_http_auth_pam_module \
+    --add-module=/usr/local/src/nginx-module-vts \
+    --add-module=/usr/local/src/ipscrubtmp/ipscrub"
+
+
+# compile nginx-ee with the modules previously selected
+bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+```
 
 ## Troubleshooting
 
@@ -153,9 +231,6 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
 * [x] Add non-interactive installation
 * [ ] Add automated update detection
 * [x] Add support for Plesk servers
-
-## Credits & Licence
-
-* [ipscrub nginx module](http://ipscrub.org/)
+* [x] Add Nginx modules choice
 
 Published & maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
