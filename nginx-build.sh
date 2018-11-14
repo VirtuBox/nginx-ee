@@ -190,7 +190,7 @@ echo -ne '       Installing dependencies               [..]\r'
 apt-get update >>/tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
-libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
+libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlib1g zlib1g-dbg \
 libcurl4-openssl-dev libgoogle-perftools-dev libperl-dev libpam0g-dev libbsd-dev zip unzip gnupg gnupg2 pigz libluajit-5.1-common \
 libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache curl debhelper dh-systemd libxml2 >>/tmp/nginx-ee.log 2>&1
 
@@ -438,7 +438,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
         git clone https://github.com/vozlt/nginx-module-vts.git
     }
     # http redis module
-    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | tar zxf - -C $DIR_SRC
+    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C $DIR_SRC
     mv ngx_http_redis-0.3.8 ngx_http_redis
     if [ "$RTMP" = "y" ]; then
         {  [ -d $DIR_SRC/nginx-rtmp-module ] && {
@@ -475,7 +475,7 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 {
     cd /usr/local/src || exit 1
-    sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | tar zxf - -C $DIR_SRC
+    sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C $DIR_SRC
     mv zlib-1.2.11 zlib
 
 }
@@ -501,7 +501,7 @@ if [ ! -x /usr/bin/pcretest ]; then
         echo -ne '       Downloading pcre                       [..]\r'
         {
             sudo wget -qO pcre.tar.gz https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz
-            sudo tar -xvzf pcre.tar.gz
+            sudo /bin/tar -xvzf pcre.tar.gz
             mv pcre-8.42 pcre
 
             cd $DIR_SRC/pcre || exit 1
@@ -561,7 +561,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 cd $DIR_SRC || exit 1
 {
-    curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | tar zxf - -C $DIR_SRC
+    curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | /bin/tar zxf - -C $DIR_SRC
     mv openssl-1.1.1 openssl
     cd $DIR_SRC/openssl  || exit 1
 } >> /tmp/nginx-ee.log 2>&1
@@ -598,7 +598,7 @@ if [ "$NAXSI" = "y" ]; then
         [ -d $DIR_SRC/naxsi ] && {
             rm -rf $DIR_SRC/naxsi
         }
-        curl -sL https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz | tar zxf - -C $DIR_SRC
+        curl -sL https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz | /bin/tar zxf - -C $DIR_SRC
         mv naxsi-$NAXSI_VER naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -652,7 +652,7 @@ echo -ne '       Downloading nginx                      [..]\r'
     rm -rf $DIR_SRC/nginx
 }
 {
-    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | tar zxf - -C $DIR_SRC
+    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar -xzf - -C $DIR_SRC
     mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
