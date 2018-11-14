@@ -119,7 +119,7 @@ The list of official modules built by default and optional modules is available 
 To override **official modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_MODULES** before launching nginx-ee script.
 
 To override **third-party modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_ADDITIONAL_MODULES** before laucnhing nginx-ee script.
-If you want to add a third-party module, you will have to download its source in `/usr/local/src` before launching the compilation.
+**Important** : If you want to add a third-party module, you will have to download its source in `/usr/local/src` before launching the compilation.
 
 Examples :
 

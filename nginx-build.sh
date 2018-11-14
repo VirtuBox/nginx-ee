@@ -146,11 +146,6 @@ if [ -z "$NGINX_RELEASE" ]; then
     done
     echo ""
 
-    echo -e '\nDoyou want memcached, http-redis & redis2 module ? (y/n)'
-    while [[ $REDIS_ASK != "y" && $REDIS_ASK != "n" ]]; do
-        read -p "Select an option [y/n]: " REDIS_ASK
-    done
-
     ##################################
     # Set nginx release and modules
     ##################################
