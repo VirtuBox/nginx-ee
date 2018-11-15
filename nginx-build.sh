@@ -363,7 +363,7 @@ fi
 ##################################
 # Download additional modules
 ##################################
-g
+
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
