@@ -33,9 +33,9 @@
 NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
 NGINX_EE_VER=3.3.1
-NGINX_RELEASES=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 )
+NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
+NGINX_RELEASES=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 2>&1)
 NGINX_ARRAY=( $NGINX_RELEASES )
-NGINX_MAINLINE=${NGINX_ARRAY[0]}
 NGINX_STABLE=${NGINX_ARRAY[1]}
 
 
@@ -626,7 +626,6 @@ if [ "$PAGESPEED" = "y" ]; then
     echo -ne '       Downloading pagespeed                  [..]\r'
 
     {
-        rm -rf
         wget -qO build_ngx_pagespeed.sh https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
         chmod +x build_ngx_pagespeed.sh
         if [ "$PAGESPEED_RELEASE" = "1" ]; then
@@ -657,7 +656,6 @@ echo -ne '       Downloading nginx                      [..]\r'
     mv $DIR_SRC/nginx-${NGINX_VER} $DIR_SRC/nginx
 } >>/tmp/nginx-ee.log 2>&1
 
-cd $DIR_SRC/nginx || exit
 
 if [ $? -eq 0 ]; then
     echo -ne "       Downloading nginx                      [${CGREEN}OK${CEND}]\\r"
@@ -676,6 +674,8 @@ echo -ne '       Applying nginx patches                 [..]\r'
 
 if [ "$NGINX_RELEASE" = "1" ]; then
     {
+
+        cd $DIR_SRC/nginx || exit 1
         curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
         curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
         curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
