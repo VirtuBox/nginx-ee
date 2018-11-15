@@ -366,94 +366,94 @@ fi
 
 # clear previous compilation archives
 
-cd $DIR_SRC || exit
-rm -rf $DIR_SRC/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
+cd ${DIR_SRC} || exit
+rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
 {
     # cache_purge module
-    { [ -d $DIR_SRC/ngx_cache_purge ] && {
-            git -C $DIR_SRC/ngx_cache_purge pull origin master
+    { [ -d ${DIR_SRC}/ngx_cache_purge ] && {
+            git -C ${DIR_SRC}/ngx_cache_purge pull origin master
         } } || {
         git clone https://github.com/FRiCKLE/ngx_cache_purge.git
     }
 
 
     # memcached module
-    { [ -d $DIR_SRC/memc-nginx-module ] && {
-            git -C $DIR_SRC/memc-nginx-module pull origin master
+    { [ -d ${DIR_SRC}/memc-nginx-module ] && {
+            git -C ${DIR_SRC}/memc-nginx-module pull origin master
         } } || {
         git clone https://github.com/openresty/memc-nginx-module.git
     }
 
     # devel kit
-    { [ -d $DIR_SRC/ngx_devel_kit ] && {
-            git -C $DIR_SRC/ngx_devel_kit pull origin master
+    { [ -d ${DIR_SRC}/ngx_devel_kit ] && {
+            git -C ${DIR_SRC}/ngx_devel_kit pull origin master
         } } || {
         git clone https://github.com/simpl/ngx_devel_kit.git
     }
     # headers-more module
-    { [ -d $DIR_SRC/headers-more-nginx-module ] && {
-            git -C $DIR_SRC/headers-more-nginx-module pull origin master
+    { [ -d ${DIR_SRC}/headers-more-nginx-module ] && {
+            git -C ${DIR_SRC}/headers-more-nginx-module pull origin master
         } } || {
         git clone https://github.com/openresty/headers-more-nginx-module.git
     }
     # echo module
-    { [ -d $DIR_SRC/echo-nginx-module ] && {
-            git -C $DIR_SRC/echo-nginx-module pull origin master
+    { [ -d ${DIR_SRC}/echo-nginx-module ] && {
+            git -C ${DIR_SRC}/echo-nginx-module pull origin master
         } } || {
         git clone https://github.com/openresty/echo-nginx-module.git
     }
     # http_substitutions_filter module
-    { [ -d $DIR_SRC/ngx_http_substitutions_filter_module ] && {
-            git -C $DIR_SRC/ngx_http_substitutions_filter_module pull origin master
+    { [ -d ${DIR_SRC}/ngx_http_substitutions_filter_module ] && {
+            git -C ${DIR_SRC}/ngx_http_substitutions_filter_module pull origin master
         } } || {
         git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
     }
     # redis2 module
-    { [ -d $DIR_SRC/redis2-nginx-module ] && {
-            git -C $DIR_SRC/redis2-nginx-module pull origin master
+    { [ -d ${DIR_SRC}/redis2-nginx-module ] && {
+            git -C ${DIR_SRC}/redis2-nginx-module pull origin master
         } } || {
         git clone https://github.com/openresty/redis2-nginx-module.git
     }
     # srcache module
-    { [ -d $DIR_SRC/srcache-nginx-module ] && {
-            git -C $DIR_SRC/srcache-nginx-module pull origin master
+    { [ -d ${DIR_SRC}/srcache-nginx-module ] && {
+            git -C ${DIR_SRC}/srcache-nginx-module pull origin master
         } } || {
         git clone https://github.com/openresty/srcache-nginx-module.git
     }
     # set-misc module
-    { [ -d $DIR_SRC/set-misc-nginx-module ] && {
-            git -C $DIR_SRC/set-misc-nginx-module pull origin master
+    { [ -d ${DIR_SRC}/set-misc-nginx-module ] && {
+            git -C ${DIR_SRC}/set-misc-nginx-module pull origin master
         } } || {
         git clone https://github.com/openresty/set-misc-nginx-module.git
     }
     # auth_pam module
-    { [ -d $DIR_SRC/ngx_http_auth_pam_module ] && {
-            git -C $DIR_SRC/ngx_http_auth_pam_module pull origin master
+    { [ -d ${DIR_SRC}/ngx_http_auth_pam_module ] && {
+            git -C ${DIR_SRC}/ngx_http_auth_pam_module pull origin master
         } } || {
         git clone https://github.com/sto/ngx_http_auth_pam_module.git
     }
     # nginx-vts module
-    { [ -d $DIR_SRC/nginx-module-vts ] && {
-            git -C $DIR_SRC/nginx-module-vts pull origin master
+    { [ -d ${DIR_SRC}/nginx-module-vts ] && {
+            git -C ${DIR_SRC}/nginx-module-vts pull origin master
         } } || {
         git clone https://github.com/vozlt/nginx-module-vts.git
     }
     # http redis module
-    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C $DIR_SRC
+    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
     mv ngx_http_redis-0.3.8 ngx_http_redis
     if [ "$RTMP" = "y" ]; then
-        {  [ -d $DIR_SRC/nginx-rtmp-module ] && {
-                git -C $DIR_SRC/nginx-rtmp-module pull origin master
+        {  [ -d ${DIR_SRC}/nginx-rtmp-module ] && {
+                git -C ${DIR_SRC}/nginx-rtmp-module pull origin master
             } } || {
             git clone https://github.com/arut/nginx-rtmp-module.git
         }
     fi
     # ipscrub module
-    { [ -d $DIR_SRC/ipscrubtmp ] && {
-            git -C $DIR_SRC/ipscrubtmp pull origin master
+    { [ -d ${DIR_SRC}/ipscrubtmp ] && {
+            git -C ${DIR_SRC}/ipscrubtmp pull origin master
         } } || {
         git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
     }
@@ -473,13 +473,11 @@ fi
 # Download zlib
 ##################################
 
-cd $DIR_SRC || exit
-
 echo -ne '       Downloading zlib                       [..]\r'
 
 {
-    cd /usr/local/src || exit 1
-    sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C $DIR_SRC
+    cd ${DIR_SRC} || exit 1
+    sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
     mv zlib-1.2.11 zlib
 
 }
@@ -497,7 +495,7 @@ fi
 # Download zlib
 ##################################
 
-cd $DIR_SRC || exit 1
+cd ${DIR_SRC} || exit 1
 
 if [ ! -x /usr/bin/pcretest ]; then
     PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
@@ -508,7 +506,7 @@ if [ ! -x /usr/bin/pcretest ]; then
             sudo /bin/tar -xvzf pcre.tar.gz
             mv pcre-8.42 pcre
 
-            cd $DIR_SRC/pcre || exit 1
+            cd ${DIR_SRC}/pcre || exit 1
             ./configure --prefix=/usr \
             --enable-utf8 \
             --enable-unicode-properties \
@@ -539,7 +537,7 @@ fi
 # Download ngx_broti
 ##################################
 
-cd $DIR_SRC || exit 1
+cd ${DIR_SRC} || exit 1
 
 echo -ne '       Downloading brotli                     [..]\r'
 {
@@ -563,11 +561,11 @@ fi
 
 echo -ne '       Downloading openssl                    [..]\r'
 
-cd $DIR_SRC || exit 1
+cd ${DIR_SRC} || exit 1
 {
-    curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | /bin/tar zxf - -C $DIR_SRC
+    curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
     mv openssl-1.1.1 openssl
-    cd $DIR_SRC/openssl  || exit 1
+    cd ${DIR_SRC}/openssl  || exit 1
 } >> /tmp/nginx-ee.log 2>&1
 
 {
@@ -595,15 +593,15 @@ fi
 # Download Naxsi
 ##################################
 
-cd $DIR_SRC || exit 1
+cd ${DIR_SRC} || exit 1
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
-        [ -d $DIR_SRC/naxsi ] && {
-            rm -rf $DIR_SRC/naxsi
+        [ -d ${DIR_SRC}/naxsi ] && {
+            rm -rf ${DIR_SRC}/naxsi
         }
-        curl -sL https://github.com/nbs-system/naxsi/archive/$NAXSI_VER.tar.gz | /bin/tar zxf - -C $DIR_SRC
-        mv naxsi-$NAXSI_VER naxsi
+        curl -sL https://github.com/nbs-system/naxsi/archive/${NAXSI_VER}.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
+        mv naxsi-${NAXSI_VER} naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
     if [ $? -eq 0 ]; then
@@ -621,7 +619,7 @@ fi
 # Download Pagespeed
 ##################################
 
-cd $DIR_SRC || exit 1
+cd ${DIR_SRC} || exit 1
 if [ "$PAGESPEED" = "y" ]; then
     echo -ne '       Downloading pagespeed                  [..]\r'
 
@@ -629,9 +627,9 @@ if [ "$PAGESPEED" = "y" ]; then
         wget -qO build_ngx_pagespeed.sh https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
         chmod +x build_ngx_pagespeed.sh
         if [ "$PAGESPEED_RELEASE" = "1" ]; then
-            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b $DIR_SRC
+            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b ${DIR_SRC}
         else
-            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b $DIR_SRC
+            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b ${DIR_SRC}
         fi
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -649,11 +647,12 @@ fi
 # Download Nginx
 ##################################
 
-cd $DIR_SRC || exit  1
+cd ${DIR_SRC} || exit  1
 echo -ne '       Downloading nginx                      [..]\r'
 {
-    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C $DIR_SRC
-    mv $DIR_SRC/nginx-${NGINX_VER} $DIR_SRC/nginx
+    wget http://nginx.org/download/nginx-${NGINX_VER}.tar.gz
+    /bin/tar -xzf nginx-${NGINX_VER}.tar.gz
+    mv nginx-${NGINX_VER} nginx
 } >>/tmp/nginx-ee.log 2>&1
 
 
@@ -675,7 +674,7 @@ echo -ne '       Applying nginx patches                 [..]\r'
 if [ "$NGINX_RELEASE" = "1" ]; then
     {
 
-        cd $DIR_SRC/nginx || exit 1
+        cd ${DIR_SRC}/nginx || exit 1
         curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
         curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
         curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
