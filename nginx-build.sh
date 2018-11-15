@@ -266,7 +266,7 @@ distro_version=$(lsb_release -sc)
     fi
 
     apt-get update
-    apt-get upgrade -y
+
 
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -366,7 +366,7 @@ fi
 # clear previous compilation archives
 
 cd $DIR_SRC || exit
-rm -rf $DIR_SRC/{*.tar.gz,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
+rm -rf $DIR_SRC/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
