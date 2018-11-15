@@ -34,9 +34,8 @@ NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
 NGINX_EE_VER=3.3.1
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
-NGINX_RELEASES=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 2>&1)
-NGINX_ARRAY=( $NGINX_RELEASES )
-NGINX_STABLE=${NGINX_ARRAY[1]}
+NGINX_STABLE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 2>&1 | grep 1.14 )
+
 
 
 # Colors
