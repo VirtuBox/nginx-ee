@@ -118,7 +118,7 @@ done
 ##################################
 
 echo ""
-echo "Welcome to the nginx-ee bash scrip v${NGINX_EE_VER}"
+echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
 echo ""
 
 # interactive
