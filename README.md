@@ -39,8 +39,6 @@ optional modules :
 * [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx) (latest-beta or latest-stable)
 * [naxsi WAF](https://github.com/nbs-system/naxsi)
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
-* redis2-nginx-module
-* memcached_nginx_module
 
 ---
 
