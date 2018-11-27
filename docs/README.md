@@ -20,7 +20,7 @@
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.15.6**
+Nginx current mainline release : **v1.15.7**
 Nginx current stable release : **v1.14.1**
 
 * ngx_cache_purge
@@ -29,7 +29,7 @@ Nginx current stable release : **v1.14.1**
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
-* Openssl 1.1.1
+* Openssl 1.1.1a
 * [ipscrub](http://www.ipscrub.org/)
 * ngx_http_auth_pam_module
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
@@ -61,17 +61,17 @@ optional modules :
 ## Usage
 
 <!-- TOC -->
-   - [Interactive install](#interactive-install)
-   - [Non interactive install](#non-interactive-install)
-     - [Options available](#options-available)
-   - [Nginx modules](#nginx-modules)
-     - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
-     - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
-   - [Troubleshooting](#troubleshooting)
-     - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
-     - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
-   - [Nginx configurations](#nginx-configurations)
-   - [Roadmap](#roadmap)
+- [Interactive install](#interactive-install)
+  - [Non interactive install](#non-interactive-install)
+  - [Options available](#options-available)
+- [Nginx modules](#nginx-modules)
+  - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
+  - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
+- [Troubleshooting](#troubleshooting)
+  - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
+  - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
+- [Nginx configurations](#nginx-configurations)
+- [Roadmap](#roadmap)
 
 <!-- /TOC -->
 
@@ -130,7 +130,6 @@ export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
     --without-mail_imap_module \
     --without-mail_pop3_module \
     --without-mail_smtp_module \
-    --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_realip_module \
     --with-http_auth_request_module \
@@ -138,11 +137,8 @@ export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
     --with-http_geoip_module \
     --with-http_gzip_static_module \
     --with-http_image_filter_module \
-    --with-http_v2_module \
     --with-http_mp4_module \
-    --with-http_sub_module \
-    --with-file-aio \
-    --with-threads"
+    --with-http_sub_module"
 
 
 # compile nginx-ee with the modules previously selected
@@ -152,6 +148,21 @@ bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngi
 #### Override list of third-party modules built by default with nginx-ee
 
 You can add/remove additional third-party modules compiled with nginx-ee.
+By default Nginx-ee will compile the following third-party modules
+
+```bash
+    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+    --add-module=/usr/local/src/srcache-nginx-module \
+    --add-module=/usr/local/src/ngx_http_redis \
+    --add-module=/usr/local/src/redis2-nginx-module \
+    --add-module=/usr/local/src/memc-nginx-module \
+    --add-module=/usr/local/src/ngx_devel_kit \
+    --add-module=/usr/local/src/set-misc-nginx-module \
+    --add-module=/usr/local/src/ngx_http_auth_pam_module \
+    --add-module=/usr/local/src/nginx-module-vts \
+    --add-module=/usr/local/src/ipscrubtmp/ipscrub
+```
+
 Here an example to add the nginx module mod_zip :
 
 ```bash
@@ -160,11 +171,7 @@ git clone https://github.com/evanmiller/mod_zip.git /usr/local/src/mod_zip
 
 # add the module to the modules list using the variable OVERRIDE_NGINX_ADDITIONAL_MODULES
 # This is the list of third-party modules built by default with nginx-ee + mod_zip module
-export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/echo-nginx-module \
-    --add-module=/usr/local/src/headers-more-nginx-module \
-    --add-module=/usr/local/src/ngx_cache_purge \
-    --add-module=/usr/local/src/ngx_brotli \
-    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
     --add-module=/usr/local/src/srcache-nginx-module \
     --add-module=/usr/local/src/ngx_http_redis \
     --add-module=/usr/local/src/redis2-nginx-module \
@@ -236,5 +243,7 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
 * [ ] Add automated update detection
 * [x] Add support for Plesk servers
 * [x] Add Nginx modules choice
+* [ ] Add support for Debian 9
+* [ ] Add support for Raspbian
 
 Published & maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>

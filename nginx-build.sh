@@ -1,17 +1,14 @@
 #!/bin/bash
-#----------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #  Nginx-ee - Automated Nginx compilation from source
-#----------------------------------------------------------------------------
-#
+# -------------------------------------------------------------------------
 # Website:       https://virtubox.net
 # GitHub:        https://github.com/VirtuBox/nginx-ee
-# Author:        VirtuBox
-# License:       M.I.T
-#----------------------------------------------------------------------------
-#
-# Version 3.3.1 - 2018-11-14
-#
-#----------------------------------------------------------------------------
+# Copyright (c) 2018 VirtuBox <contact@virtubox.net>
+# This script is licensed under M.I.T
+# -------------------------------------------------------------------------
+# Version 3.3.2 - 2018-11-27
+# -------------------------------------------------------------------------
 
 # Check if user is root
 [ "$(id -u)" != "0" ] && {
@@ -31,7 +28,8 @@
 
 NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
-NGINX_EE_VER=3.3.1
+NGINX_EE_VER=3.3.2
+OPENSSL_VER=1.1.1a
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
 NGINX_STABLE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)
 
@@ -52,13 +50,12 @@ echo "" >/tmp/nginx-ee.log
 # detect Plesk
 [ -d /etc/psa ] && {
     NGINX_PLESK=1
-    echo "Plesk installation detected"
 }
 
 # detect easyengine
 [ -d /etc/ee ] && {
-    echo "EasyEngine installation detected"
     NGINX_EASYENGINE=1
+    EE_VALID="YES"
 }
 
 [ ! -x /usr/sbin/nginx ] && {
@@ -73,28 +70,28 @@ echo "" >/tmp/nginx-ee.log
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
-        --pagespeed)
+        '--pagespeed')
             PAGESPEED="y"
             shift
         ;;
-        --pagespeed-beta)
+        '--pagespeed-beta')
             PAGESPEED="y"
             PAGESPEED_RELEASE="1"
             shift
         ;;
-        --naxsi)
+        '--naxsi')
             NAXSI="y"
             shift
         ;;
-        --rtmp)
+        '--rtmp')
             RTMP="y"
             shift
         ;;
-        --latest | --mainline)
+        '--latest' | '--mainline')
             NGINX_RELEASE=1
             shift
         ;;
-        --stable)
+        '--stable')
             NGINX_RELEASE=2
             shift
         ;;
@@ -153,33 +150,62 @@ else
     NGX_HPACK=""
 fi
 
-if [ "$RTMP" = "y" ]; then
+if [ -z "$RTMP" ]; then
+    if [ "$distro_version" == "xenial" ] && [ "$distro_version" == "bionic" ]; then
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
+    else
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+    fi
+    NGX_RTMP=""
+    RTMP_VALID="NO"
+else
     NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
     NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
-else
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
-    NGX_RTMP=""
+    RTMP_VALID="YES"
 fi
 
 if [ "$NAXSI" = "y" ]; then
     NGX_NAXSI="--add-module=/usr/local/src/naxsi/naxsi_src "
+    NAXSI_VALID="YES"
 else
     NGX_NAXSI=""
+    NAXSI_VALID="NO"
 fi
 
 if [ "$PAGESPEED_RELEASE" = "1" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
+    PAGESPEED_VALID="Beta"
     elif [ "$PAGESPEED_RELEASE" = "2" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
+    PAGESPEED_VALID="Stable"
 else
     NGX_PAGESPEED=""
+    PAGESPEED_VALID="NO"
 fi
 
 if [ "$NGINX_PLESK" = "1" ]; then
     NGX_USER="--user=nginx  --group=nginx"
+    PLESK_VALID="YES"
 else
     NGX_USER=""
+    PLESK_VALID="NO"
 fi
+
+if [ -z "$NGINX_EASYENGINE" ]; then
+    EE_VALID="NO"
+else
+    EE_VALID="YES"
+fi
+
+echo ""
+echo "Compilation summary : "
+echo "- Nginx release : $NGINX_MAINLINE"
+echo "- Pagespeed : $PAGESPEED_VALID "
+echo "- Naxsi : $NAXSI_VALID"
+echo "- RTMP : $RTMP_VALID"
+echo "- EasyEngine : $EE_VALID"
+echo "- Plesk : $PLESK_VALID"
+echo ""
 
 ##################################
 # Install dependencies
@@ -466,10 +492,10 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 {
     cd ${DIR_SRC} || exit 1
-    sudo curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
+    curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
     mv zlib-1.2.11 zlib
 
-}
+} >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Downloading zlib                       [${CGREEN}OK${CEND}]\\r"
@@ -491,8 +517,7 @@ if [ ! -x /usr/bin/pcretest ]; then
     if [ "$PCRE_VERSION" != "8.42" ]; then
         echo -ne '       Downloading pcre                       [..]\r'
         {
-            sudo wget -qO pcre.tar.gz https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz
-            sudo /bin/tar -xvzf pcre.tar.gz
+            curl -sL https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
             mv pcre-8.42 pcre
 
             cd ${DIR_SRC}/pcre || exit 1
@@ -506,8 +531,8 @@ if [ ! -x /usr/bin/pcretest ]; then
             --enable-pcretest-libreadline \
             --enable-jit
 
-            sudo make -j "$(nproc)"
-            sudo make install
+            make -j "$(nproc)"
+            make install
             mv -v /usr/lib/libpcre.so.* /lib
             ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
         } >>/tmp/nginx-ee.log 2>&1
@@ -552,8 +577,8 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 cd ${DIR_SRC} || exit 1
 {
-    curl -sL https://www.openssl.org/source/openssl-1.1.1.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
-    mv openssl-1.1.1 openssl
+    curl -sL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
+    mv openssl-${OPENSSL_VER} openssl
     cd ${DIR_SRC}/openssl || exit 1
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -708,25 +733,11 @@ NGINX_BUILD_OPTIONS="--prefix=/usr/share \
 --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 --modules-path=/usr/share/nginx/modules"
 
-NGINX_PLESK_BUILD="--prefix=/usr/share \
---conf-path=/etc/nginx/nginx.conf \
---http-log-path=/var/log/nginx/access.log \
---error-log-path=/var/log/nginx/error.log \
---lock-path=/var/lock/nginx.lock \
---pid-path=/var/run/nginx.pid \
---http-client-body-temp-path=/var/lib/nginx/body \
---http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
---http-proxy-temp-path=/var/lib/nginx/proxy \
---http-scgi-temp-path=/var/lib/nginx/scgi \
---http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
---modules-path=/usr/share/nginx/modules"
-
 if [ -z "$OVERRIDE_NGINX_MODULES" ]; then
     NGINX_INCLUDED_MODULES="--without-http_uwsgi_module \
     --without-mail_imap_module \
     --without-mail_pop3_module \
     --without-mail_smtp_module \
-    --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_realip_module \
     --with-http_auth_request_module \
@@ -734,21 +745,15 @@ if [ -z "$OVERRIDE_NGINX_MODULES" ]; then
     --with-http_geoip_module \
     --with-http_gzip_static_module \
     --with-http_image_filter_module \
-    --with-http_v2_module \
     --with-http_mp4_module \
-    --with-http_sub_module \
-    --with-file-aio \
-    --with-threads"
+    --with-http_sub_module"
+
 else
     NGINX_INCLUDED_MODULES="$OVERRIDE_NGINX_MODULES"
 fi
 
 if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
-    NGINX_THIRD_MODULES="--add-module=/usr/local/src/echo-nginx-module \
-    --add-module=/usr/local/src/headers-more-nginx-module \
-    --add-module=/usr/local/src/ngx_cache_purge \
-    --add-module=/usr/local/src/ngx_brotli \
-    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+    NGINX_THIRD_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
     --add-module=/usr/local/src/srcache-nginx-module \
     --add-module=/usr/local/src/ngx_http_redis \
     --add-module=/usr/local/src/redis2-nginx-module \
@@ -762,22 +767,31 @@ else
     NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
 fi
 
-    ./configure \
-    ${NGX_NAXSI} \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
-    ${NGINX_BUILD_OPTIONS} \
-    --build='VirtuBox Nginx-ee' \
-    ${NGX_USER} \
-    ${NGINX_INCLUDED_MODULES} \
-    ${NGINX_THIRD_MODULES} \
-    ${NGX_HPACK} \
-    ${NGX_PAGESPEED} \
-    ${NGX_RTMP} \
-    --with-pcre-jit \
-    --with-zlib=/usr/local/src/zlib \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
-    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+./configure \
+"${NGINX_CC_OPT[@]}" \
+${NGX_NAXSI} \
+--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
+${NGINX_BUILD_OPTIONS} \
+--build='VirtuBox Nginx-ee' \
+${NGX_USER} \
+--with-file-aio \
+--with-threads \
+--with-http_v2_module \
+--with-http_ssl_module \
+--with-pcre-jit \
+${NGINX_INCLUDED_MODULES} \
+${NGINX_THIRD_MODULES} \
+${NGX_HPACK} \
+${NGX_PAGESPEED} \
+${NGX_RTMP} \
+--add-module=/usr/local/src/echo-nginx-module \
+--add-module=/usr/local/src/headers-more-nginx-module \
+--add-module=/usr/local/src/ngx_cache_purge \
+--add-module=/usr/local/src/ngx_brotli \
+--with-zlib=/usr/local/src/zlib \
+--with-openssl=/usr/local/src/openssl \
+--with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
+--sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
