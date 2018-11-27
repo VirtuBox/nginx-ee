@@ -197,14 +197,13 @@ else
     EE_VALID="YES"
 fi
 
-echo ""
-echo "Compilation summary : "
-echo "- Nginx release : $NGINX_MAINLINE"
-echo "- Pagespeed : $PAGESPEED_VALID "
-echo "- Naxsi : $NAXSI_VALID"
-echo "- RTMP : $RTMP_VALID"
-echo "- EasyEngine : $EE_VALID"
-echo "- Plesk : $PLESK_VALID"
+echo "   Compilation summary : "
+echo "       - Nginx release : $NGINX_MAINLINE"
+echo "       - Pagespeed : $PAGESPEED_VALID "
+echo "       - Naxsi : $NAXSI_VALID"
+echo "       - RTMP : $RTMP_VALID"
+echo "       - EasyEngine : $EE_VALID"
+echo "       - Plesk : $PLESK_VALID"
 echo ""
 
 ##################################
@@ -577,20 +576,13 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 cd ${DIR_SRC} || exit 1
 {
-    curl -sL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
-    mv openssl-${OPENSSL_VER} openssl
+    git clone https://github.com/openssl/openssl.git
     cd ${DIR_SRC}/openssl || exit 1
 } >>/tmp/nginx-ee.log 2>&1
 
 {
     # apply openssl ciphers patch
-    curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.1_ciphers.patch | patch -p1
-    # apply patch from centminmod
-    curl https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-reset-tls1.3-ciphers-SSL_CTX_set_ssl_version.patch | patch -p1
-    curl https://raw.githubusercontent.com/centminmod/centminmod/master/patches/openssl/OpenSSL-1.1.1-sni-fix-delay-sig-algs.patch | patch -p1
-    curl https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/openssl/OpenSSL-1.1.1-fix-ocsp-memleak.patch | patch -p1
-    curl https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/openssl/OpenSSL-1.1.1-safer-mem-cleanup.patch | patch -p1
-
+    curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.2-dev_ciphers.patch| patch -p1
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
