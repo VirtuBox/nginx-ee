@@ -29,7 +29,6 @@
 NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
 NGINX_EE_VER=3.3.2
-OPENSSL_VER=1.1.1a
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
 NGINX_STABLE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)
 
@@ -291,60 +290,63 @@ distro_version=$(lsb_release -sc)
 
 if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
     if [ "$distro_version" == "bionic" ]; then
-
         if [ ! -x /usr/bin/gcc-8 ]; then
             echo -ne '       Installing gcc-8                       [..]\r'
-            apt-get install gcc-8 g++-8 -y  >>/tmp/nginx-ee.log 2>&1
-        fi
-        {
-            update-alternatives --remove-all gcc
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
-        } >>/tmp/nginx-ee.log 2>&1
-        if [ $? -eq 0 ]; then
-            echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
-            echo -ne '\n'
-        else
-            echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-            exit 1
+            {
+                apt-get install gcc-8 g++-8 -y
+                update-alternatives --remove-all gcc
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            } >>/tmp/nginx-ee.log 2>&1
+            if [ $? -eq 0 ]; then
+                echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+                echo -ne '\n'
+            else
+                echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+                echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+                exit 1
+            fi
         fi
 
         elif [ "$distro_version" == "xenial" ]; then
-        {
-            if [ ! -x /usr/bin/gcc-8 ]; then
-                echo -ne '       Installing gcc-8                       [..]\r'
+
+        if [ ! -x /usr/bin/gcc-8 ]; then
+            echo -ne '       Installing gcc-8                       [..]\r'
+            {
                 apt-get install gcc-8 g++-8 -y  >>/tmp/nginx-ee.log 2>&1
+
+                update-alternatives --remove-all gcc
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            } >>/tmp/nginx-ee.log 2>&1
+            if [ $? -eq 0 ]; then
+                echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+                echo -ne '\n'
+            else
+                echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+                echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+                exit 1
             fi
-            update-alternatives --remove-all gcc
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
-        } >>/tmp/nginx-ee.log 2>&1
-        if [ $? -eq 0 ]; then
-            echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
-            echo -ne '\n'
-        else
-            echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
-            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-            exit 1
         fi
     fi
 else
     if [ "$distro_version" == "xenial" ]; then
+        if [ ! -x /usr/bin/gcc-7 ]; then
+            echo -ne '       Installing gcc-7                       [..]\r'
 
-        echo -ne '       Installing gcc-7                       [..]\r'
-        {
-            add-apt-repository -y ppa:jonathonf/gcc-7.1
-            apt-get update -y
-            apt-get install gcc-7 g++-7 -y
-            update-alternatives --remove-all gcc
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-        } >>/tmp/nginx-ee.log 2>&1
-        if [ $? -eq 0 ]; then
-            echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
-            echo -ne '\n'
-        else
-            echo -e "        Installing gcc-7                      [${CRED}FAIL${CEND}]"
-            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-            exit 1
+            {
+                add-apt-repository -y ppa:jonathonf/gcc-7.1
+                apt-get update -y
+                apt-get install gcc-7 g++-7 -y
+                update-alternatives --remove-all gcc
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+            } >>/tmp/nginx-ee.log 2>&1
+            if [ $? -eq 0 ]; then
+                echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
+                echo -ne '\n'
+            else
+                echo -e "        Installing gcc-7                      [${CRED}FAIL${CEND}]"
+                echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+                exit 1
+            fi
         fi
     fi
 fi

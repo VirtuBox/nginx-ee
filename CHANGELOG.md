@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - fix nginx compilation arguments
 - cleanup code
-- openssl version bump to 1.1.1a
+- openssl version bump to 1.1.2-dev
 
 ## [3.3.1] - 2018-11-16
 

@@ -29,7 +29,7 @@ Nginx current stable release : **v1.14.1**
 * srcache-nginx-module
 * ngx_http_substitutions_filter_module
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
-* Openssl 1.1.1a
+* Openssl 1.1.2-dev
 * [ipscrub](http://www.ipscrub.org/)
 * ngx_http_auth_pam_module
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
