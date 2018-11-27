@@ -282,20 +282,21 @@ distro_version=$(lsb_release -sc)
 
     if [ "$distro_version" == "bionic" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-bionic.list ]; then
         add-apt-repository -y ppa:jonathonf/gcc
+        apt-get update
         elif [ "$distro_version" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
         add-apt-repository -y ppa:jonathonf/gcc
+        apt-get update
     fi
-
-    apt-get update
-
-} \
->>/tmp/nginx-ee.log 2>&1
+} >>/tmp/nginx-ee.log 2>&1
 
 if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
     if [ "$distro_version" == "bionic" ]; then
-        echo -ne '       Installing gcc-8                       [..]\r'
+
+        if [ ! -x /usr/bin/gcc-8 ]; then
+            echo -ne '       Installing gcc-8                       [..]\r'
+            apt-get install gcc-8 g++-8 -y  >>/tmp/nginx-ee.log 2>&1
+        fi
         {
-            apt-get install gcc-8 g++-8 -y
             update-alternatives --remove-all gcc
             update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
         } >>/tmp/nginx-ee.log 2>&1
@@ -309,11 +310,11 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
         fi
 
         elif [ "$distro_version" == "xenial" ]; then
-        echo -ne '       Installing gcc-8                       [..]\r'
         {
-            add-apt-repository -y ppa:jonathonf/gcc-8.1
-            apt-get update
-            apt-get install gcc-8 g++-8 -y
+            if [ ! -x /usr/bin/gcc-8 ]; then
+                echo -ne '       Installing gcc-8                       [..]\r'
+                apt-get install gcc-8 g++-8 -y  >>/tmp/nginx-ee.log 2>&1
+            fi
             update-alternatives --remove-all gcc
             update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
         } >>/tmp/nginx-ee.log 2>&1
