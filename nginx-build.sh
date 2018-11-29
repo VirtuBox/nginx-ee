@@ -356,7 +356,7 @@ fi
 ##################################
 
 if [ "$RTMP" = "y" ]; then
-    echo -ne '       Installing FFMPEG for RMTP module      [..]\r'
+    echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
         if [ "$distro_version" == "xenial" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
