@@ -149,7 +149,11 @@ else
     NGX_HPACK=""
 fi
 
-if [ -z "$RTMP" ]; then
+if [ "$RTMP" = "y" ]; then
+    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
+    RTMP_VALID="YES"
+else
     if [ "$distro_version" == "xenial" ] && [ "$distro_version" == "bionic" ]; then
         NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
     else
@@ -157,10 +161,6 @@ if [ -z "$RTMP" ]; then
     fi
     NGX_RTMP=""
     RTMP_VALID="NO"
-else
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
-    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
-    RTMP_VALID="YES"
 fi
 
 if [ "$NAXSI" = "y" ]; then
@@ -356,7 +356,7 @@ fi
 ##################################
 
 if [ "$RTMP" = "y" ]; then
-    echo -ne '       Installing FFMPEG for RMTP module      [..]\r'
+    echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
         if [ "$distro_version" == "xenial" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
