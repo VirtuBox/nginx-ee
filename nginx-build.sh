@@ -28,7 +28,7 @@
 
 NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
-NGINX_EE_VER=3.3.2
+NGINX_EE_VER=3.3.3
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
 NGINX_STABLE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)
 
@@ -183,7 +183,7 @@ else
 fi
 
 if [ "$NGINX_PLESK" = "1" ]; then
-    NGX_USER="--user=nginx  --group=nginx"
+    NGX_USER="--user=nginx --group=nginx"
     PLESK_VALID="YES"
 else
     NGX_USER=""
@@ -252,7 +252,7 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
     {
 
         wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
-        ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+        ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
         [ ! -f /lib/systemd/system/nginx.service ] && {
             wget -O /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
@@ -385,7 +385,7 @@ fi
 # clear previous compilation archives
 
 cd ${DIR_SRC} || exit
-rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
+rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*,ngx_cache_purge}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -585,7 +585,7 @@ cd ${DIR_SRC} || exit 1
 
 {
     # apply openssl ciphers patch
-    curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl-equal-1.1.2-dev_ciphers.patch| patch -p1
+    curl https://raw.githubusercontent.com/VirtuBox/openssl-patch/master/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
@@ -690,6 +690,11 @@ else
     curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 
+# patching nginx cache purge
+cd ${DIR_SRC}/ngx_cache_purge || exit 1
+curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/ngx-cache-purge/ngx-cache-purge-1116.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
+
+
 if [ $? -eq 0 ]; then
     echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
@@ -706,7 +711,7 @@ fi
 echo -ne '       Configuring nginx                      [..]\r'
 
 if [ "$distro_version" = "xenial" ] || [ "$distro_version" = "bionic" ]; then
-    if [ "$NGINX_RELEASE" = "1" ] && [ "$RTMP" != "y" ]; then
+    if [ "$RTMP" != "y" ]; then
         export CC="/usr/bin/gcc-8"
         export CXX="/usr/bin/gc++-8"
     else
@@ -840,7 +845,7 @@ fi
         {
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
             apt-mark unhold nginx nginx-full nginx-common
-        }
+        } >>/tmp/nginx-ee.log
     fi
 }
 

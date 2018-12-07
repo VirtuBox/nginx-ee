@@ -246,4 +246,9 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
 * [ ] Add support for Debian 9
 * [ ] Add support for Raspbian
 
+## Credits
+
+* [centminmod](https://github.com/centminmod/centminmod) : Nginx, Nginx modules & various other patches
+* [hakase](https://github.com/hakasenyang/openssl-patch) : OpenSSL-patch
+
 Published & maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
