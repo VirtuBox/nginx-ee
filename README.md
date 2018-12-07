@@ -21,7 +21,7 @@
 ## Additional Third-party modules
 
 Nginx current mainline release : **v1.15.7**
-Nginx current stable release : **v1.14.1**
+Nginx current stable release : **v1.14.2**
 
 * ngx_cache_purge
 * headers-more-nginx-module

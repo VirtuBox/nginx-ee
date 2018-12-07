@@ -13,6 +13,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for Raspbian
 - Improve documentation
 
+## [3.3.3] - 2018-12-07
+
+### Added
+
+- Fix RTMP module choice by @Madic- [Pull request #23](https://github.com/VirtuBox/nginx-ee/pull/23)
+- Update openssl-patch url
+
 ## [3.3.2] - 2018-11-27
 
 ### Added
