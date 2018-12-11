@@ -800,7 +800,7 @@ ${NGX_RTMP} \
 --add-module=/usr/local/src/ngx_brotli \
 --with-zlib=/usr/local/src/zlib \
 --with-openssl=/usr/local/src/openssl \
---with-openssl-opt="enable-ec_nistp_64_gcc_128 enable-tls1_3" \
+--with-openssl-opt='enable-tls1_3' \
 --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
