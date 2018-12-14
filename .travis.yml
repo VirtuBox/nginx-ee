@@ -1,5 +1,7 @@
 language: bash
 
+dist: xenial
+
 before_install:
   - rm -rf ~/.gnupg
 
@@ -13,8 +15,10 @@ script:
   - sudo apt-get install -y --force-yes git nginx curl wget
   - export NGINX_RELEASE="1"
   - sudo bash nginx-build.sh $TRAVIS_BRANCH
+  - sudo bash -c 'cat /tmp/nginx-ee.log'
   - export NGINX_RELEASE="2"
   - sudo bash nginx-build.sh $TRAVIS_BRANCH
+  - sudo bash -c 'cat /tmp/nginx-ee.log'
   - export PAGESPEED="y"
   - export NAXSI="y"
   - export RTMP="y"
