@@ -10,6 +10,13 @@ before_script:
 script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
-  - sudo apt-get install -y --force-yes git nginx python3-setuptools python3-dev python3-apt
+  - sudo apt-get install -y --force-yes git nginx curl wget
+  - export NGINX_RELEASE="1"
+  - sudo bash nginx-build.sh $TRAVIS_BRANCH
+  - export NGINX_RELEASE="2"
+  - sudo bash nginx-build.sh $TRAVIS_BRANCH
+  - export PAGESPEED="y"
+  - export NAXSI="y"
+  - export RTMP="y"
   - sudo bash nginx-build.sh $TRAVIS_BRANCH
   - sudo bash -c 'cat /tmp/nginx-ee.log'
