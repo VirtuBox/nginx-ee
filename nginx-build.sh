@@ -17,10 +17,14 @@
 }
 
 # check if curl is installed
-
 [ ! -x /usr/bin/curl ] && {
-    apt-get install curl
-} >>/tmp/nginx-ee.log 2>&1
+    apt-get install curl | sudo tee -a /tmp/nginx-ee.log 2>&1
+}
+
+# Checking lsb_release package
+[ ! -x /usr/bin/lsb_release  ]&& {
+    sudo apt-get -y install lsb-release | sudo tee -a /tmp/nginx-ee.log 2>&1
+}
 
 ##################################
 # Variables
@@ -31,6 +35,12 @@ DIR_SRC=/usr/local/src
 NGINX_EE_VER=3.3.3
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
 NGINX_STABLE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)
+DISTRO_VERSION=$(lsb_release -sc)
+TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
+
+
+
+# install gcc-7
 
 # Colors
 CSI='\033['
@@ -66,33 +76,31 @@ echo "" >/tmp/nginx-ee.log
 # Parse script arguments
 ##################################
 
-while [[ $# -gt 0 ]]; do
-    arg="$1"
-    case $arg in
-        '--pagespeed')
+while [ ${#} -gt 0 ]; do
+    case "${1}" in
+        --pagespeed)
             PAGESPEED="y"
-            shift
         ;;
-        '--pagespeed-beta')
+        --pagespeed-beta)
             PAGESPEED="y"
             PAGESPEED_RELEASE="1"
-            shift
         ;;
-        '--naxsi')
+        --full)
+            PAGESPEED="y"
             NAXSI="y"
-            shift
-        ;;
-        '--rtmp')
             RTMP="y"
-            shift
         ;;
-        '--latest' | '--mainline')
-            NGINX_RELEASE=1
-            shift
+        --naxsi)
+            NAXSI="y"
         ;;
-        '--stable')
-            NGINX_RELEASE=2
-            shift
+        --rtmp)
+            RTMP="y"
+        ;;
+        --latest | --mainline)
+            NGINX_RELEASE="1"
+        ;;
+        --stable)
+            NGINX_RELEASE="2"
         ;;
         *) ;;
     esac
@@ -154,10 +162,10 @@ if [ "$RTMP" = "y" ]; then
     NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
     RTMP_VALID="YES"
 else
-    if [ "$distro_version" == "xenial" ] && [ "$distro_version" == "bionic" ]; then
+    if [ "$DISTRO_VERSION" == "xenial" ] && [ "$DISTRO_VERSION" == "bionic" ]; then
         NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
     else
-        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64' )
     fi
     NGX_RTMP=""
     RTMP_VALID="NO"
@@ -269,27 +277,19 @@ fi
 # gcc7 for nginx stable on Ubuntu 16.04 LTS
 # gcc8 for nginx mainline on Ubuntu 16.04 LTS & 18.04 LTS
 
-# Checking lsb_release package
-if [ ! -x /usr/bin/lsb_release ]; then
-    sudo apt-get -y install lsb-release | sudo tee -a /tmp/nginx-ee.log 2>&1
-fi
-
-# install gcc-7
-distro_version=$(lsb_release -sc)
-
 {
 
-    if [ "$distro_version" == "bionic" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-bionic.list ]; then
+    if [ "$DISTRO_VERSION" == "bionic" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-bionic.list ]; then
         add-apt-repository -y ppa:jonathonf/gcc
         apt-get update
-        elif [ "$distro_version" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
+        elif [ "$DISTRO_VERSION" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
         add-apt-repository -y ppa:jonathonf/gcc
         apt-get update
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
-    if [ "$distro_version" == "bionic" ]; then
+    if [ "$DISTRO_VERSION" == "bionic" ]; then
         if [ ! -x /usr/bin/gcc-8 ]; then
             echo -ne '       Installing gcc-8                       [..]\r'
             {
@@ -307,7 +307,7 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
             fi
         fi
 
-        elif [ "$distro_version" == "xenial" ]; then
+        elif [ "$DISTRO_VERSION" == "xenial" ]; then
 
         if [ ! -x /usr/bin/gcc-8 ]; then
             echo -ne '       Installing gcc-8                       [..]\r'
@@ -328,7 +328,7 @@ if [ "$NGINX_RELEASE" == "1" ] && [ "$RTMP" != "y" ]; then
         fi
     fi
 else
-    if [ "$distro_version" == "xenial" ]; then
+    if [ "$DISTRO_VERSION" == "xenial" ]; then
         if [ ! -x /usr/bin/gcc-7 ]; then
             echo -ne '       Installing gcc-7                       [..]\r'
 
@@ -358,7 +358,7 @@ fi
 if [ "$RTMP" = "y" ]; then
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
-        if [ "$distro_version" == "xenial" ]; then
+        if [ "$DISTRO_VERSION" == "xenial" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
                 sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
                 sudo apt-get update
@@ -705,7 +705,7 @@ fi
 
 echo -ne '       Configuring nginx                      [..]\r'
 
-if [ "$distro_version" = "xenial" ] || [ "$distro_version" = "bionic" ]; then
+if [ "$DISTRO_VERSION" = "xenial" ] || [ "$DISTRO_VERSION" = "bionic" ]; then
     if [ "$RTMP" != "y" ]; then
         export CC="/usr/bin/gcc-8"
         export CXX="/usr/bin/gc++-8"
@@ -832,7 +832,7 @@ fi
         elif [ "$NGINX_EASYENGINE" = "1" ]; then
         # replace old TLS v1.3 ciphers suite
         {
-            sed -i 's/TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256/TLS13+AESGCM+AES128/' /etc/nginx/nginx.conf
+            sed -i "s/ssl_ciphers\ \(\"\|'\)\(.*\)\(\"\|'\)/ssl_ciphers \"$TLS13_CIPHERS\"/" /etc/nginx/nginx.conf
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
             apt-mark unhold nginx-ee nginx-common
         } >>/tmp/nginx-ee.log

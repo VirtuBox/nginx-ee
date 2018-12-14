@@ -1,5 +1,7 @@
 # Nginx-EE
 
+![nginx-ee](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)
+
 ## Compile and install the latest nginx releases from source with additional modules with EasyEngine, Plesk Onyx or from scratch
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
@@ -48,7 +50,9 @@ optional modules :
 
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
-* Debian 8 (Deprecated)
+* Debian 9 (Stretch)
+* Debian 8 (Jessie)
+* Raspbian (Stretch)
 
 ### Plesk releases
 
@@ -67,9 +71,6 @@ optional modules :
 - [Nginx modules](#nginx-modules)
   - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
   - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
-- [Troubleshooting](#troubleshooting)
-  - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
-  - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
 - [Nginx configurations](#nginx-configurations)
 - [Roadmap](#roadmap)
 
@@ -78,13 +79,13 @@ optional modules :
 ### Interactive install
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 ### Non interactive install
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) [options] ...
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) [options] ...
 ```
 
 #### Options available
@@ -106,7 +107,7 @@ Example :
 Compile Nginx mailine release with pagespeed stable
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
 ```
 
 ### Nginx modules
@@ -142,7 +143,7 @@ export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
 
 
 # compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 #### Override list of third-party modules built by default with nginx-ee
@@ -184,44 +185,7 @@ export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/ngx_http_s
     --add-module=/usr/local/src/mod_zip" # add mod_zip module at the end of the list
 
 # compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
-```
-
-## Troubleshooting
-
-TLS v1.3 do not work or browser show error message `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` :
-
-Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/etc/nginx/conf.d/ssl.conf` for Plesk servers
-
-### TLSv1.2 + TLSv1.3
-
-```nginx
-    ##
-    # SSL Settings
-    ##
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES128:EECDH+AES128';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
-```
-
-### TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3
-
-```nginx
-    ##
-    # SSL Settings
-    ##
-    # intermediate configuration. tweak to your needs.
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 ---
