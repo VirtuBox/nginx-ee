@@ -50,7 +50,9 @@ Optional modules :
 
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
-* Debian 8 (Deprecated)
+* Debian 9 (Stretch)
+* Debian 8 (Jessie)
+* Raspbian (Stretch)
 
 ### Plesk releases
 
@@ -142,7 +144,7 @@ export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
 
 
 # compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 #### Override list of third-party modules built by default with nginx-ee
@@ -184,7 +186,7 @@ export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/ngx_http_s
     --add-module=/usr/local/src/mod_zip" # add mod_zip module at the end of the list
 
 # compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 ---
