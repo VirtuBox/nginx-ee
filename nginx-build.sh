@@ -350,7 +350,7 @@ fi
 if [ "$RTMP" = "y" ]; then
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
-        if [ "$distro_version" == "xenial" ]; &&  [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
+        if [ "$distro_version" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
                 sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
                 sudo apt-get update
                 sudo apt-get install ffmpeg -y
