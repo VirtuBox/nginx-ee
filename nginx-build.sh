@@ -66,33 +66,26 @@ echo "" >/tmp/nginx-ee.log
 # Parse script arguments
 ##################################
 
-while [[ $# -gt 0 ]]; do
-    arg="$1"
-    case $arg in
+while [ ${#} -gt 0 ]; do
+    case "${1}" in
         '--pagespeed')
             PAGESPEED="y"
-            shift
         ;;
         '--pagespeed-beta')
             PAGESPEED="y"
             PAGESPEED_RELEASE="1"
-            shift
         ;;
         '--naxsi')
             NAXSI="y"
-            shift
         ;;
         '--rtmp')
             RTMP="y"
-            shift
         ;;
         '--latest' | '--mainline')
             NGINX_RELEASE=1
-            shift
         ;;
         '--stable')
             NGINX_RELEASE=2
-            shift
         ;;
         *) ;;
     esac
@@ -279,12 +272,11 @@ distro_version=$(lsb_release -sc)
 
 {
 
-    if [ "$distro_version" == "bionic" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-bionic.list ]; then
-        add-apt-repository -y ppa:jonathonf/gcc
-        apt-get update
-        elif [ "$distro_version" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-xenial.list ]; then
-        add-apt-repository -y ppa:jonathonf/gcc
-        apt-get update
+    if [ "$distro_version" == "bionic" ] || [ "$distro_version" == "xenial" ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-$(lsb_release -sc).list ]; then
+            add-apt-repository -y ppa:jonathonf/gcc
+            apt-get update
+        fi
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -358,12 +350,10 @@ fi
 if [ "$RTMP" = "y" ]; then
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
-        if [ "$distro_version" == "xenial" ]; then
-            if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
+        if [ "$distro_version" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
                 sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
                 sudo apt-get update
                 sudo apt-get install ffmpeg -y
-            fi
         else
             sudo apt-get install ffmpeg -y
         fi
