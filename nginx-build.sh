@@ -7,7 +7,7 @@
 # Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.3.3 - 2018-11-27
+# Version 3.4.0 - 2018-11-27
 # -------------------------------------------------------------------------
 
 # Check if user is root
@@ -19,8 +19,14 @@
 # check if curl is installed
 
 [ ! -x /usr/bin/curl ] && {
-    apt-get install curl
+    apt-get update && apt-get install curl
 } >>/tmp/nginx-ee.log 2>&1
+
+# Checking lsb_release package
+
+[ ! -x /usr/bin/lsb_release ] && {
+    apt-get update && apt-get -y install lsb-release
+}
 
 ##################################
 # Variables
@@ -28,9 +34,10 @@
 
 NAXSI_VER=0.56
 DIR_SRC=/usr/local/src
-NGINX_EE_VER=3.3.3
+NGINX_EE_VER=3.4.0
 NGINX_MAINLINE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)
 NGINX_STABLE=$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)
+distro_version=$(lsb_release -sc)
 
 # Colors
 CSI='\033['
@@ -57,6 +64,11 @@ echo "" >/tmp/nginx-ee.log
     EE_VALID="YES"
 }
 
+[ -d /etc/wo ] && {
+    NGINX_WO=1
+    WO_VALID="YES"
+}
+
 [ ! -x /usr/sbin/nginx ] && {
     NGINX_FROM_SCRATCH=1
     echo "No Plesk or EasyEngine installation detected"
@@ -68,24 +80,32 @@ echo "" >/tmp/nginx-ee.log
 
 while [ ${#} -gt 0 ]; do
     case "${1}" in
-        '--pagespeed')
+        "--pagespeed")
             PAGESPEED="y"
+            if [ "$2" ]; then
+                PAGESPEED_VER="$2"
+            fi
+            shift
         ;;
-        '--pagespeed-beta')
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="1"
-        ;;
-        '--naxsi')
+        "--naxsi")
             NAXSI="y"
         ;;
-        '--rtmp')
+        "--rtmp")
             RTMP="y"
         ;;
-        '--latest' | '--mainline')
+        "--mainline" | "latest")
             NGINX_RELEASE=1
         ;;
-        '--stable')
+        "full")
+            PAGESPEED="y"
+            NAXSI="y"
+            RTMP="y"
+        ;;
+        "--stable")
             NGINX_RELEASE=2
+        ;;
+        "-i" | "--interactive")
+            INTERACTIVE_SETUP="1"
         ;;
         *) ;;
     esac
@@ -101,7 +121,7 @@ echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
 echo ""
 
 # interactive
-if [ -z "$NGINX_RELEASE" ]; then
+if [ "$INTERACTIVE_SETUP" = "1" ]; then
     clear
     echo ""
     echo "Do you want to compile the latest Nginx [1] Mainline v${NGINX_MAINLINE} or [2] Stable v${NGINX_STABLE} Release ?"
@@ -123,13 +143,17 @@ if [ -z "$NGINX_RELEASE" ]; then
     while [[ $NAXSI != "y" && $NAXSI != "n" ]]; do
         read -p "Select an option [y/n]: " NAXSI
     done
-
     echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ $RTMP != "y" && $RTMP != "n" ]]; do
         read -p "Select an option [y/n]: " RTMP
     done
     echo ""
 fi
+
+if [ -z "$NGINX_RELEASE" ]; then
+    NGINX_RELEASE=1
+fi
+
 ##################################
 # Set nginx release and modules
 ##################################
@@ -142,19 +166,24 @@ else
     NGX_HPACK=""
 fi
 
-if [ "$RTMP" = "y" ]; then
-    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
+
+if [ -z "$RTMP" ]; then
+    if [ "$distro_version" == "xenial" ] || [ "$distro_version" == "bionic" ]; then
+        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
+        NGX_RTMP=""
+        RTMP_VALID="NO"
+    else
+        NGINX_CC_OPT=( [index]='' )
+        NGX_RTMP=""
+        RTMP_VALID="NO"
+    fi
+else
+    NGINX_CC_OPT=( [index]='' )
     NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
     RTMP_VALID="YES"
-else
-    if [ "$distro_version" == "xenial" ] && [ "$distro_version" == "bionic" ]; then
-        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' )
-    else
-        NGINX_CC_OPT=( [index]=--with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -Wno-error=date-time -D_FORTIFY_SOURCE=2' )
-    fi
-    NGX_RTMP=""
-    RTMP_VALID="NO"
 fi
+
+
 
 if [ "$NAXSI" = "y" ]; then
     NGX_NAXSI="--add-module=/usr/local/src/naxsi/naxsi_src "
@@ -166,10 +195,10 @@ fi
 
 if [ "$PAGESPEED_RELEASE" = "1" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
-    PAGESPEED_VALID="Beta"
+    PAGESPEED_VALID="beta"
     elif [ "$PAGESPEED_RELEASE" = "2" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
-    PAGESPEED_VALID="Stable"
+    PAGESPEED_VALID="stable"
 else
     NGX_PAGESPEED=""
     PAGESPEED_VALID="NO"
@@ -195,6 +224,7 @@ echo "       - Pagespeed : $PAGESPEED_VALID "
 echo "       - Naxsi : $NAXSI_VALID"
 echo "       - RTMP : $RTMP_VALID"
 echo "       - EasyEngine : $EE_VALID"
+echo "       - WordOps : $WO_VALID"
 echo "       - Plesk : $PLESK_VALID"
 echo ""
 
@@ -208,7 +238,7 @@ apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
 libpcre3 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
 libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
 libcurl4-openssl-dev libgoogle-perftools-dev libperl-dev libpam0g-dev libbsd-dev zip unzip gnupg gnupg2 pigz libluajit-5.1-common \
-libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache curl debhelper dh-systemd libxml2 >>/tmp/nginx-ee.log 2>&1
+libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -262,18 +292,9 @@ fi
 # gcc7 for nginx stable on Ubuntu 16.04 LTS
 # gcc8 for nginx mainline on Ubuntu 16.04 LTS & 18.04 LTS
 
-# Checking lsb_release package
-if [ ! -x /usr/bin/lsb_release ]; then
-    sudo apt-get -y install lsb-release | sudo tee -a /tmp/nginx-ee.log 2>&1
-fi
-
-# install gcc-7
-distro_version=$(lsb_release -sc)
-
 {
-
-    if [ "$distro_version" == "bionic" ] || [ "$distro_version" == "xenial" ]; then
-        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-$(lsb_release -sc).list ]; then
+    if [ "$distro_version" = "bionic" ] || [ "$distro_version" = "xenial" ]; then
+        if  [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
             add-apt-repository -y ppa:jonathonf/gcc
             apt-get update
         fi
@@ -375,9 +396,12 @@ fi
 # clear previous compilation archives
 
 cd ${DIR_SRC} || exit
-rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*,ngx_cache_purge}
+rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,ngx_brotli,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install}
 
 echo -ne '       Downloading additionals modules        [..]\r'
+
+
+
 
 {
     # cache_purge module
@@ -543,12 +567,14 @@ fi
 # Download ngx_broti
 ##################################
 
-cd ${DIR_SRC} || exit 1
-
 echo -ne '       Downloading brotli                     [..]\r'
 {
-    git clone https://github.com/eustas/ngx_brotli
-    cd ngx_brotli || exit 1
+    if [ -d $DIR_SRC/ngx_broti ]; then
+        git -C $DIR_SRC/ngx_broti pull origin master
+    else
+        git clone https://github.com/eustas/ngx_brotli $DIR_SRC/ngx_broti
+    fi
+    cd $DIR_SRC/ngx_broti || exit 1
     git submodule update --init --recursive
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -567,9 +593,8 @@ fi
 
 echo -ne '       Downloading openssl                    [..]\r'
 
-cd ${DIR_SRC} || exit 1
 {
-    git clone https://github.com/openssl/openssl.git
+    git clone https://github.com/openssl/openssl.git $DIR_SRC/openssl
     cd ${DIR_SRC}/openssl || exit 1
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -720,16 +745,12 @@ NGINX_BUILD_OPTIONS="--prefix=/usr/share \
 
 if [ -z "$OVERRIDE_NGINX_MODULES" ]; then
     NGINX_INCLUDED_MODULES="--without-http_uwsgi_module \
-    --without-mail_imap_module \
-    --without-mail_pop3_module \
-    --without-mail_smtp_module \
     --with-http_stub_status_module \
     --with-http_realip_module \
     --with-http_auth_request_module \
     --with-http_addition_module \
-    --with-http_geoip_module \
     --with-http_gzip_static_module \
-    --with-http_image_filter_module \
+    --with-http_gunzip_module \
     --with-http_mp4_module \
     --with-http_sub_module"
 
@@ -739,15 +760,15 @@ fi
 
 if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
     NGINX_THIRD_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-    --add-module=/usr/local/src/srcache-nginx-module \
-    --add-module=/usr/local/src/ngx_http_redis \
-    --add-module=/usr/local/src/redis2-nginx-module \
-    --add-module=/usr/local/src/memc-nginx-module \
+    --add-dynamic-module=/usr/local/src/srcache-nginx-module \
+    --add-dynamic-module=/usr/local/src/ngx_http_redis \
+    --add-dynamic-module=/usr/local/src/redis2-nginx-module \
+    --add-dynamic-module=/usr/local/src/memc-nginx-module \
     --add-module=/usr/local/src/ngx_devel_kit \
     --add-module=/usr/local/src/set-misc-nginx-module \
-    --add-module=/usr/local/src/ngx_http_auth_pam_module \
+    --add-dynamic-module=/usr/local/src/ngx_http_auth_pam_module \
     --add-module=/usr/local/src/nginx-module-vts \
-    --add-module=/usr/local/src/ipscrubtmp/ipscrub"
+    --add-dynamic-module=/usr/local/src/ipscrubtmp/ipscrub"
 else
     NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
 fi
@@ -764,6 +785,10 @@ ${NGX_USER} \
 --with-http_v2_module \
 --with-http_ssl_module \
 --with-pcre-jit \
+--with-mail=dynamic \
+--with-stream=dynamic \
+--with-http_geoip_module=dynamic \
+--with-http_image_filter_module=dynamic \
 ${NGINX_INCLUDED_MODULES} \
 ${NGINX_THIRD_MODULES} \
 ${NGX_HPACK} \
@@ -775,7 +800,7 @@ ${NGX_RTMP} \
 --add-module=/usr/local/src/ngx_brotli \
 --with-zlib=/usr/local/src/zlib \
 --with-openssl=/usr/local/src/openssl \
---with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
+--with-openssl-opt="enable-ec_nistp_64_gcc_128 enable-tls1_3" \
 --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then

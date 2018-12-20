@@ -1,17 +1,19 @@
 # Nginx-EE
 
-## Compile and install the latest nginx releases from source with additional modules with EasyEngine, Plesk Onyx or from scratch
-
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
+
+[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee)
+
+Automated Nginx compilation with additional modules for EasyEngine v3, Plesk Onyx or from scratch
 
 ---
 
 ## Features
 
-* Compile the latest Nginx Mainline or Stable Release
+* Compile the latest Nginx release : stable or mainline
 * Install Nginx or replace Nginx package previously installed
 * Nginx official modules selection
-* Nginx Third-party Additonal selection
+* Nginx Third-party module selection
 * Brotli Support
 * TLS v1.3 support (Final)
 * Cloudflare HPACK (for Mainline release only)
@@ -23,18 +25,18 @@
 Nginx current mainline release : **v1.15.7**
 Nginx current stable release : **v1.14.2**
 
-* ngx_cache_purge
-* headers-more-nginx-module
+* [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
+* [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
 * [ngx_brotli](https://github.com/eustas/ngx_brotli)
-* srcache-nginx-module
-* ngx_http_substitutions_filter_module
+* [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
+* [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
-* Openssl 1.1.2-dev
+* [OpenSSL](https://github.com/openssl/openssl)
 * [ipscrub](http://www.ipscrub.org/)
-* ngx_http_auth_pam_module
+* [ngx_http_auth_pam_module](https://github.com/sto/ngx_http_auth_pam_module)
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
 
-optional modules :
+Optional modules :
 
 * [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx) (latest-beta or latest-stable)
 * [naxsi WAF](https://github.com/nbs-system/naxsi)
@@ -67,9 +69,6 @@ optional modules :
 - [Nginx modules](#nginx-modules)
   - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
   - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
-- [Troubleshooting](#troubleshooting)
-  - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
-  - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
 - [Nginx configurations](#nginx-configurations)
 - [Roadmap](#roadmap)
 
@@ -78,21 +77,22 @@ optional modules :
 ### Interactive install
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --interactive
 ```
 
 ### Non interactive install
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) [options] ...
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) [options] ...
 ```
 
 #### Options available
 
-Nginx release (required) :
+Build options :
 
 * `--mainline` : compile nginx mainline release
 * `--stable` : compile nginx stable release
+* `--full` : compile nginx mainline release with all additional modules
 
 Additional modules (optional)
 
@@ -106,7 +106,7 @@ Example :
 Compile Nginx mailine release with pagespeed stable
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
 ```
 
 ### Nginx modules
@@ -185,43 +185,6 @@ export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/ngx_http_s
 
 # compile nginx-ee with the modules previously selected
 bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
-```
-
-## Troubleshooting
-
-TLS v1.3 do not work or browser show error message `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` :
-
-Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/etc/nginx/conf.d/ssl.conf` for Plesk servers
-
-### TLSv1.2 + TLSv1.3
-
-```nginx
-    ##
-    # SSL Settings
-    ##
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES128:EECDH+AES128';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
-```
-
-### TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3
-
-```nginx
-    ##
-    # SSL Settings
-    ##
-    # intermediate configuration. tweak to your needs.
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
 ```
 
 ---
