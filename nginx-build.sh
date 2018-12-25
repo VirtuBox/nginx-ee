@@ -83,29 +83,29 @@ echo "" >/tmp/nginx-ee.log
 
 while [ ${#} -gt 0 ]; do
     case "${1}" in
-        "--pagespeed")
+        --pagespeed)
             PAGESPEED="y"
-            if [ "$2" ]; then
-                PAGESPEED_VER="$2"
-            fi
-            shift
         ;;
-        "--naxsi")
-            NAXSI="y"
+        --pagespeed-beta)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="1"
         ;;
-        "--rtmp")
-            RTMP="y"
-        ;;
-        "--mainline" | "latest")
-            NGINX_RELEASE=1
-        ;;
-        "full")
+        --full)
             PAGESPEED="y"
             NAXSI="y"
             RTMP="y"
         ;;
-        "--stable")
-            NGINX_RELEASE=2
+        --naxsi)
+            NAXSI="y"
+        ;;
+        --rtmp)
+            RTMP="y"
+        ;;
+        --latest | --mainline)
+            NGINX_RELEASE="1"
+        ;;
+        --stable)
+            NGINX_RELEASE="2"
         ;;
         "-i" | "--interactive")
             INTERACTIVE_SETUP="1"
