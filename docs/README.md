@@ -49,10 +49,15 @@ Optional modules :
 
 ### Operating System
 
+#### Recommended 
+
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
-* Debian 9 (Stretch)
-* Debian 8 (Jessie)
+
+#### Testing
+
+* Debian 9 (Stretch) 
+* Debian 8 (Jessie 
 * Raspbian (Stretch)
 
 ### Plesk releases
@@ -66,15 +71,10 @@ Optional modules :
 ## Usage
 
 <!-- TOC -->
-- [Interactive install](#interactive-install)
-  - [Non interactive install](#non-interactive-install)
-  - [Options available](#options-available)
+- [Default non-interactive install](#default-non-interactive-install)
+  - [Interactive install](#interactive-install)
+  - [Custom installation](#custom-installation)
 - [Nginx modules](#nginx-modules)
-  - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
-  - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
-- [Troubleshooting](#troubleshooting)
-  - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
-  - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
 - [Nginx configurations](#nginx-configurations)
 - [Roadmap](#roadmap)
 
@@ -121,124 +121,7 @@ Optional third-party modules :
 
 ### Nginx modules
 
-You can choose Nginx built-in and third-party modules you want to compile with Nginx-ee.
-To do so, you can override the list of modules compiled by Nginx-ee by exporting the variable **OVERRIDE_NGINX_MODULES** before launching the script.
-
-Some Nginx modules are built by default and do not have to be specified (for example --with-http_gzip_module isn't required). Default modules can be explicitly excluded with the flag `--without-ngx_module_name`
-But many modules are not built by default and must be listed in the modules to compile, for example you can add mp4 streaming module with  `--with-http_mp4_module`.
-You do not need to use `--without` for modules not built by default with Nginx.
-
-The list of Nginx modules compiled by default and optional modules is available on [Nginx Docs](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#modules-built-by-default)
-
-To override **official modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_MODULES** before launching nginx-ee script.
-
-To override **third-party modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_ADDITIONAL_MODULES** before laucnhing nginx-ee script.
-**Important** : If you want to add a third-party module, you will have to download its source in `/usr/local/src` before launching the compilation.
-
-Examples :
-
-#### Override list of modules built by default with nginx-ee
-
-```bash
-# choose modules you want to build
-# This is the list of modules built by default with nginx-ee
-export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
-    --without-mail_imap_module \
-    --without-mail_pop3_module \
-    --without-mail_smtp_module \
-    --with-http_stub_status_module \
-    --with-http_realip_module \
-    --with-http_auth_request_module \
-    --with-http_addition_module \
-    --with-http_geoip_module \
-    --with-http_gzip_static_module \
-    --with-http_image_filter_module \
-    --with-http_mp4_module \
-    --with-http_sub_module"
-
-
-# compile nginx-ee with the modules previously selected
-bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
-```
-
-#### Override list of third-party modules built by default with nginx-ee
-
-You can add/remove additional third-party modules compiled with nginx-ee.
-By default Nginx-ee will compile the following third-party modules
-
-```bash
-    --add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-    --add-module=/usr/local/src/srcache-nginx-module \
-    --add-module=/usr/local/src/ngx_http_redis \
-    --add-module=/usr/local/src/redis2-nginx-module \
-    --add-module=/usr/local/src/memc-nginx-module \
-    --add-module=/usr/local/src/ngx_devel_kit \
-    --add-module=/usr/local/src/set-misc-nginx-module \
-    --add-module=/usr/local/src/ngx_http_auth_pam_module \
-    --add-module=/usr/local/src/nginx-module-vts \
-    --add-module=/usr/local/src/ipscrubtmp/ipscrub
-```
-
-Here an example to add the nginx module mod_zip :
-
-```bash
-# clone the module repository into /usr/local/src
-git clone https://github.com/evanmiller/mod_zip.git /usr/local/src/mod_zip
-
-# add the module to the modules list using the variable OVERRIDE_NGINX_ADDITIONAL_MODULES
-# This is the list of third-party modules built by default with nginx-ee + mod_zip module
-export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-    --add-module=/usr/local/src/srcache-nginx-module \
-    --add-module=/usr/local/src/ngx_http_redis \
-    --add-module=/usr/local/src/redis2-nginx-module \
-    --add-module=/usr/local/src/memc-nginx-module \
-    --add-module=/usr/local/src/ngx_devel_kit \
-    --add-module=/usr/local/src/set-misc-nginx-module \
-    --add-module=/usr/local/src/ngx_http_auth_pam_module \
-    --add-module=/usr/local/src/nginx-module-vts \
-    --add-module=/usr/local/src/ipscrubtmp/ipscrub \
-    --add-module=/usr/local/src/mod_zip" # add mod_zip module at the end of the list
-
-# compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
-```
-
-## Troubleshooting
-
-TLS v1.3 do not work or browser show error message `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` :
-
-Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/etc/nginx/conf.d/ssl.conf` for Plesk servers
-
-### TLSv1.2 + TLSv1.3
-
-```nginx
-    ##
-    # SSL Settings
-    ##
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
-```
-
-### TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3
-
-```nginx
-    ##
-    # SSL Settings
-    ##
-    # intermediate configuration. tweak to your needs.
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES128:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-    ssl_ecdh_curve X25519:sect571r1:secp521r1:secp384r1;
-```
+You can choose Nginx built-in and third-party modules you want to compile with Nginx-ee. You can find more informations in the [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/Nginx-modules)
 
 ---
 
