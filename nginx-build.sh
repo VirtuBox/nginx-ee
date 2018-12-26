@@ -185,7 +185,7 @@ if [ -z "$RTMP" ]; then
         RTMP_VALID="NO"
     fi
 else
-    NGINX_CC_OPT=( [index]='' )
+    NGINX_CC_OPT=( [index]=--with-cc-opt='-m64' )
     NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
     RTMP_VALID="YES"
 fi
@@ -329,8 +329,10 @@ fi
 
 if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
     if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
+    {
         add-apt-repository -y ppa:jonathonf/gcc
         apt-get update
+    } >>/tmp/nginx-ee.log 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
         if [ ! -x /usr/bin/gcc-8 ]; then
@@ -407,9 +409,6 @@ cd ${DIR_SRC} || exit
 rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install}
 
 echo -ne '       Downloading additionals modules        [..]\r'
-
-
-
 
 {
     # cache_purge module
