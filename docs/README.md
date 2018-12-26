@@ -1,17 +1,20 @@
 # Nginx-EE
 
-## Compile and install the latest nginx releases from source with additional modules with EasyEngine, Plesk Onyx or from scratch
-
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
+
+[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee)
+
+Automated Nginx compilation with additional modules for EasyEngine v3, Plesk Onyx or from scratch
 
 ---
 
 ## Features
 
-* Compile the latest Nginx Mainline or Stable Release
+* Compile the latest Nginx release : stable or mainline
 * Install Nginx or replace Nginx package previously installed
-* Nginx official modules selection
-* Nginx Third-party Additonal selection
+* Nginx built-in modules selection
+* Nginx Third-party module selection
+* Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
 * Cloudflare HPACK (for Mainline release only)
@@ -20,21 +23,21 @@
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.15.7**
+Nginx current mainline release : **v1.15.8**
 Nginx current stable release : **v1.14.2**
 
-* ngx_cache_purge
-* headers-more-nginx-module
+* [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
+* [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
 * [ngx_brotli](https://github.com/eustas/ngx_brotli)
-* srcache-nginx-module
-* ngx_http_substitutions_filter_module
+* [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
+* [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
-* Openssl 1.1.2-dev
+* [OpenSSL](https://github.com/openssl/openssl)
 * [ipscrub](http://www.ipscrub.org/)
-* ngx_http_auth_pam_module
+* [ngx_http_auth_pam_module](https://github.com/sto/ngx_http_auth_pam_module)
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
 
-optional modules :
+Optional modules :
 
 * [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx) (latest-beta or latest-stable)
 * [naxsi WAF](https://github.com/nbs-system/naxsi)
@@ -48,7 +51,9 @@ optional modules :
 
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
-* Debian 8 (Deprecated)
+* Debian 9 (Stretch)
+* Debian 8 (Jessie)
+* Raspbian (Stretch)
 
 ### Plesk releases
 
@@ -75,44 +80,55 @@ optional modules :
 
 <!-- /TOC -->
 
-### Interactive install
+### Default non-interactive install
+
+By default, nginx-ee compile Nginx Mainline release without Pagespeed, Naxsi or RTMP
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
-### Non interactive install
+### Interactive install
+
+Interactive installation is also available
 
 ```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) [options] ...
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --interactive
+```
+
+### Custom installation
+
+Exemple : Nginx stable release with pagespeed and naxsi
+
+```bash
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --stable --pagespeed --naxsi
 ```
 
 #### Options available
 
-Nginx release (required) :
+Nginx build options :
 
-* `--mainline` : compile nginx mainline release
-* `--stable` : compile nginx stable release
+* `--stable` : compile Nginx stable release
+* `--full` : Naxsi + PageSpeed + RTMP
+* `--dynamic` : compile Nginx with dynamic modules
 
-Additional modules (optional)
+Optional third-party modules :
 
 * `--pagespeed`: compile nginx with ngx_pagespeed latest-stable
 * `--pagespeed-beta`: compile nginx with ngx_pagespeed latest-beta
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 
-Example :
-
-Compile Nginx mailine release with pagespeed stable
-
-```bash
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --mainline --pagespeed
-```
-
 ### Nginx modules
 
-You can choose Nginx official modules and third-party modules you want to compile with Nginx-ee.
-The list of official modules built by default and optional modules is available on [Nginx Docs](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#modules-built-by-default)
+You can choose Nginx built-in and third-party modules you want to compile with Nginx-ee.
+To do so, you can override the list of modules compiled by Nginx-ee by exporting the variable **OVERRIDE_NGINX_MODULES** before launching the script.
+
+Some Nginx modules are built by default and do not have to be specified (for example --with-http_gzip_module isn't required). Default modules can be explicitly excluded with the flag `--without-ngx_module_name`
+But many modules are not built by default and must be listed in the modules to compile, for example you can add mp4 streaming module with  `--with-http_mp4_module`.
+You do not need to use `--without` for modules not built by default with Nginx.
+
+The list of Nginx modules compiled by default and optional modules is available on [Nginx Docs](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/#modules-built-by-default)
 
 To override **official modules** compiled with nginx-ee, export the variable **OVERRIDE_NGINX_MODULES** before launching nginx-ee script.
 
@@ -142,7 +158,7 @@ export OVERRIDE_NGINX_MODULES="--without-http_uwsgi_module \
 
 
 # compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 #### Override list of third-party modules built by default with nginx-ee
@@ -200,7 +216,7 @@ Update nginx ssl_ciphers in `/etc/nginx/nginx.conf` for EasyEngine servers or `/
     # SSL Settings
     ##
     ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS13+AESGCM+AES128:EECDH+AES128';
+    ssl_ciphers 'TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES';
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:50m;
     ssl_session_timeout 1d;
