@@ -13,14 +13,9 @@ script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo apt-get install -y --force-yes git nginx curl wget
-  - export NGINX_RELEASE="1"
+  - sudo bash nginx-build.sh --stable $TRAVIS_BRANCH
+  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
   - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'cat /tmp/nginx-ee.log'
-  - export NGINX_RELEASE="2"
-  - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'cat /tmp/nginx-ee.log'
-  - export PAGESPEED="y"
-  - export NAXSI="y"
-  - export RTMP="y"
-  - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'cat /tmp/nginx-ee.log'
+  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
+  - sudo bash nginx-build.sh --full $TRAVIS_BRANCH
+  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
