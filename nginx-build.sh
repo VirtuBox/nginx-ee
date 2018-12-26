@@ -38,6 +38,10 @@ NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'n
 DISTRO_VERSION="$(lsb_release -sc)"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 
+
+
+# install gcc-7
+
 # Colors
 CSI='\033['
 CEND="${CSI}0m"
@@ -143,7 +147,6 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$NAXSI" != "y" && "$NAXSI" != "n" ]]; do
         read -p "Select an option [y/n]: " NAXSI
     done
-
     echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
         read -p "Select an option [y/n]: " RTMP
@@ -405,6 +408,9 @@ rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl,openssl-*,pcre,zlib,incubato
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
+
+
+
 {
     # cache_purge module
     { [ -d ${DIR_SRC}/ngx_cache_purge ] && {
@@ -593,7 +599,6 @@ fi
 
 echo -ne '       Downloading openssl                    [..]\r'
 
-cd ${DIR_SRC} || exit 1
 {
     git clone https://github.com/openssl/openssl.git $DIR_SRC/openssl
     cd ${DIR_SRC}/openssl || exit 1

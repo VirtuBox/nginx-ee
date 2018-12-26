@@ -72,9 +72,6 @@ Optional modules :
 - [Nginx modules](#nginx-modules)
   - [Override list of modules built by default with nginx-ee](#override-list-of-modules-built-by-default-with-nginx-ee)
   - [Override list of third-party modules built by default with nginx-ee](#override-list-of-third-party-modules-built-by-default-with-nginx-ee)
-- [Troubleshooting](#troubleshooting)
-  - [TLSv1.2 + TLSv1.3](#tlsv12--tlsv13)
-  - [TLSv1.0 + TLSv1.1 + TLSv1.2 + TLSv1.3](#tlsv10--tlsv11--tlsv12--tlsv13)
 - [Nginx configurations](#nginx-configurations)
 - [Roadmap](#roadmap)
 
@@ -200,7 +197,7 @@ export OVERRIDE_NGINX_ADDITIONAL_MODULES="--add-module=/usr/local/src/ngx_http_s
     --add-module=/usr/local/src/mod_zip" # add mod_zip module at the end of the list
 
 # compile nginx-ee with the modules previously selected
-bash <(wget -qO - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
 ```
 
 ## Troubleshooting
