@@ -7,8 +7,12 @@
 # Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.4.0 - 2018-12-26
+# Version 3.4.1 - 2018-12-27
 # -------------------------------------------------------------------------
+
+##################################
+# Check requirements
+##################################
 
 # Check if user is root
 [ "$(id -u)" != "0" ] && {
@@ -18,29 +22,28 @@
 
 # check if curl is installed
 [ ! -x /usr/bin/curl ] && {
-    apt-get install curl | sudo tee -a /tmp/nginx-ee.log 2>&1
+    apt-get install curl >> /tmp/nginx-ee.log 2>&1
 }
 
 # Checking lsb_release package
 [ ! -x /usr/bin/lsb_release ] && {
-    sudo apt-get -y install lsb-release | sudo tee -a /tmp/nginx-ee.log 2>&1
+    apt-get -y install lsb-release >> /tmp/nginx-ee.log 2>&1
 }
 
+[ ! -x /bin/tar ] && {
+    apt-get -y install tar >> /tmp/nginx-ee.log 2>&1
+}
 ##################################
 # Variables
 ##################################
 
 NAXSI_VER="0.56"
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.4.0"
+NGINX_EE_VER="3.4.1"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
 DISTRO_VERSION="$(lsb_release -sc)"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
-
-
-
-# install gcc-7
 
 # Colors
 CSI='\033['
@@ -72,7 +75,6 @@ echo "" >/tmp/nginx-ee.log
 
 [ ! -x /usr/sbin/nginx ] && {
     NGINX_FROM_SCRATCH=1
-    echo "No Plesk or EasyEngine installation detected"
 }
 
 ##################################
@@ -81,37 +83,37 @@ echo "" >/tmp/nginx-ee.log
 
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
-    --pagespeed)
-        PAGESPEED="y"
+        --pagespeed)
+            PAGESPEED="y"
         ;;
-    --pagespeed-beta)
-        PAGESPEED="y"
-        PAGESPEED_RELEASE="1"
+        --pagespeed-beta)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="1"
         ;;
-    --full)
-        PAGESPEED="y"
-        NAXSI="y"
-        RTMP="y"
+        --full)
+            PAGESPEED="y"
+            NAXSI="y"
+            RTMP="y"
         ;;
-    --naxsi)
-        NAXSI="y"
+        --naxsi)
+            NAXSI="y"
         ;;
-    --rtmp)
-        RTMP="y"
+        --rtmp)
+            RTMP="y"
         ;;
-    --latest | --mainline)
-        NGINX_RELEASE="1"
+        --latest | --mainline)
+            NGINX_RELEASE="1"
         ;;
-    --stable)
-        NGINX_RELEASE="2"
+        --stable)
+            NGINX_RELEASE="2"
         ;;
-    -i | --interactive)
-        INTERACTIVE_SETUP="1"
+        -i | --interactive)
+            INTERACTIVE_SETUP="1"
         ;;
-    --dynamic)
-        DYNAMIC_MODULES="1"
+        --dynamic)
+            DYNAMIC_MODULES="1"
         ;;
-    *) ;;
+        *) ;;
     esac
     shift
 done
@@ -209,7 +211,7 @@ fi
 if [ "$PAGESPEED_RELEASE" = "1" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
     PAGESPEED_VALID="beta"
-elif [ "$PAGESPEED_RELEASE" = "2" ]; then
+    elif [ "$PAGESPEED_RELEASE" = "2" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
     PAGESPEED_VALID="stable"
 else
@@ -270,10 +272,10 @@ echo ""
 echo -ne '       Installing dependencies               [..]\r'
 apt-get update >>/tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
-    libpcre3 libpcre3-dev libgd-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
-    libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
-    libcurl4-openssl-dev libgoogle-perftools-dev libperl-dev libpam0g-dev libbsd-dev zip unzip gnupg gnupg2 pigz libluajit-5.1-common \
-    libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache curl debhelper dh-systemd libxml2 >>/tmp/nginx-ee.log 2>&1
+libpcre3 libpcre3-dev libgd3 libgd-dev libssl-dev libxslt1.1 libxslt1-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
+libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
+libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libluajit-5.1-common \
+libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 libxml2-dev >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -291,31 +293,44 @@ fi
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
 
     # clone custom nginx configuration
-    git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
+    git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx >>/tmp/nginx-ee.log 2>&1
 
     # create nginx temp directory
     mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
     # create nginx cache directory
     [ ! -d /var/cache/nginx ] && {
-        mkdir -p /var/run/nginx-cache
+        mkdir -p /var/cache/nginx
     }
     [ ! -d /var/run/nginx-cache ] && {
         mkdir -p /var/run/nginx-cache
     }
+    [ ! -d /var/log/nginx ] && {
+        mkdir -p /var/log/nginx
+        chmod 640 /var/log/nginx
+        chown -R www-data:adm /var/log/nginx
+    }
+
     # set proper permissions
-    chown -R www-data:root /var/lib/nginx/* /var/cache/nginx /var/run/nginx-cache
+    chown -R www-data:root /var/lib/nginx /var/cache/nginx /var/run/nginx-cache
+
     # create websites directory
-    mkdir -p /var/www/html
+    [ ! -d /var/www/html ] && {
+        mkdir -p /var/www/html
+    }
+
 
     {
-
+        # download default nginx page
         wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
         ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-
+        # download nginx systemd service
         [ ! -f /lib/systemd/system/nginx.service ] && {
             wget -O /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
             systemctl enable nginx.service
         }
+
+        # download logrotate configuration
+        wget -O /etc/logrotate.d/nginx https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/logrotate.d/nginx
 
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -329,10 +344,10 @@ fi
 
 if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
     if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
-    {
-        add-apt-repository -y ppa:jonathonf/gcc
-        apt-get update
-    } >>/tmp/nginx-ee.log 2>&1
+        {
+            add-apt-repository -y ppa:jonathonf/gcc
+            apt-get update
+        } >>/tmp/nginx-ee.log 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
         if [ ! -x /usr/bin/gcc-8 ]; then
@@ -356,8 +371,6 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
             echo -ne '       Installing gcc-7                       [..]\r'
 
             {
-                add-apt-repository -y ppa:jonathonf/gcc-7.1
-                apt-get update -y
                 apt-get install gcc-7 g++-7 -y
                 update-alternatives --remove-all gcc
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
@@ -381,10 +394,13 @@ fi
 if [ "$RTMP" = "y" ]; then
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
-        if [ "$DISTRO_VERSION" == "xenial" ] && [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-xenial.list ]; then
+
+        if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
             add-apt-repository -y ppa:jonathonf/ffmpeg-4
             apt-get update
             apt-get install ffmpeg -y
+        fi
         else
             apt-get install ffmpeg -y
         fi
@@ -413,68 +429,68 @@ echo -ne '       Downloading additionals modules        [..]\r'
 {
     # cache_purge module
     { [ -d ${DIR_SRC}/ngx_cache_purge ] && {
-        git -C ${DIR_SRC}/ngx_cache_purge pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/ngx_cache_purge pull origin master
+        }; } || {
         git clone https://github.com/FRiCKLE/ngx_cache_purge.git
     }
     # memcached module
     { [ -d ${DIR_SRC}/memc-nginx-module ] && {
-        git -C ${DIR_SRC}/memc-nginx-module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/memc-nginx-module pull origin master
+        }; } || {
         git clone https://github.com/openresty/memc-nginx-module.git
     }
     # devel kit
     { [ -d ${DIR_SRC}/ngx_devel_kit ] && {
-        git -C ${DIR_SRC}/ngx_devel_kit pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/ngx_devel_kit pull origin master
+        }; } || {
         git clone https://github.com/simpl/ngx_devel_kit.git
     }
     # headers-more module
     { [ -d ${DIR_SRC}/headers-more-nginx-module ] && {
-        git -C ${DIR_SRC}/headers-more-nginx-module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/headers-more-nginx-module pull origin master
+        }; } || {
         git clone https://github.com/openresty/headers-more-nginx-module.git
     }
     # echo module
     { [ -d ${DIR_SRC}/echo-nginx-module ] && {
-        git -C ${DIR_SRC}/echo-nginx-module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/echo-nginx-module pull origin master
+        }; } || {
         git clone https://github.com/openresty/echo-nginx-module.git
     }
     # http_substitutions_filter module
     { [ -d ${DIR_SRC}/ngx_http_substitutions_filter_module ] && {
-        git -C ${DIR_SRC}/ngx_http_substitutions_filter_module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/ngx_http_substitutions_filter_module pull origin master
+        }; } || {
         git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
     }
     # redis2 module
     { [ -d ${DIR_SRC}/redis2-nginx-module ] && {
-        git -C ${DIR_SRC}/redis2-nginx-module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/redis2-nginx-module pull origin master
+        }; } || {
         git clone https://github.com/openresty/redis2-nginx-module.git
     }
     # srcache module
     { [ -d ${DIR_SRC}/srcache-nginx-module ] && {
-        git -C ${DIR_SRC}/srcache-nginx-module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/srcache-nginx-module pull origin master
+        }; } || {
         git clone https://github.com/openresty/srcache-nginx-module.git
     }
     # set-misc module
     { [ -d ${DIR_SRC}/set-misc-nginx-module ] && {
-        git -C ${DIR_SRC}/set-misc-nginx-module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/set-misc-nginx-module pull origin master
+        }; } || {
         git clone https://github.com/openresty/set-misc-nginx-module.git
     }
     # auth_pam module
     { [ -d ${DIR_SRC}/ngx_http_auth_pam_module ] && {
-        git -C ${DIR_SRC}/ngx_http_auth_pam_module pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/ngx_http_auth_pam_module pull origin master
+        }; } || {
         git clone https://github.com/sto/ngx_http_auth_pam_module.git
     }
     # nginx-vts module
     { [ -d ${DIR_SRC}/nginx-module-vts ] && {
-        git -C ${DIR_SRC}/nginx-module-vts pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/nginx-module-vts pull origin master
+        }; } || {
         git clone https://github.com/vozlt/nginx-module-vts.git
     }
     # http redis module
@@ -482,15 +498,15 @@ echo -ne '       Downloading additionals modules        [..]\r'
     mv ngx_http_redis-0.3.8 ngx_http_redis
     if [ "$RTMP" = "y" ]; then
         { [ -d ${DIR_SRC}/nginx-rtmp-module ] && {
-            git -C ${DIR_SRC}/nginx-rtmp-module pull origin master
-        }; } || {
+                git -C ${DIR_SRC}/nginx-rtmp-module pull origin master
+            }; } || {
             git clone https://github.com/arut/nginx-rtmp-module.git
         }
     fi
     # ipscrub module
     { [ -d ${DIR_SRC}/ipscrubtmp ] && {
-        git -C ${DIR_SRC}/ipscrubtmp pull origin master
-    }; } || {
+            git -C ${DIR_SRC}/ipscrubtmp pull origin master
+        }; } || {
         git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
     }
 
@@ -512,8 +528,8 @@ fi
 echo -ne '       Downloading zlib                       [..]\r'
 
 {
-    cd ${DIR_SRC} || exit 1
-    curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
+    cd "$DIR_SRC" || exit 1
+    curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
     mv zlib-1.2.11 zlib
 
 } >>/tmp/nginx-ee.log 2>&1
@@ -538,24 +554,25 @@ if [ ! -x /usr/bin/pcretest ]; then
     if [ "$PCRE_VERSION" != "8.42" ]; then
         echo -ne '       Downloading pcre                       [..]\r'
         {
-            curl -sL https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
+            curl -sL https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
             mv pcre-8.42 pcre
 
             cd ${DIR_SRC}/pcre || exit 1
             ./configure --prefix=/usr \
-                --enable-utf8 \
-                --enable-unicode-properties \
-                --enable-pcre16 \
-                --enable-pcre32 \
-                --enable-pcregrep-libz \
-                --enable-pcregrep-libbz2 \
-                --enable-pcretest-libreadline \
-                --enable-jit
+            --enable-utf8 \
+            --enable-unicode-properties \
+            --enable-pcre16 \
+            --enable-pcre32 \
+            --enable-pcregrep-libz \
+            --enable-pcregrep-libbz2 \
+            --enable-pcretest-libreadline \
+            --enable-jit
 
             make -j "$(nproc)"
             make install
             mv -v /usr/lib/libpcre.so.* /lib
             ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
+
         } >>/tmp/nginx-ee.log 2>&1
         if [ $? -eq 0 ]; then
             echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
@@ -621,14 +638,14 @@ fi
 # Download Naxsi
 ##################################
 
-cd ${DIR_SRC} || exit 1
+cd "$DIR_SRC" || exit 1
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
         [ -d ${DIR_SRC}/naxsi ] && {
             rm -rf ${DIR_SRC}/naxsi
         }
-        curl -sL https://github.com/nbs-system/naxsi/archive/${NAXSI_VER}.tar.gz | /bin/tar zxf - -C ${DIR_SRC}
+        curl -sL https://github.com/nbs-system/naxsi/archive/${NAXSI_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
         mv naxsi-${NAXSI_VER} naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -647,7 +664,7 @@ fi
 # Download Pagespeed
 ##################################
 
-cd ${DIR_SRC} || exit 1
+cd "$DIR_SRC" || exit 1
 if [ "$PAGESPEED" = "y" ]; then
     echo -ne '       Downloading pagespeed                  [..]\r'
 
@@ -655,9 +672,9 @@ if [ "$PAGESPEED" = "y" ]; then
         wget -qO build_ngx_pagespeed.sh https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
         chmod +x build_ngx_pagespeed.sh
         if [ "$PAGESPEED_RELEASE" = "1" ]; then
-            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b ${DIR_SRC}
+            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b "$DIR_SRC"
         else
-            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b ${DIR_SRC}
+            ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b "$DIR_SRC"
         fi
     } >>/tmp/nginx-ee.log 2>&1
 
@@ -675,11 +692,11 @@ fi
 # Download Nginx
 ##################################
 
-cd ${DIR_SRC} || exit 1
+cd "$DIR_SRC" || exit 1
 echo -ne '       Downloading nginx                      [..]\r'
 
 {
-    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C $DIR_SRC
+    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
     mv $DIR_SRC/nginx-${NGINX_VER} $DIR_SRC/nginx
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -724,7 +741,6 @@ fi
 ##################################
 
 echo -ne '       Configuring nginx                      [..]\r'
-
 
 # main configuration
 NGINX_BUILD_OPTIONS="--prefix=/usr/share \
@@ -801,30 +817,30 @@ else
 fi
 
 ./configure \
-    ${NGX_NAXSI} \
-    "${NGINX_CC_OPT[@]}" \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
-    ${NGINX_BUILD_OPTIONS} \
-    --build='VirtuBox Nginx-ee' \
-    ${NGX_USER} \
-    --with-file-aio \
-    --with-threads \
-    --with-http_v2_module \
-    --with-http_ssl_module \
-    --with-pcre-jit \
-    ${NGINX_INCLUDED_MODULES} \
-    ${NGINX_THIRD_MODULES} \
-    ${NGX_HPACK} \
-    ${NGX_PAGESPEED} \
-    ${NGX_RTMP} \
-    --add-module=/usr/local/src/echo-nginx-module \
-    --add-module=/usr/local/src/headers-more-nginx-module \
-    --add-module=/usr/local/src/ngx_cache_purge \
-    --add-module=/usr/local/src/ngx_brotli \
-    --with-zlib=/usr/local/src/zlib \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt='enable-tls1_3' \
-    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+${NGX_NAXSI} \
+"${NGINX_CC_OPT[@]}" \
+--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
+${NGINX_BUILD_OPTIONS} \
+--build='VirtuBox Nginx-ee' \
+${NGX_USER} \
+--with-file-aio \
+--with-threads \
+--with-http_v2_module \
+--with-http_ssl_module \
+--with-pcre-jit \
+${NGINX_INCLUDED_MODULES} \
+${NGINX_THIRD_MODULES} \
+${NGX_HPACK} \
+${NGX_PAGESPEED} \
+${NGX_RTMP} \
+--add-module=/usr/local/src/echo-nginx-module \
+--add-module=/usr/local/src/headers-more-nginx-module \
+--add-module=/usr/local/src/ngx_cache_purge \
+--add-module=/usr/local/src/ngx_brotli \
+--with-zlib=/usr/local/src/zlib \
+--with-openssl=/usr/local/src/openssl \
+--with-openssl-opt='enable-tls1_3' \
+--sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
@@ -851,7 +867,7 @@ if [ $? -eq 0 ]; then
     echo -ne "       Compiling nginx                        [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
-    echo -e "        Compile nginx      [${CRED}FAIL${CEND}]"
+    echo -e "       Compiling nginx                        [${CRED}FAIL${CEND}]"
     echo -e '\n      Please look at /tmp/nginx-ee.log\n'
     exit 1
 fi
@@ -860,6 +876,23 @@ fi
 # Perform final tasks
 ##################################
 
+# update nginx manual
+[ -f /usr/share/man/man8/nginx.8.gz ] && {
+    rm /usr/share/man/man8/nginx.8.gz
+}
+
+{
+    cp -f ${DIR_SRC}/nginx/man/nginx.8 /usr/share/man/man8
+    gzip /usr/share/man/man8/nginx.8
+
+} >>/tmp/nginx-ee.log
+
+# update mime.types
+cp -f ${DIR_SRC}/nginx/conf/mime.types /etc/nginx/mime.types
+
+
+
+# block Nginx package update from APT repository
 [ ! -f /etc/apt/preferences.d/nginx-block ] && {
     if [ "$NGINX_PLESK" = "1" ]; then
         {
@@ -885,7 +918,6 @@ fi
     fi
 }
 
-
 {
     # enable nginx service
     systemctl unmask nginx.service
@@ -910,6 +942,7 @@ else
     echo -e "       Checking nginx configuration           [${CRED}FAIL${CEND}]"
     echo -e '\nPlease look at /tmp/nginx-ee.log or use the command nginx -t to find the issue\n'
 fi
+
 # We're done !
 echo ""
 echo -e "       ${CGREEN}Nginx ee was compiled successfully !${CEND}"

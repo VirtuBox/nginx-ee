@@ -1,7 +1,7 @@
 /var/log/nginx/*.log {
         weekly
         missingok
-        rotate 2
+        rotate 4
         compress
         delaycompress
         notifempty
