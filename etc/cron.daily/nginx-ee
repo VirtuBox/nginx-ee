@@ -1,0 +1,64 @@
+#!/bin/sh
+# -------------------------------------------------------------------------
+#  Nginx-ee - Daily Update Cronjob
+# -------------------------------------------------------------------------
+# Website:       https://virtubox.net
+# GitHub:        https://github.com/VirtuBox/nginx-ee
+# Copyright (c) 2018 VirtuBox <contact@virtubox.net>
+# This script is licensed under M.I.T
+# -------------------------------------------------------------------------
+# Version 3.5.0 - 2019-01-01
+# -------------------------------------------------------------------------
+
+##################################
+# Check Nginx version and modules
+##################################
+
+CURRENT_NGINX="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}')"
+NGINX_MAINLINE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
+NGINX_STABLE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
+CURRENT_STABLE="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}' | grep 1.14)"
+PAGESPEED="$(/usr/sbin/nginx -V 2>&1 | grep pagespeed)"
+NAXSI="$(/usr/sbin/nginx -V 2>&1 | grep naxsi)"
+RTMP="$(/usr/sbin/nginx -V 2>&1 | grep rtmp)"
+PAGESPEED_BETA="$(/usr/sbin/nginx -V 2>&1 | grep latest-beta)"
+
+##################################
+# Check if new release is available
+##################################
+
+if [ "$CURRENT_NGINX" != "$NGINX_MAINLINE" ] && [ "$CURRENT_NGINX" != "$NGINX_STABLE" ]; then
+    [ ! -d $HOME/.scripts ] && {
+        mkdir -p $HOME/.scripts
+    }
+    wget -O $HOME/.scripts/nginx-build.sh https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh >/dev/null 2>&1
+    chmod +x $HOME/.scripts/nginx-build.sh
+
+    if [ -n "$PAGESPEED" ]; then
+        if [ -n "$PAGESPEED_BETA" ]; then
+            PAGESPEED_ARG="--pagespeed-beta"
+        else
+            PAGESPEED_ARG="--pagespeed"
+        fi
+    else
+        PAGESPEED_ARG=""
+    fi
+
+    if [ -n "$NAXSI" ]; then
+        NAXSI_ARG="--naxsi"
+    else
+        NAXSI_ARG=""
+    fi
+
+    if [ -n "$RTMP" ]; then
+        RTMP_ARG="--rtmp"
+    else
+        RTMP_ARG=""
+    fi
+
+    if [ -n "$CURRENT_STABLE" ]; then
+        $HOME/.scripts/nginx-build.sh --stable "$PAGESPEED_ARG" "$NAXSI_ARG" "$RTMP_ARG" >/dev/null 2>&1
+    else
+        $HOME/.scripts/nginx-build.sh "$PAGESPEED_ARG" "$NAXSI_ARG" "$RTMP_ARG" >/dev/null 2>&1
+    fi
+fi
