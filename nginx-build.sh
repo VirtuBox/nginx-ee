@@ -974,7 +974,7 @@ echo -ne '       Performing final steps                 [..]\r'
     systemctl enable nginx.service
     systemctl start nginx.service
     # remove default configuration
-    rm /etc/nginx/{*.default,*.dpkg-dist}
+    rm -f /etc/nginx/{*.default,*.dpkg-dist}
 } >/dev/null 2>&1
 
 if [ $? -eq 0 ]; then
