@@ -9,9 +9,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Make nginx-ee more modular
-- Add support for Debian 9
-- Add support for Raspbian
 - Improve documentation
+
+## [3.5.0] - 2018-12-26
+
+### Changed
+
+- uwsgi support re-added
+- set back apt-mark hold on sw-nginx package for Plesk
+
+### Added
+
+- added daily cronjob for automated update
+- Add support for Debian 9 & Raspbian
 
 ## [3.4.0] - 2018-12-26
 
