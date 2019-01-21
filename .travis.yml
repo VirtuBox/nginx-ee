@@ -1,9 +1,5 @@
 language: bash
 
-branches:
-  only:
-  - develop
-
 dist: xenial
 
 before_install:
