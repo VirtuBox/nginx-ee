@@ -1,9 +1,5 @@
 language: bash
 
-branches:
-  only:
-  - develop
-
 dist: xenial
 
 before_install:
@@ -17,9 +13,6 @@ script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo apt-get install -y --force-yes git nginx curl wget
-  - sudo bash nginx-build.sh --stable $TRAVIS_BRANCH
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
-  - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
-  - sudo bash nginx-build.sh --full $TRAVIS_BRANCH
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
+  - sudo bash nginx-build.sh $TRAVIS_BRANCH || sudo tail -n50 /tmp/nginx-ee.log
+  - sudo bash nginx-build.sh --stable $TRAVIS_BRANCH || sudo tail -n50 /tmp/nginx-ee.log
+  - sudo bash nginx-build.sh --full $TRAVIS_BRANCH || sudo tail -n50 /tmp/nginx-ee.log

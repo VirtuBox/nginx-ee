@@ -83,18 +83,19 @@ echo "" >/tmp/nginx-ee.log
 
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
-    --pagespeed)
-        PAGESPEED="y"
+        --pagespeed)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="2"
         ;;
     --pagespeed-beta)
         PAGESPEED="y"
         PAGESPEED_RELEASE="1"
         ;;
-    --full)
-        PAGESPEED="y"
-        NAXSI="y"
-        RTMP="y"
-        ;;
+        --full)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="2"
+            NAXSI="y"
+            RTMP="y"
     --naxsi)
         NAXSI="y"
         ;;
