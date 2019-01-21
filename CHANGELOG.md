@@ -9,9 +9,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Make nginx-ee more modular
-- Add support for Debian 9
-- Add support for Raspbian
 - Improve documentation
+
+## [3.5.0] - 2018-12-26
+
+### Changed
+
+- uwsgi support re-added
+- set back apt-mark hold on sw-nginx package for Plesk
+
+### Added
+
+- added daily cronjob for automated update
+- Add support for Debian 9 & Raspbian
+
+## [3.4.0] - 2018-12-26
+
+### Changed
+
+- Fix gcc setup with nginx stable release
+- Fix arguments parsing for non-interactive install
+- By default Nginx-ee compile the latest mainline release without optional modules like pagespeed or naxsi
+- Fix wrong Nginx version displayed in the compilation summary
+
+### Added
+
+- Interactive install can be launched with the argument -i or --interactive
+- Add WordOps detection
 
 ## [3.3.3] - 2018-12-07
 
