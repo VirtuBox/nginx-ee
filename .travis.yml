@@ -1,5 +1,9 @@
 language: bash
 
+branches:
+  only:
+  - develop
+
 dist: xenial
 
 before_install:
@@ -7,26 +11,12 @@ before_install:
 
 before_script:
   - sudo apt-get -qq autoremove
-  - sudo apt-get update
+  - sudo apt-get update -q
 
 script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo apt-get install -y --force-yes git nginx curl wget
-  - export NGINX_RELEASE="1"
-  - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
-  - export NGINX_RELEASE="2"
-  - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
-  - export NGINX_RELEASE="1"
-  - export PAGESPEED="y"
-  - export NAXSI="y"
-  - export RTMP="y"
-  - sudo bash nginx-build.sh $TRAVIS_BRANCH
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
-  - export NGINX_RELEASE="2"
-  - export PAGESPEED="y"
-  - export NAXSI="y"
-  - export RTMP="y"
-  - sudo bash -c 'tail -n 50 /tmp/nginx-ee.log'
+  - sudo bash nginx-build.sh $TRAVIS_BRANCH || sudo tail -n50 /tmp/nginx-ee.log
+  - sudo bash nginx-build.sh --stable $TRAVIS_BRANCH || sudo tail -n50 /tmp/nginx-ee.log
+  - sudo bash nginx-build.sh --full $TRAVIS_BRANCH || sudo tail -n50 /tmp/nginx-ee.log
