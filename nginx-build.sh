@@ -85,6 +85,7 @@ while [ "${#}" -gt 0 ]; do
     case "${1}" in
     --pagespeed)
         PAGESPEED="y"
+        PAGESPEED_RELEASE="2"
         ;;
     --pagespeed-beta)
         PAGESPEED="y"
@@ -92,6 +93,7 @@ while [ "${#}" -gt 0 ]; do
         ;;
     --full)
         PAGESPEED="y"
+        PAGESPEED_RELEASE="2"
         NAXSI="y"
         RTMP="y"
         ;;
