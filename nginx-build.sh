@@ -74,7 +74,7 @@ echo "" >/tmp/nginx-ee.log
 }
 
 [ ! -x /usr/sbin/nginx ] && {
-    NGINX_FROM_SCRATCH=1
+    NGINX_FROM_SCRATCH="1"
 }
 
 ##################################
@@ -161,21 +161,18 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     echo ""
 fi
 
-if [ -z "$NGINX_RELEASE" ]; then
-    NGINX_RELEASE=1
-fi
-
 ##################################
 # Set nginx release and HPACK
 ##################################
 
-if [ "$NGINX_RELEASE" = "1" ]; then
+if [ -z "$NGINX_RELEASE" ] || [ "$NGINX_RELEASE" = "1" ]; then
     NGINX_VER="$NGINX_MAINLINE"
     NGX_HPACK="--with-http_v2_hpack_enc"
 else
     NGINX_VER="$NGINX_STABLE"
     NGX_HPACK=""
 fi
+
 
 ##################################
 # Set RTMP module
@@ -257,9 +254,15 @@ echo "       - Nginx release : $NGINX_VER"
 echo "       - Pagespeed : $PAGESPEED_VALID "
 echo "       - Naxsi : $NAXSI_VALID"
 echo "       - RTMP : $RTMP_VALID"
-echo "       - EasyEngine : $EE_VALID"
-echo "       - WordOps : $WO_VALID"
-echo "       - Plesk : $PLESK_VALID"
+[ -n "$EE_VALID" ] && {
+    echo "       - EasyEngine : $EE_VALID"
+}
+[ -n "$WO_VALID" ] && {
+    echo "       - WordOps : $WO_VALID"
+}
+[ -n "$PLESK_VALID" ] && {
+    echo "       - Plesk : $PLESK_VALID"
+}
 echo ""
 
 ##################################
@@ -960,7 +963,7 @@ echo -ne '       Performing final steps                 [..]\r'
             sed -i "s/ssl_ciphers\ \(\"\|'\)\(.*\)\(\"\|'\)/ssl_ciphers \"$TLS13_CIPHERS\"/" /etc/nginx/nginx.conf
             # block sw-nginx package updates from APT repository
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
-            apt-mark unhold nginx-ee nginx-common
+            apt-mark hold nginx-ee nginx-common nginx-custom
         } >>/tmp/nginx-ee.log
     else
         {
