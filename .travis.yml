@@ -16,7 +16,7 @@ before_script:
 script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
-  - sudo apt-get install -y --allow git nginx curl wget ccze
+  - sudo apt-get install -y --force-yes git nginx curl wget ccze
   - sudo bash nginx-build.sh --stable $TRAVIS_BRANCH || sudo bash -c 'tail -n 50 /tmp/nginx-ee.log | ccze -A' && exit 1
   - sudo bash nginx-build.sh $TRAVIS_BRANCH || sudo bash -c 'tail -n 50 /tmp/nginx-ee.log | ccze -A' && exit 1
   - sudo bash nginx-build.sh $TRAVIS_BRANCH || sudo bash -c 'tail -n 50 /tmp/nginx-ee.log | ccze -A' && exit 1
