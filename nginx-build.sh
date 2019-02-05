@@ -39,7 +39,7 @@
 
 NAXSI_VER="0.56"
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.5.0"
+NGINX_EE_VER="3.5.1"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
 DISTRO_VERSION="$(lsb_release -sc)"
@@ -420,8 +420,8 @@ fi
 
 # clear previous compilation archives
 
-cd $DIR_SRC || exit
-rm -rf "$DIR_SRC/{*.tar.gz,nginx,nginx-1.*,openssl*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install}"
+cd "$DIR_SRC" || exit
+rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -495,6 +495,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
     # http redis module
     sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C $DIR_SRC
     mv ngx_http_redis-0.3.8 ngx_http_redis
+
     if [ "$RTMP" = "y" ]; then
         { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
             git -C "$DIR_SRC/nginx-rtmp-module" pull origin master
@@ -502,6 +503,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
             git clone https://github.com/arut/nginx-rtmp-module.git
         }
     fi
+
     # ipscrub module
     { [ -d "$DIR_SRC/ipscrubtmp" ] && {
         git -C "$DIR_SRC/ipscrubtmp" pull origin master
@@ -528,6 +530,7 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 {
     cd "$DIR_SRC" || exit 1
+    rm -rf zlib*
     curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
     mv zlib-1.2.11 zlib
 
@@ -588,12 +591,14 @@ fi
 # Download ngx_broti
 ##################################
 
+cd "$DIR_SRC" || exit 1
+
 echo -ne '       Downloading brotli                     [..]\r'
 {
     if [ -d "$DIR_SRC/ngx_brotli" ]; then
         git -C "$DIR_SRC/ngx_brotli" pull origin master
     else
-        git clone https://github.com/eustas/ngx_brotli $DIR_SRC/ngx_brotli
+        git clone https://github.com/eustas/ngx_brotli "$DIR_SRC/ngx_brotli"
     fi
     cd "$DIR_SRC/ngx_brotli" || exit 1
     git submodule update --init --recursive
@@ -612,9 +617,12 @@ fi
 # Download and patch OpenSSL
 ##################################
 
+cd "$DIR_SRC" || exit 1
+
 echo -ne '       Downloading openssl                    [..]\r'
 
 {
+    rm -rf openssl*
     git clone https://github.com/openssl/openssl.git "$DIR_SRC/openssl"
     cd "$DIR_SRC/openssl" || exit 1
     git checkout OpenSSL_1_1_1a
@@ -640,11 +648,12 @@ fi
 ##################################
 
 cd "$DIR_SRC" || exit 1
+
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
         [ -d "$DIR_SRC/naxsi" ] && {
-            rm -rf "$DIR_SRC/naxsi"
+            rm -rf "$DIR_SRC/naxsi*"
         }
         curl -sL https://github.com/nbs-system/naxsi/archive/${NAXSI_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
         mv "naxsi-$NAXSI_VER" naxsi
@@ -698,7 +707,7 @@ echo -ne '       Downloading nginx                      [..]\r'
 
 {
     curl -sL "http://nginx.org/download/nginx-$NGINX_VER.tar.gz" | /bin/tar xzf - -C "$DIR_SRC"
-    mv "$DIR_SRC/nginx-$NGINX_VER" "$DIR_SRC/nginx"
+    mv ${DIR_SRC}/nginx-${NGINX_VER} ${DIR_SRC}/nginx
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
