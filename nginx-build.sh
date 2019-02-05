@@ -421,7 +421,7 @@ fi
 # clear previous compilation archives
 
 cd "$DIR_SRC" || exit
-rm -rf ${DIR_SRC}/{*.tar.gz,nginx,nginx-1.*,openssl*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis}
+rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,openssl*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -706,8 +706,9 @@ cd "$DIR_SRC" || exit 1
 echo -ne '       Downloading nginx                      [..]\r'
 
 {
-    curl -sL "http://nginx.org/download/nginx-$NGINX_VER.tar.gz" | /bin/tar xzf - -C "$DIR_SRC"
-    mv ${DIR_SRC}/nginx-${NGINX_VER} ${DIR_SRC}/nginx
+    rm -rf /usr/local/src/nginx
+    curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
+    mv /usr/local/src/nginx-${NGINX_VER} /usr/local/src/nginx
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
