@@ -629,7 +629,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 {
     # apply openssl ciphers patch
-    curl https://raw.githubusercontent.com/VirtuBox/openssl-patch/5146f0934a74c7eedc29df05196613931c9e36da/openssl-3.0.0-dev-chacha_draft.patch | patch -p1
+    curl https://raw.githubusercontent.com/VirtuBox/openssl-patch/5146f0934a74c7eedc29df05196613931c9e36da/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
 
 } >>/tmp/nginx-ee.log 2>&1
 
