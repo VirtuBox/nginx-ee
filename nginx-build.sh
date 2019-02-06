@@ -641,6 +641,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 {
     cd /usr/local/src/openssl || exit 1
     # apply openssl ciphers patch
+    echo "openssl ciphers patch"
     curl -sL https://raw.githubusercontent.com/VirtuBox/openssl-patch/master/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
 
 } >>/tmp/nginx-ee.log 2>&1
@@ -739,12 +740,14 @@ echo -ne '       Applying nginx patches                 [..]\r'
 
 if [ "$NGINX_RELEASE" = "1" ]; then
     {
-
+        echo "## nginx__dynamic_tls_records patch "
         curl -sL https://github.com/centminmod/centminmod/blob/123.09beta01/patches/cloudflare/nginx__dynamic_tls_records_1015008.patch | patch -p1
+        echo "##  nginx-1.15.8_http2-hpack.patch"
         curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.8_http2-hpack.patch | patch -p1
     } >>/tmp/nginx-ee.log 2>&1
 
 else
+    echo "##  nginx_1.13.1_http2_hpack.patch"
     curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx_1.13.1_http2_hpack.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 
