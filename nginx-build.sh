@@ -738,7 +738,7 @@ fi
 cd "$DIR_SRC/nginx" || exit 1
 echo -ne '       Applying nginx patches                 [..]\r'
 
-if [ "$NGINX_RELEASE" = "1" ]; then
+if [ "$NGINX_VER" = "$NGINX_MAINLINE" ]; then
     {
         echo "## nginx__dynamic_tls_records patch "
         curl -sL https://github.com/centminmod/centminmod/blob/123.09beta01/patches/cloudflare/nginx__dynamic_tls_records_1015008.patch | patch -p1
