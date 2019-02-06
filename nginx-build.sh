@@ -838,11 +838,11 @@ else
     NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
 fi
 
-if [[ "$(uname -m)" = 'x86_64' ]]; then
-    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128'"
-else
-    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt=enable-tls1_3"
-fi
+#if [[ "$(uname -m)" = 'x86_64' ]]; then
+#    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl "
+#else
+#    OPENSSLOPT="  --with-openssl-opt=enable-tls1_3"
+#fi
 
 if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
 
@@ -868,7 +868,8 @@ if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
     --add-module=/usr/local/src/ngx_cache_purge \
     --add-module=/usr/local/src/ngx_brotli \
     --with-zlib=/usr/local/src/zlib \
-    ${OPENSSLOPT} \
+    --with-openssl=/usr/local/src/openssl \
+    --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128' \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 else
@@ -893,7 +894,8 @@ else
     --add-module=/usr/local/src/ngx_cache_purge \
     --add-module=/usr/local/src/ngx_brotli \
     --with-zlib=/usr/local/src/zlib \
-    ${OPENSSLOPT} \
+    --with-openssl=/usr/local/src/openssl \
+    --with-openssl-opt='enable-tls1_3' \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 fi
