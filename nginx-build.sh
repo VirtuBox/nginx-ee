@@ -841,7 +841,7 @@ fi
 if [[ "$(uname -m)" = 'x86_64' ]]; then
     OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128'"
 else
-    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt='enable-tls1_3'"
+    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt=enable-tls1_3"
 fi
 
 if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
