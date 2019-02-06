@@ -421,7 +421,7 @@ fi
 # clear previous compilation archives
 
 cd "$DIR_SRC" || exit
-rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,openssl*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
+rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -622,14 +622,22 @@ cd "$DIR_SRC" || exit 1
 echo -ne '       Downloading openssl                    [..]\r'
 
 {
-    rm -rf /usr/local/src/openssl*
-    git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
-    cd /usr/local/src/openssl || exit 1
+    if [ -d /usr/local/src/openssl ] && [ ! -d /usr/local/src/openssl/.git ]; then
+        rm -rf /usr/local/src/openssl
+        git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+    else
+        cd /usr/local/src/openssl || exit 1
+        git add .
+        git commit -am "pre-checkout"
+        git fetch --all
+        git reset --hard origin/master
+    fi
 } >>/tmp/nginx-ee.log 2>&1
 
 {
+    cd /usr/local/src/openssl || exit 1
     # apply openssl ciphers patch
-    curl https://raw.githubusercontent.com/VirtuBox/openssl-patch/5146f0934a74c7eedc29df05196613931c9e36da/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
+    curl -sL https://raw.githubusercontent.com/VirtuBox/openssl-patch/5146f0934a74c7eedc29df05196613931c9e36da/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
 
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -728,13 +736,13 @@ echo -ne '       Applying nginx patches                 [..]\r'
 if [ "$NGINX_RELEASE" = "1" ]; then
     {
 
-        curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
-        curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
-        curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+        curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
+        curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
+        curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
     } >>/tmp/nginx-ee.log 2>&1
 
 else
-    curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
+    curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 
 if [ $? -eq 0 ]; then
