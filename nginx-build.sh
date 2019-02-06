@@ -641,7 +641,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 {
     cd /usr/local/src/openssl || exit 1
     # apply openssl ciphers patch
-    curl -sL https://raw.githubusercontent.com/VirtuBox/openssl-patch/5146f0934a74c7eedc29df05196613931c9e36da/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
+    curl -sL https://raw.githubusercontent.com/VirtuBox/openssl-patch/master/openssl-equal-3.0.0-dev_ciphers.patch | patch -p1
 
 } >>/tmp/nginx-ee.log 2>&1
 
