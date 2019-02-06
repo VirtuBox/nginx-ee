@@ -44,6 +44,7 @@ NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
 DISTRO_VERSION="$(lsb_release -sc)"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
+OS_ARCH="$(uname -m)"
 
 # Colors
 CSI='\033['
@@ -844,34 +845,35 @@ fi
 #    OPENSSLOPT="  --with-openssl-opt=enable-tls1_3"
 #fi
 
-if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
+if [ "$OS_ARCH" = 'x86_64' ]; then
+    if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
 
-    ./configure \
-    ${NGX_NAXSI} \
-    --with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
-    --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
-    ${NGINX_BUILD_OPTIONS} \
-    --build='VirtuBox Nginx-ee' \
-    ${NGX_USER} \
-    --with-file-aio \
-    --with-threads \
-    --with-http_v2_module \
-    --with-http_ssl_module \
-    --with-pcre-jit \
-    ${NGINX_INCLUDED_MODULES} \
-    ${NGINX_THIRD_MODULES} \
-    ${NGX_HPACK} \
-    ${NGX_PAGESPEED} \
-    ${NGX_RTMP} \
-    --add-module=/usr/local/src/echo-nginx-module \
-    --add-module=/usr/local/src/headers-more-nginx-module \
-    --add-module=/usr/local/src/ngx_cache_purge \
-    --add-module=/usr/local/src/ngx_brotli \
-    --with-zlib=/usr/local/src/zlib \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128' \
-    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
-
+        ./configure \
+        ${NGX_NAXSI} \
+        --with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
+        --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
+        ${NGINX_BUILD_OPTIONS} \
+        --build='VirtuBox Nginx-ee' \
+        ${NGX_USER} \
+        --with-file-aio \
+        --with-threads \
+        --with-http_v2_module \
+        --with-http_ssl_module \
+        --with-pcre-jit \
+        ${NGINX_INCLUDED_MODULES} \
+        ${NGINX_THIRD_MODULES} \
+        ${NGX_HPACK} \
+        ${NGX_PAGESPEED} \
+        ${NGX_RTMP} \
+        --add-module=/usr/local/src/echo-nginx-module \
+        --add-module=/usr/local/src/headers-more-nginx-module \
+        --add-module=/usr/local/src/ngx_cache_purge \
+        --add-module=/usr/local/src/ngx_brotli \
+        --with-zlib=/usr/local/src/zlib \
+        --with-openssl=/usr/local/src/openssl \
+        --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128' \
+        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+    fi
 else
 
     ./configure \
