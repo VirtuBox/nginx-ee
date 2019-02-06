@@ -83,42 +83,42 @@ echo "" >/tmp/nginx-ee.log
 
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
-    --pagespeed)
-        PAGESPEED="y"
-        PAGESPEED_RELEASE="2"
+        --pagespeed)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="2"
         ;;
-    --pagespeed-beta)
-        PAGESPEED="y"
-        PAGESPEED_RELEASE="1"
+        --pagespeed-beta)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="1"
         ;;
-    --full)
-        PAGESPEED="y"
-        PAGESPEED_RELEASE="2"
-        NAXSI="y"
-        RTMP="y"
+        --full)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="2"
+            NAXSI="y"
+            RTMP="y"
         ;;
-    --naxsi)
-        NAXSI="y"
+        --naxsi)
+            NAXSI="y"
         ;;
-    --rtmp)
-        RTMP="y"
+        --rtmp)
+            RTMP="y"
         ;;
-    --latest | --mainline)
-        NGINX_RELEASE="1"
+        --latest | --mainline)
+            NGINX_RELEASE="1"
         ;;
-    --stable)
-        NGINX_RELEASE="2"
+        --stable)
+            NGINX_RELEASE="2"
         ;;
-    -i | --interactive)
-        INTERACTIVE_SETUP="1"
+        -i | --interactive)
+            INTERACTIVE_SETUP="1"
         ;;
-    --dynamic)
-        DYNAMIC_MODULES="1"
+        --dynamic)
+            DYNAMIC_MODULES="1"
         ;;
-    --cron)
-        CRON_SETUP="1"
+        --cron)
+            CRON_SETUP="1"
         ;;
-    *) ;;
+        *) ;;
     esac
     shift
 done
@@ -205,7 +205,7 @@ fi
 if [ "$PAGESPEED_RELEASE" = "1" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-beta "
     PAGESPEED_VALID="beta"
-elif [ "$PAGESPEED_RELEASE" = "2" ]; then
+    elif [ "$PAGESPEED_RELEASE" = "2" ]; then
     NGX_PAGESPEED="--add-module=/usr/local/src/incubator-pagespeed-ngx-latest-stable "
     PAGESPEED_VALID="stable"
 else
@@ -272,10 +272,10 @@ echo ""
 echo -ne '       Installing dependencies               [..]\r'
 apt-get update >>/tmp/nginx-ee.log 2>&1
 apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
-    libpcre3 libpcre3-dev libgd3 libgd-dev libssl-dev libxslt1.1 libxslt1-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
-    libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
-    libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libluajit-5.1-common \
-    libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 libxml2-dev >>/tmp/nginx-ee.log 2>&1
+libpcre3 libpcre3-dev libgd3 libgd-dev libssl-dev libxslt1.1 libxslt1-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
+libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
+libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libluajit-5.1-common \
+libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 libxml2-dev >>/tmp/nginx-ee.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
@@ -428,68 +428,68 @@ echo -ne '       Downloading additionals modules        [..]\r'
 {
     # cache_purge module
     { [ -d "$DIR_SRC/ngx_cache_purge" ] && {
-        git -C "$DIR_SRC/ngx_cache_purge" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/ngx_cache_purge" pull origin master
+        }; } || {
         git clone https://github.com/FRiCKLE/ngx_cache_purge.git
     }
     # memcached module
     { [ -d "$DIR_SRC/memc-nginx-module" ] && {
-        git -C "$DIR_SRC/memc-nginx-module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/memc-nginx-module" pull origin master
+        }; } || {
         git clone https://github.com/openresty/memc-nginx-module.git
     }
     # devel kit
     { [ -d "$DIR_SRC/ngx_devel_kit" ] && {
-        git -C "$DIR_SRC/ngx_devel_kit" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/ngx_devel_kit" pull origin master
+        }; } || {
         git clone https://github.com/simpl/ngx_devel_kit.git
     }
     # headers-more module
     { [ -d "$DIR_SRC/headers-more-nginx-module" ] && {
-        git -C "$DIR_SRC/headers-more-nginx-module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/headers-more-nginx-module" pull origin master
+        }; } || {
         git clone https://github.com/openresty/headers-more-nginx-module.git
     }
     # echo module
     { [ -d "$DIR_SRC/echo-nginx-module" ] && {
-        git -C "$DIR_SRC/echo-nginx-module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/echo-nginx-module" pull origin master
+        }; } || {
         git clone https://github.com/openresty/echo-nginx-module.git
     }
     # http_substitutions_filter module
     { [ -d "$DIR_SRC/ngx_http_substitutions_filter_module" ] && {
-        git -C "$DIR_SRC/ngx_http_substitutions_filter_module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/ngx_http_substitutions_filter_module" pull origin master
+        }; } || {
         git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
     }
     # redis2 module
     { [ -d "$DIR_SRC/redis2-nginx-module" ] && {
-        git -C "$DIR_SRC/redis2-nginx-module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/redis2-nginx-module" pull origin master
+        }; } || {
         git clone https://github.com/openresty/redis2-nginx-module.git
     }
     # srcache module
     { [ -d "$DIR_SRC/srcache-nginx-module" ] && {
-        git -C "$DIR_SRC/srcache-nginx-module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/srcache-nginx-module" pull origin master
+        }; } || {
         git clone https://github.com/openresty/srcache-nginx-module.git
     }
     # set-misc module
     { [ -d "$DIR_SRC/set-misc-nginx-module" ] && {
-        git -C "$DIR_SRC/set-misc-nginx-module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/set-misc-nginx-module" pull origin master
+        }; } || {
         git clone https://github.com/openresty/set-misc-nginx-module.git
     }
     # auth_pam module
     { [ -d "$DIR_SRC/ngx_http_auth_pam_module" ] && {
-        git -C "$DIR_SRC/ngx_http_auth_pam_module" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/ngx_http_auth_pam_module" pull origin master
+        }; } || {
         git clone https://github.com/sto/ngx_http_auth_pam_module.git
     }
     # nginx-vts module
     { [ -d "$DIR_SRC/nginx-module-vts" ] && {
-        git -C "$DIR_SRC/nginx-module-vts" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/nginx-module-vts" pull origin master
+        }; } || {
         git clone https://github.com/vozlt/nginx-module-vts.git
     }
     # http redis module
@@ -498,16 +498,16 @@ echo -ne '       Downloading additionals modules        [..]\r'
 
     if [ "$RTMP" = "y" ]; then
         { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
-            git -C "$DIR_SRC/nginx-rtmp-module" pull origin master
-        }; } || {
+                git -C "$DIR_SRC/nginx-rtmp-module" pull origin master
+            }; } || {
             git clone https://github.com/arut/nginx-rtmp-module.git
         }
     fi
 
     # ipscrub module
     { [ -d "$DIR_SRC/ipscrubtmp" ] && {
-        git -C "$DIR_SRC/ipscrubtmp" pull origin master
-    }; } || {
+            git -C "$DIR_SRC/ipscrubtmp" pull origin master
+        }; } || {
         git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
     }
 
@@ -561,14 +561,14 @@ if [ ! -x /usr/bin/pcretest ]; then
 
             cd "$DIR_SRC/pcre" || exit 1
             ./configure --prefix=/usr \
-                --enable-utf8 \
-                --enable-unicode-properties \
-                --enable-pcre16 \
-                --enable-pcre32 \
-                --enable-pcregrep-libz \
-                --enable-pcregrep-libbz2 \
-                --enable-pcretest-libreadline \
-                --enable-jit
+            --enable-utf8 \
+            --enable-unicode-properties \
+            --enable-pcre16 \
+            --enable-pcre32 \
+            --enable-pcregrep-libz \
+            --enable-pcregrep-libbz2 \
+            --enable-pcretest-libreadline \
+            --enable-jit
 
             make -j "$(nproc)"
             make install
@@ -622,15 +622,19 @@ cd "$DIR_SRC" || exit 1
 echo -ne '       Downloading openssl                    [..]\r'
 
 {
-    if [ -d /usr/local/src/openssl ] && [ ! -d /usr/local/src/openssl/.git ]; then
-        rm -rf /usr/local/src/openssl
-        git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+    if [ -d /usr/local/src/openssl ]; then
+        if [ ! -d /usr/local/src/openssl/.git ]; then
+            rm -rf /usr/local/src/openssl
+            git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+        else
+            cd /usr/local/src/openssl || exit 1
+            git add .
+            git commit -am "pre-checkout"
+            git fetch --all
+            git reset --hard origin/master
+        fi
     else
-        cd /usr/local/src/openssl || exit 1
-        git add .
-        git commit -am "pre-checkout"
-        git fetch --all
-        git reset --hard origin/master
+        git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -835,56 +839,56 @@ fi
 if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
 
     ./configure \
-        ${NGX_NAXSI} \
-        --with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
-        --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
-        ${NGINX_BUILD_OPTIONS} \
-        --build='VirtuBox Nginx-ee' \
-        ${NGX_USER} \
-        --with-file-aio \
-        --with-threads \
-        --with-http_v2_module \
-        --with-http_ssl_module \
-        --with-pcre-jit \
-        ${NGINX_INCLUDED_MODULES} \
-        ${NGINX_THIRD_MODULES} \
-        ${NGX_HPACK} \
-        ${NGX_PAGESPEED} \
-        ${NGX_RTMP} \
-        --add-module=/usr/local/src/echo-nginx-module \
-        --add-module=/usr/local/src/headers-more-nginx-module \
-        --add-module=/usr/local/src/ngx_cache_purge \
-        --add-module=/usr/local/src/ngx_brotli \
-        --with-zlib=/usr/local/src/zlib \
-        --with-openssl=/usr/local/src/openssl \
-        --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
-        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+    ${NGX_NAXSI} \
+    --with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
+    ${NGINX_BUILD_OPTIONS} \
+    --build='VirtuBox Nginx-ee' \
+    ${NGX_USER} \
+    --with-file-aio \
+    --with-threads \
+    --with-http_v2_module \
+    --with-http_ssl_module \
+    --with-pcre-jit \
+    ${NGINX_INCLUDED_MODULES} \
+    ${NGINX_THIRD_MODULES} \
+    ${NGX_HPACK} \
+    ${NGX_PAGESPEED} \
+    ${NGX_RTMP} \
+    --add-module=/usr/local/src/echo-nginx-module \
+    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/ngx_brotli \
+    --with-zlib=/usr/local/src/zlib \
+    --with-openssl=/usr/local/src/openssl \
+    --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
+    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 else
 
     ./configure \
-        ${NGX_NAXSI} \
-        ${NGINX_BUILD_OPTIONS} \
-        --build='VirtuBox Nginx-ee' \
-        ${NGX_USER} \
-        --with-file-aio \
-        --with-threads \
-        --with-http_v2_module \
-        --with-http_ssl_module \
-        --with-pcre-jit \
-        ${NGINX_INCLUDED_MODULES} \
-        ${NGINX_THIRD_MODULES} \
-        ${NGX_HPACK} \
-        ${NGX_PAGESPEED} \
-        ${NGX_RTMP} \
-        --add-module=/usr/local/src/echo-nginx-module \
-        --add-module=/usr/local/src/headers-more-nginx-module \
-        --add-module=/usr/local/src/ngx_cache_purge \
-        --add-module=/usr/local/src/ngx_brotli \
-        --with-zlib=/usr/local/src/zlib \
-        --with-openssl=/usr/local/src/openssl \
-        --with-openssl-opt='enable-tls1_3' \
-        --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+    ${NGX_NAXSI} \
+    ${NGINX_BUILD_OPTIONS} \
+    --build='VirtuBox Nginx-ee' \
+    ${NGX_USER} \
+    --with-file-aio \
+    --with-threads \
+    --with-http_v2_module \
+    --with-http_ssl_module \
+    --with-pcre-jit \
+    ${NGINX_INCLUDED_MODULES} \
+    ${NGINX_THIRD_MODULES} \
+    ${NGX_HPACK} \
+    ${NGX_PAGESPEED} \
+    ${NGX_RTMP} \
+    --add-module=/usr/local/src/echo-nginx-module \
+    --add-module=/usr/local/src/headers-more-nginx-module \
+    --add-module=/usr/local/src/ngx_cache_purge \
+    --add-module=/usr/local/src/ngx_brotli \
+    --with-zlib=/usr/local/src/zlib \
+    --with-openssl=/usr/local/src/openssl \
+    --with-openssl-opt='enable-tls1_3' \
+    --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 fi
 
