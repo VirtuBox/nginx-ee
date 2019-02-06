@@ -735,22 +735,20 @@ fi
 ##################################
 # Apply Nginx patches
 ##################################
-cd "$DIR_SRC/nginx" || exit 1
-echo -ne '       Applying nginx patches                 [..]\r'
 
-if [ "$NGINX_VER" = "$NGINX_MAINLINE" ]; then
+cd ${DIR_SRC}/nginx || exit 1
+
+echo -ne '       Applying nginx patches                 [..]\r'
+if [ "$NGINX_RELEASE" = "1" ] || [ -z "$NGINX_RELEASE" ]; then
     {
-        echo "## nginx__dynamic_tls_records patch "
-        curl -sL https://github.com/centminmod/centminmod/blob/123.09beta01/patches/cloudflare/nginx__dynamic_tls_records_1015008.patch | patch -p1
-        echo "##  nginx-1.15.8_http2-hpack.patch"
-        curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.8_http2-hpack.patch | patch -p1
-        echo "## nginx_auto_using_PRIORITIZE_CHACHA.patch"
-        curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+
+        curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
+        curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
+        curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
     } >>/tmp/nginx-ee.log 2>&1
 
 else
-    echo "##  nginx_1.13.1_http2_hpack.patch"
-    curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx_1.13.1_http2_hpack.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
+    curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 
 if [ $? -eq 0 ]; then
@@ -840,6 +838,12 @@ else
     NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
 fi
 
+if [[ "$(uname -m)" = 'x86_64' ]]; then
+    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128'"
+else
+    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl --with-openssl-opt='enable-tls1_3'"
+fi
+
 if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
 
     ./configure \
@@ -864,8 +868,7 @@ if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
     --add-module=/usr/local/src/ngx_cache_purge \
     --add-module=/usr/local/src/ngx_brotli \
     --with-zlib=/usr/local/src/zlib \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
+    ${OPENSSLOPT} \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 else
@@ -889,8 +892,7 @@ else
     --add-module=/usr/local/src/ngx_cache_purge \
     --add-module=/usr/local/src/ngx_brotli \
     --with-zlib=/usr/local/src/zlib \
-    --with-openssl=/usr/local/src/openssl \
-    --with-openssl-opt='enable-tls1_3' \
+    ${OPENSSLOPT} \
     --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
 
 fi
