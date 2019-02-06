@@ -598,7 +598,7 @@ echo -ne '       Downloading brotli                     [..]\r'
     if [ -d "$DIR_SRC/ngx_brotli" ]; then
         git -C "$DIR_SRC/ngx_brotli" pull origin master
     else
-        git clone https://github.com/eustas/ngx_brotli "$DIR_SRC/ngx_brotli"
+        git clone https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli
     fi
     cd "$DIR_SRC/ngx_brotli" || exit 1
     git submodule update --init --recursive
@@ -622,15 +622,14 @@ cd "$DIR_SRC" || exit 1
 echo -ne '       Downloading openssl                    [..]\r'
 
 {
-    rm -rf openssl*
-    git clone https://github.com/openssl/openssl.git "$DIR_SRC/openssl"
-    cd "$DIR_SRC/openssl" || exit 1
-    git checkout OpenSSL_1_1_1a
+    rm -rf /usr/local/src/openssl*
+    git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+    cd /usr/local/src/openssl || exit 1
 } >>/tmp/nginx-ee.log 2>&1
 
 {
     # apply openssl ciphers patch
-    curl https://raw.githubusercontent.com/VirtuBox/openssl-patch/master/openssl-equal-1.1.1a_ciphers.patch | patch -p1
+    curl https://raw.githubusercontent.com/VirtuBox/openssl-patch/5146f0934a74c7eedc29df05196613931c9e36da/openssl-3.0.0-dev-chacha_draft.patch | patch -p1
 
 } >>/tmp/nginx-ee.log 2>&1
 
