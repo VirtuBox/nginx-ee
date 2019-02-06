@@ -744,6 +744,8 @@ if [ "$NGINX_VER" = "$NGINX_MAINLINE" ]; then
         curl -sL https://github.com/centminmod/centminmod/blob/123.09beta01/patches/cloudflare/nginx__dynamic_tls_records_1015008.patch | patch -p1
         echo "##  nginx-1.15.8_http2-hpack.patch"
         curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.8_http2-hpack.patch | patch -p1
+        echo "## nginx_auto_using_PRIORITIZE_CHACHA.patch"
+        curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
     } >>/tmp/nginx-ee.log 2>&1
 
 else
@@ -875,7 +877,6 @@ else
     ${NGX_USER} \
     --with-file-aio \
     --with-threads \
-    --with-http_v2_module \
     --with-http_ssl_module \
     --with-pcre-jit \
     ${NGINX_INCLUDED_MODULES} \
