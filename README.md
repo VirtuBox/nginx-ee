@@ -2,7 +2,7 @@
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
-[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee)
+[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
 
 Automated Nginx compilation with additional modules for EasyEngine v3, Plesk Onyx or from scratch
 
@@ -49,15 +49,15 @@ Optional modules :
 
 ### Operating System
 
-#### Recommended 
+#### Recommended
 
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
 
 #### Testing
 
-* Debian 9 (Stretch) 
-* Debian 8 (Jessie 
+* Debian 9 (Stretch)
+* Debian 8 (Jessie)
 * Raspbian (Stretch)
 
 ### Plesk releases
@@ -72,8 +72,8 @@ Optional modules :
 
 <!-- TOC -->
 - [Default non-interactive install](#default-non-interactive-install)
-  - [Interactive install](#interactive-install)
-  - [Custom installation](#custom-installation)
+- [Interactive install](#interactive-install)
+- [Custom installation](#custom-installation)
 - [Nginx modules](#nginx-modules)
 - [Nginx configurations](#nginx-configurations)
 - [Roadmap](#roadmap)
@@ -85,15 +85,15 @@ Optional modules :
 By default, nginx-ee compile Nginx Mainline release without Pagespeed, Naxsi or RTMP
 
 ```bash
-bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh)
+bash <(wget -O - https://virtubox.net/nginx-ee)
 ```
 
 ### Interactive install
 
-Interactive installation is also available
+Interactive installation is available with arguments `-i` or `--interactive`
 
 ```bash
-bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --interactive
+bash <(wget -O - https://virtubox.net/nginx-ee) --interactive
 ```
 
 ### Custom installation
@@ -101,7 +101,7 @@ bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/ngin
 Exemple : Nginx stable release with pagespeed and naxsi
 
 ```bash
-bash <(wget -O - https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh) --stable --pagespeed --naxsi
+bash <(wget -O - https://virtubox.net/nginx-ee) --stable --pagespeed --naxsi
 ```
 
 #### Options available

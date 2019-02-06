@@ -839,12 +839,6 @@ else
     NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
 fi
 
-#if [[ "$(uname -m)" = 'x86_64' ]]; then
-#    OPENSSLOPT=" --with-openssl=/usr/local/src/openssl "
-#else
-#    OPENSSLOPT="  --with-openssl-opt=enable-tls1_3"
-#fi
-
 if [ "$OS_ARCH" = 'x86_64' ]; then
     if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
 
