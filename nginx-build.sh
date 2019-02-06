@@ -880,6 +880,7 @@ else
     ${NGX_USER} \
     --with-file-aio \
     --with-threads \
+    --with-http_v2_module \
     --with-http_ssl_module \
     --with-pcre-jit \
     ${NGINX_INCLUDED_MODULES} \
