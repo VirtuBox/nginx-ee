@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
 
-Automated Nginx compilation with additional modules for EasyEngine v3, Plesk Onyx or from scratch
+Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, Plesk Onyx or from scratch
 
 ---
 
@@ -18,6 +18,7 @@ Automated Nginx compilation with additional modules for EasyEngine v3, Plesk Ony
 * Brotli Support
 * TLS v1.3 support (Final)
 * Cloudflare HPACK (for Mainline release only)
+* Setup a daily cronjob to automated nginx updates
 
 ---
 
@@ -57,7 +58,6 @@ Optional modules :
 #### Testing
 
 * Debian 9 (Stretch)
-* Debian 8 (Jessie)
 * Raspbian (Stretch)
 
 ### Plesk releases
@@ -110,7 +110,7 @@ Nginx build options :
 
 * `--stable` : compile Nginx stable release
 * `--full` : Naxsi + PageSpeed + RTMP
-* `--dynamic` : compile Nginx with dynamic modules
+* `--dynamic` : Compile Nginx modules as dynamic modules
 
 Optional third-party modules :
 
@@ -119,16 +119,23 @@ Optional third-party modules :
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 
+Extras :
+
+* `--cron` : setup daily cronjob to update nginx each time a new release is available
+
 ### Nginx modules
 
 You can choose Nginx built-in and third-party modules you want to compile with Nginx-ee. You can find more informations in the [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/Nginx-modules)
 
 ---
 
-## Nginx configurations
+## Related repositories & pages
 
-* [Wiki](https://github.com/VirtuBox/nginx-ee/wiki)
-* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server/tree/master/etc/nginx)
+* [Nginx-ee Wiki](https://github.com/VirtuBox/nginx-ee/wiki)
+* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server) : repository with all custom nginx configurations used by VirtuBox
+* [Wo-nginx-setup](https://github.com/VirtuBox/wo-nginx-setup) : automated wordops setup script
+* [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template) : Plesk Onyx custom hosting templates with fastcgi_cache support
+* [Nginx-cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
 
 ---
 
@@ -139,7 +146,7 @@ You can choose Nginx built-in and third-party modules you want to compile with N
 * [x] Add Cloudflare HPACK patch
 * [x] Add support for servers without EasyEngine
 * [x] Add non-interactive installation
-* [ ] Add automated update detection
+* [x] Add automated update detection
 * [x] Add support for Plesk servers
 * [x] Add Nginx modules choice
 * [ ] Add support for Debian 9

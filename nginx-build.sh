@@ -7,7 +7,7 @@
 # Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.5.1 - 2019-02-05
+# Version 3.5.1 - 2019-02-07
 # -------------------------------------------------------------------------
 
 ##################################
@@ -115,7 +115,7 @@ while [ "${#}" -gt 0 ]; do
         --dynamic)
             DYNAMIC_MODULES="1"
         ;;
-        --cron)
+        --cron| --cronjob)
             CRON_SETUP="1"
         ;;
         *) ;;
@@ -471,9 +471,10 @@ echo -ne '       Downloading additionals modules        [..]\r'
         git clone https://github.com/vozlt/nginx-module-vts.git
     }
     # http redis module
-    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C $DIR_SRC
+    [ ! -d ngx_http_redis ] && {
+    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
     mv ngx_http_redis-0.3.8 ngx_http_redis
-
+    }
     if [ "$RTMP" = "y" ]; then
         { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
                 git -C "$DIR_SRC/nginx-rtmp-module" pull origin master
@@ -643,7 +644,7 @@ if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
         [ -d "$DIR_SRC/naxsi" ] && {
-            rm -rf "$DIR_SRC/naxsi*"
+            rm -rf "$DIR_SRC/naxsi"
         }
         git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
     } >>/tmp/nginx-ee.log 2>&1
@@ -777,7 +778,8 @@ if [ -z "$OVERRIDE_NGINX_MODULES" ]; then
         --with-http_gzip_static_module \
         --with-http_gunzip_module \
         --with-http_mp4_module \
-        --with-http_sub_module--with-mail=dynamic \
+        --with-http_sub_module
+        --with-mail=dynamic \
         --with-stream=dynamic \
         --with-http_geoip_module=dynamic \
         --with-http_image_filter_module=dynamic "
