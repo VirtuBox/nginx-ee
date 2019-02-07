@@ -509,9 +509,20 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 {
     cd "$DIR_SRC" || exit 1
+    if [ "$OS_ARCH" = 'x86_64' ]; then
+    { [ -d /usr/local/src/zlib-cf ] && {
+        git -c /usr/local/src/zlib-cf pull
+    } } || {
+    git clone https://github.com/cloudflare/zlib.git -b gcc.amd64 /usr/local/src/zlib-cf
+    }
+    cd /usr/local/src/zlib-cf || exit 1
+    make -f Makefile.in distclean
+    ./configure --prefix=/usr/local/zlib-cf
+    else
     rm -rf zlib
     curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
     mv zlib-1.2.11 zlib
+    fi
 
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -841,7 +852,7 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         --add-module=/usr/local/src/headers-more-nginx-module \
         --add-module=/usr/local/src/ngx_cache_purge \
         --add-module=/usr/local/src/ngx_brotli \
-        --with-zlib=/usr/local/src/zlib \
+        --with-zlib=/usr/local/src/zlib-cf \
         --with-openssl=/usr/local/src/openssl \
         --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128' \
         --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
