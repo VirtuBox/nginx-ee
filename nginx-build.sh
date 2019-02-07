@@ -509,7 +509,7 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 {
     cd "$DIR_SRC" || exit 1
-    rm -rf zlib*
+    rm -rf zlib
     curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
     mv zlib-1.2.11 zlib
 
