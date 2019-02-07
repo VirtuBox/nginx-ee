@@ -85,7 +85,7 @@ Optional modules :
 By default, nginx-ee compile Nginx Mainline release without Pagespeed, Naxsi or RTMP
 
 ```bash
-bash <(wget -O - https://virtubox.net/nginx-ee)
+bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee)
 ```
 
 ### Interactive install
@@ -93,7 +93,7 @@ bash <(wget -O - https://virtubox.net/nginx-ee)
 Interactive installation is available with arguments `-i` or `--interactive`
 
 ```bash
-bash <(wget -O - https://virtubox.net/nginx-ee) --interactive
+bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --interactive
 ```
 
 ### Custom installation
@@ -101,7 +101,7 @@ bash <(wget -O - https://virtubox.net/nginx-ee) --interactive
 Exemple : Nginx stable release with pagespeed and naxsi
 
 ```bash
-bash <(wget -O - https://virtubox.net/nginx-ee) --stable --pagespeed --naxsi
+bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --stable --pagespeed --naxsi
 ```
 
 #### Options available
