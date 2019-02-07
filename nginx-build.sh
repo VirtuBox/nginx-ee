@@ -37,7 +37,6 @@
 # Variables
 ##################################
 
-NAXSI_VER="0.56"
 DIR_SRC="/usr/local/src"
 NGINX_EE_VER="3.5.1"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
@@ -62,16 +61,16 @@ echo "" >/tmp/nginx-ee.log
 
 # detect Plesk
 [ -d /etc/psa ] && {
-    NGINX_PLESK="1"
+    PLESK_VALID="YES"
 }
 
 # detect easyengine
 [ -d /etc/ee ] && {
-    NGINX_EASYENGINE="1"
+    EE_VALID="YES"
 }
 
 [ -d /etc/wo ] && {
-    NGINX_WO="1"
+    WO_VALID="YES"
 }
 
 [ ! -x /usr/sbin/nginx ] && {
@@ -218,32 +217,10 @@ fi
 # Set Plesk configuration
 ##################################
 
-if [ "$NGINX_PLESK" = "1" ]; then
+if [ "$PLESK_VALID" = "YES" ]; then
     NGX_USER="--user=nginx --group=nginx"
-    PLESK_VALID="YES"
 else
     NGX_USER=""
-    PLESK_VALID="NO"
-fi
-
-##################################
-# Set EasyEngine status
-##################################
-
-if [ -z "$NGINX_EASYENGINE" ]; then
-    EE_VALID="NO"
-else
-    EE_VALID="YES"
-fi
-
-##################################
-# Set WordOps status
-##################################
-
-if [ -z "$NGINX_WO" ]; then
-    WO_VALID="NO"
-else
-    WO_VALID="YES"
 fi
 
 ##################################
@@ -252,7 +229,7 @@ fi
 
 echo "   Compilation summary : "
 echo "       - Nginx release : $NGINX_VER"
-echo "       - Pagespeed : $PAGESPEED_VALID "
+echo "       - Pagespeed : $PAGESPEED_VALID"
 echo "       - Naxsi : $NAXSI_VALID"
 echo "       - RTMP : $RTMP_VALID"
 [ -n "$EE_VALID" ] && {
@@ -668,8 +645,7 @@ if [ "$NAXSI" = "y" ]; then
         [ -d "$DIR_SRC/naxsi" ] && {
             rm -rf "$DIR_SRC/naxsi*"
         }
-        curl -sL https://github.com/nbs-system/naxsi/archive/${NAXSI_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-        mv "naxsi-$NAXSI_VER" naxsi
+        git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
     if [ $? -eq 0 ]; then
