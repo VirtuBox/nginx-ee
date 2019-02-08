@@ -149,8 +149,8 @@ You can choose Nginx built-in and third-party modules you want to compile with N
 * [x] Add automated update detection
 * [x] Add support for Plesk servers
 * [x] Add Nginx modules choice
-* [ ] Add support for Debian 9
-* [ ] Add support for Raspbian
+* [x] Add support for Debian 9
+* [x] Add support for Raspbian
 
 ## Credits
 
