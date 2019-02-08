@@ -55,7 +55,7 @@ Optional modules :
 * Ubuntu 18.04 LTS (Bionic)
 * Ubuntu 16.04 LTS (Xenial)
 
-#### Testing
+#### Also compatible
 
 * Debian 9 (Stretch)
 * Raspbian (Stretch)

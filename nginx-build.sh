@@ -7,7 +7,7 @@
 # Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.5.1 - 2019-02-07
+# Version 3.5.1 - 2019-02-08
 # -------------------------------------------------------------------------
 
 ##################################
@@ -81,8 +81,8 @@ echo "" >/tmp/nginx-ee.log
 # Parse script arguments
 ##################################
 
-while [ "${#}" -gt 0 ]; do
-    case "${1}" in
+while [ "$#" -gt 0 ]; do
+    case "$1" in
         --pagespeed)
             PAGESPEED="y"
             PAGESPEED_RELEASE="2"
@@ -113,10 +113,10 @@ while [ "${#}" -gt 0 ]; do
             INTERACTIVE_SETUP="1"
         ;;
         --dynamic)
-            DYNAMIC_MODULES="1"
+            DYNAMIC_MODULES="y"
         ;;
         --cron| --cronjob)
-            CRON_SETUP="1"
+            CRON_SETUP="y"
         ;;
         *) ;;
     esac
@@ -157,6 +157,14 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
         read -p "Select an option [y/n]: " RTMP
+    done
+    echo -e '\nDo you want to build modules as dynamic modules? (y/n)'
+    while [[ "$DYNAMIC_MODULES" != "y" && "$DYNAMIC_MODULES" != "n" ]]; do
+        read -p "Select an option [y/n]: " DYNAMIC_MODULES
+    done
+        echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
+    while [[ "$CRON_SETUP" != "y" && "$CRON_SETUP" != "n" ]]; do
+        read -p "Select an option [y/n]: " CRONJOB
     done
     echo ""
 fi
@@ -223,15 +231,23 @@ else
     NGX_USER=""
 fi
 
+if [ "$DYNAMIC_MODULES" = "y" ]; then
+    DYNAMIC_MODULES_VALID="YES"
+else
+    DYNAMIC_MODULES_VALID="NO"
+fi
+
 ##################################
 # Display Compilation Summary
 ##################################
 
-echo "   Compilation summary : "
-echo "       - Nginx release : $NGINX_VER"
-echo "       - Pagespeed : $PAGESPEED_VALID"
-echo "       - Naxsi : $NAXSI_VALID"
-echo "       - RTMP : $RTMP_VALID"
+echo "  Compilation summary : "
+echo ""
+echo "    - Nginx release : $NGINX_VER"
+echo "    - Dynamic modules $DYNAMIC_MODULES_VALID: "
+echo "    - Pagespeed : $PAGESPEED_VALID"
+echo "    - Naxsi : $NAXSI_VALID"
+echo "    - RTMP : $RTMP_VALID"
 [ -n "$EE_VALID" ] && {
     echo "       - EasyEngine : $EE_VALID"
 }
@@ -334,7 +350,7 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
                 update-alternatives --remove-all gcc
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
             } >>/tmp/nginx-ee.log 2>&1
-            if [ $? -eq 0 ]; then
+            if [ "$?" -eq 0 ]; then
                 echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
                 echo -ne '\n'
             else
@@ -352,7 +368,7 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
                 update-alternatives --remove-all gcc
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
             } >>/tmp/nginx-ee.log 2>&1
-            if [ $? -eq 0 ]; then
+            if [ "$?" -eq 0 ]; then
                 echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
                 echo -ne '\n'
             else
@@ -399,7 +415,7 @@ fi
 # clear previous compilation archives
 
 cd "$DIR_SRC" || exit
-rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre*,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
+rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -471,9 +487,9 @@ echo -ne '       Downloading additionals modules        [..]\r'
         git clone https://github.com/vozlt/nginx-module-vts.git
     }
     # http redis module
-    [ ! -d ngx_http_redis ] && {
-    sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-    mv ngx_http_redis-0.3.8 ngx_http_redis
+    [ ! -d /usr/local/src/ngx_http_redis ] && {
+        sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+        mv ngx_http_redis-0.3.8 ngx_http_redis
     }
     if [ "$RTMP" = "y" ]; then
         { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
@@ -510,18 +526,18 @@ echo -ne '       Downloading zlib                       [..]\r'
 {
     cd "$DIR_SRC" || exit 1
     if [ "$OS_ARCH" = 'x86_64' ]; then
-    { [ -d /usr/local/src/zlib-cf ] && {
-        git -c /usr/local/src/zlib-cf pull
-    } } || {
-    git clone https://github.com/cloudflare/zlib.git -b gcc.amd64 /usr/local/src/zlib-cf
-    }
-    cd /usr/local/src/zlib-cf || exit 1
-    make -f Makefile.in distclean
-    ./configure --prefix=/usr/local/zlib-cf
+        { [ -d /usr/local/src/zlib-cf ] && {
+                git -c /usr/local/src/zlib-cf pull
+            } } || {
+            git clone https://github.com/cloudflare/zlib.git -b gcc.amd64 /usr/local/src/zlib-cf
+        }
+        cd /usr/local/src/zlib-cf || exit 1
+        make -f Makefile.in distclean
+        ./configure --prefix=/usr/local/zlib-cf
     else
-    rm -rf zlib
-    curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-    mv zlib-1.2.11 zlib
+        rm -rf zlib
+        curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+        mv zlib-1.2.11 zlib
     fi
 
 } >>/tmp/nginx-ee.log 2>&1
@@ -636,7 +652,7 @@ echo -ne '       Downloading openssl                    [..]\r'
 
 } >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -660,7 +676,7 @@ if [ "$NAXSI" = "y" ]; then
         git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
     } >>/tmp/nginx-ee.log 2>&1
 
-    if [ $? -eq 0 ]; then
+    if [ "$?" -eq 0 ]; then
         echo -ne "       Downloading naxsi                      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -689,7 +705,7 @@ if [ "$PAGESPEED" = "y" ]; then
         fi
     } >>/tmp/nginx-ee.log 2>&1
 
-    if [ $? -eq 0 ]; then
+    if [ "$?" -eq 0 ]; then
         echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -712,7 +728,7 @@ echo -ne '       Downloading nginx                      [..]\r'
     mv /usr/local/src/nginx-${NGINX_VER} /usr/local/src/nginx
 } >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Downloading nginx                      [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -731,16 +747,16 @@ echo -ne '       Applying nginx patches                 [..]\r'
 if [ "$NGINX_RELEASE" = "1" ] || [ -z "$NGINX_RELEASE" ]; then
     {
 
-        curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
-        curl -s https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
-        curl -s https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+        curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
+        curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
+        curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
     } >>/tmp/nginx-ee.log 2>&1
 
 else
-    curl -s https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
+    curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -801,18 +817,7 @@ fi
 
 # third party modules
 if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
-    if [ -z "$DYNAMIC_MODULES" ]; then
-        NGINX_THIRD_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
-        --add-module=/usr/local/src/srcache-nginx-module \
-        --add-module=/usr/local/src/ngx_http_redis \
-        --add-module=/usr/local/src/redis2-nginx-module \
-        --add-module=/usr/local/src/memc-nginx-module \
-        --add-module=/usr/local/src/ngx_devel_kit \
-        --add-module=/usr/local/src/set-misc-nginx-module \
-        --add-module=/usr/local/src/ngx_http_auth_pam_module \
-        --add-module=/usr/local/src/nginx-module-vts \
-        --add-module=/usr/local/src/ipscrubtmp/ipscrub"
-    else
+    if [ "$DYNAMIC_MODULES" = "y" ]; then
         NGINX_THIRD_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
         --add-dynamic-module=/usr/local/src/srcache-nginx-module \
         --add-dynamic-module=/usr/local/src/ngx_http_redis \
@@ -823,6 +828,17 @@ if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
         --add-dynamic-module=/usr/local/src/ngx_http_auth_pam_module \
         --add-module=/usr/local/src/nginx-module-vts \
         --add-dynamic-module=/usr/local/src/ipscrubtmp/ipscrub"
+    else
+        NGINX_THIRD_MODULES="--add-module=/usr/local/src/ngx_http_substitutions_filter_module \
+        --add-module=/usr/local/src/srcache-nginx-module \
+        --add-module=/usr/local/src/ngx_http_redis \
+        --add-module=/usr/local/src/redis2-nginx-module \
+        --add-module=/usr/local/src/memc-nginx-module \
+        --add-module=/usr/local/src/ngx_devel_kit \
+        --add-module=/usr/local/src/set-misc-nginx-module \
+        --add-module=/usr/local/src/ngx_http_auth_pam_module \
+        --add-module=/usr/local/src/nginx-module-vts \
+        --add-module=/usr/local/src/ipscrubtmp/ipscrub"
     fi
 else
     NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
@@ -833,8 +849,8 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
 
         ./configure \
         ${NGX_NAXSI} \
-        --with-cc-opt='-m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
-        --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' \
+        --with-cc-opt='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
+        --with-ld-opt='-ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto' \
         ${NGINX_BUILD_OPTIONS} \
         --build='VirtuBox Nginx-ee' \
         ${NGX_USER} \
@@ -854,8 +870,9 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         --add-module=/usr/local/src/ngx_brotli \
         --with-zlib=/usr/local/src/zlib-cf \
         --with-openssl=/usr/local/src/openssl \
-        --with-openssl-opt='enable-tls1_3 enable-ec_nistp_64_gcc_128' \
+        --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3' \
         --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
+
     fi
 else
 
@@ -885,7 +902,7 @@ else
 
 fi
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -906,7 +923,7 @@ echo -ne '       Compiling nginx                        [..]\r'
 
 } >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Compiling nginx                        [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -944,13 +961,13 @@ else
     exit 1
 fi
 
-if [ "$CRON_SETUP" = "1" ]; then
+if [ "$CRON_SETUP" = "y" ]; then
     echo -ne '       Installing Nginx-ee Cronjob            [..]\r'
 
     wget -O /etc/cron.daily/nginx-ee https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/cron.daily/nginx-ee >>/tmp/nginx-ee.log
     chmod +x /etc/cron.daily/nginx-ee
 
-    if [ $? -eq 0 ]; then
+    if [ "$?" -eq 0 ]; then
         echo -ne "       Installing Nginx-ee Cronjob            [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
