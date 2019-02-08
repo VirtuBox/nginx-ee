@@ -11,6 +11,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Make nginx-ee more modular
 - Improve documentation
 
+## [3.5.1] - 2019-02-07
+
+### Changed
+
+- improve openssl download and patching
+- improve code quality
+- improve travis build configuration
+- update repository image
+
+### Added
+
+- add infos about auto-update cronjob
+- Add support for Raspbian Stretch
+- Add Cloudflare zlib
+- Add dynamic module compilation in interactive installation menu
+- Add cronjob setup in interactive installation menu
+
 ## [3.5.0] - 2018-12-26
 
 ### Changed
