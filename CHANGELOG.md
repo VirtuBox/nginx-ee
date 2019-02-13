@@ -8,8 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- Make nginx-ee more modular
-- Improve documentation
+- Improve Nginx setup from scratch
 
 ## [3.5.1] - 2019-02-07
 

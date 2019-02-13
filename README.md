@@ -151,6 +151,7 @@ You can choose Nginx built-in and third-party modules you want to compile with N
 * [x] Add Nginx modules choice
 * [x] Add support for Debian 9
 * [x] Add support for Raspbian
+* [ ] Add support for config.inc build configuration
 
 ## Credits
 
