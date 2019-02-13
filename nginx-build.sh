@@ -165,7 +165,7 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     done
         echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
     while [[ "$CRON_SETUP" != "y" && "$CRON_SETUP" != "n" ]]; do
-        read -p "Select an option [y/n]: " CRONJOB
+        read -p "Select an option [y/n]: " CRON_SETUP
     done
     echo ""
 fi
@@ -655,6 +655,7 @@ echo -ne '       Downloading openssl                    [..]\r'
             git commit -am "pre-checkout"
             git fetch --all
             git reset --hard origin/master
+            git checkout 03cdfe1efaf2a3b5192b8cb3ef331939af7bfeb8
         fi
     else
         git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
