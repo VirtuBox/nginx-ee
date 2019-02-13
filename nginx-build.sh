@@ -44,6 +44,7 @@ NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'n
 DISTRO_VERSION="$(lsb_release -sc)"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 OS_ARCH="$(uname -m)"
+OS_DISTRO="$(lsb_release -ds)"
 
 # Colors
 CSI='\033['
@@ -241,21 +242,27 @@ fi
 # Display Compilation Summary
 ##################################
 
-echo "  Compilation summary : "
 echo ""
-echo "    - Nginx release : $NGINX_VER"
-echo "    - Dynamic modules $DYNAMIC_MODULES_VALID: "
-echo "    - Pagespeed : $PAGESPEED_VALID"
-echo "    - Naxsi : $NAXSI_VALID"
-echo "    - RTMP : $RTMP_VALID"
+echo -e "${CGREEN}##################################${CEND}"
+echo " Compilation summary "
+echo -e "${CGREEN}##################################${CEND}"
+echo ""
+echo " Detected OS : $OS_DISTRO"
+echo " Detected Arch : $OS_ARCH"
+echo ""
+echo -e "  - Nginx release : $NGINX_VER"
+echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
+echo "  - Pagespeed : $PAGESPEED_VALID"
+echo "  - Naxsi : $NAXSI_VALID"
+echo "  - RTMP : $RTMP_VALID"
 [ -n "$EE_VALID" ] && {
-    echo "       - EasyEngine : $EE_VALID"
+echo "  - EasyEngine : $EE_VALID"
 }
 [ -n "$WO_VALID" ] && {
-    echo "       - WordOps : $WO_VALID"
+echo "  - WordOps : $WO_VALID"
 }
 [ -n "$PLESK_VALID" ] && {
-    echo "       - Plesk : $PLESK_VALID"
+echo "  - Plesk : $PLESK_VALID"
 }
 echo ""
 
@@ -271,7 +278,7 @@ libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-pro
 libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libluajit-5.1-common \
 libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 libxml2-dev >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -286,6 +293,7 @@ fi
 
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
 
+echo -ne '       Setting Up Nginx configurations        [..]\r'
     # clone custom nginx configuration
     git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx >>/tmp/nginx-ee.log 2>&1
 
@@ -315,6 +323,7 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
     {
         # download default nginx page
         wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
+        mkdir -p  /etc/nginx/sites-enabled
         ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
         # download nginx systemd service
         [ ! -f /lib/systemd/system/nginx.service ] && {
@@ -327,6 +336,14 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
 
     } >>/tmp/nginx-ee.log 2>&1
 
+if [ "$?" -eq 0 ]; then
+    echo -ne "       Setting Up Nginx configurations        [${CGREEN}OK${CEND}]\\r"
+    echo -ne '\n'
+else
+    echo -e "       Setting Up Nginx configurations        [${CRED}FAIL${CEND}]"
+    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+    exit 1
+fi
 fi
 
 ##################################
@@ -398,7 +415,7 @@ if [ "$RTMP" = "y" ]; then
             apt-get install ffmpeg -y
         fi
     } >>/tmp/nginx-ee.log 2>&1
-    if [ $? -eq 0 ]; then
+    if [ "$?" -eq 0 ]; then
         echo -ne "       Installing FFMPEG for RMTP module      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -508,7 +525,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
 
 } >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -542,7 +559,7 @@ echo -ne '       Downloading zlib                       [..]\r'
 
 } >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Downloading zlib                       [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -582,7 +599,7 @@ if [ ! -x /usr/bin/pcretest ]; then
             ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
 
         } >>/tmp/nginx-ee.log 2>&1
-        if [ $? -eq 0 ]; then
+        if [ "$?" -eq 0 ]; then
             echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
@@ -610,7 +627,7 @@ echo -ne '       Downloading brotli                     [..]\r'
     git submodule update --init --recursive
 } >>/tmp/nginx-ee.log 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Downloading brotli                     [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -952,7 +969,7 @@ echo -ne '       Updating Nginx manual                  [..]\r'
 # update mime.types
 cp -f ${DIR_SRC}/nginx/conf/mime.types /etc/nginx/mime.types
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Updating Nginx manual                  [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
@@ -1015,7 +1032,7 @@ echo -ne '       Performing final steps                 [..]\r'
     rm -f /etc/nginx/{*.default,*.dpkg-dist}
 } >/dev/null 2>&1
 
-if [ $? -eq 0 ]; then
+if [ "$?" -eq 0 ]; then
     echo -ne "       Performing final steps                 [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 else
