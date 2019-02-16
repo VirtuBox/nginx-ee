@@ -4,10 +4,10 @@
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
 # GitHub:        https://github.com/VirtuBox/nginx-ee
-# Copyright (c) 2018 VirtuBox <contact@virtubox.net>
+# Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.5.1 - 2019-02-08
+# Version 3.5.1 - 2019-02-16
 # -------------------------------------------------------------------------
 
 ##################################
@@ -659,6 +659,8 @@ echo -ne '       Downloading openssl                    [..]\r'
         fi
     else
         git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+        cd /usr/local/src/openssl || exit 1
+        git checkout 03cdfe1efaf2a3b5192b8cb3ef331939af7bfeb8
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
