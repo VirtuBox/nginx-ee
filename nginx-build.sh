@@ -163,7 +163,7 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$DYNAMIC_MODULES" != "y" && "$DYNAMIC_MODULES" != "n" ]]; do
         read -p "Select an option [y/n]: " DYNAMIC_MODULES
     done
-        echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
+    echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
     while [[ "$CRON_SETUP" != "y" && "$CRON_SETUP" != "n" ]]; do
         read -p "Select an option [y/n]: " CRON_SETUP
     done
@@ -256,13 +256,13 @@ echo "  - Pagespeed : $PAGESPEED_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
 echo "  - RTMP : $RTMP_VALID"
 [ -n "$EE_VALID" ] && {
-echo "  - EasyEngine : $EE_VALID"
+    echo "  - EasyEngine : $EE_VALID"
 }
 [ -n "$WO_VALID" ] && {
-echo "  - WordOps : $WO_VALID"
+    echo "  - WordOps : $WO_VALID"
 }
 [ -n "$PLESK_VALID" ] && {
-echo "  - Plesk : $PLESK_VALID"
+    echo "  - Plesk : $PLESK_VALID"
 }
 echo ""
 
@@ -293,7 +293,7 @@ fi
 
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
 
-echo -ne '       Setting Up Nginx configurations        [..]\r'
+    echo -ne '       Setting Up Nginx configurations        [..]\r'
     # clone custom nginx configuration
     git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx >>/tmp/nginx-ee.log 2>&1
 
@@ -336,14 +336,14 @@ echo -ne '       Setting Up Nginx configurations        [..]\r'
 
     } >>/tmp/nginx-ee.log 2>&1
 
-if [ "$?" -eq 0 ]; then
-    echo -ne "       Setting Up Nginx configurations        [${CGREEN}OK${CEND}]\\r"
-    echo -ne '\n'
-else
-    echo -e "       Setting Up Nginx configurations        [${CRED}FAIL${CEND}]"
-    echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-    exit 1
-fi
+    if [ "$?" -eq 0 ]; then
+        echo -ne "       Setting Up Nginx configurations        [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
+        echo -e "       Setting Up Nginx configurations        [${CRED}FAIL${CEND}]"
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+        exit 1
+    fi
 fi
 
 ##################################
@@ -355,6 +355,7 @@ fi
 if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
     if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
         {
+            echo "### adding gcc repository ###"
             add-apt-repository -y ppa:jonathonf/gcc
             apt-get update
         } >>/tmp/nginx-ee.log 2>&1
@@ -363,6 +364,7 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
         if [ ! -x /usr/bin/gcc-8 ]; then
             echo -ne '       Installing gcc-8                       [..]\r'
             {
+                echo "### installing gcc8 ###"
                 apt-get install gcc-8 g++-8 -y
                 update-alternatives --remove-all gcc
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
@@ -381,6 +383,7 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
             echo -ne '       Installing gcc-7                       [..]\r'
 
             {
+                echo "### installing gcc7 ###"
                 apt-get install gcc-7 g++-7 -y
                 update-alternatives --remove-all gcc
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
@@ -432,11 +435,12 @@ fi
 # clear previous compilation archives
 
 cd "$DIR_SRC" || exit
-rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis*}
+rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
 {
+    echo "### downloading additionals modules ###"
     # cache_purge module
     { [ -d "$DIR_SRC/ngx_cache_purge" ] && {
             git -C "$DIR_SRC/ngx_cache_purge" pull origin master
@@ -523,6 +527,7 @@ echo -ne '       Downloading additionals modules        [..]\r'
         git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
     }
 
+    echo "### additionals modules downloaded ###"
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$?" -eq 0 ]; then
@@ -544,14 +549,19 @@ echo -ne '       Downloading zlib                       [..]\r'
     cd "$DIR_SRC" || exit 1
     if [ "$OS_ARCH" = 'x86_64' ]; then
         { [ -d /usr/local/src/zlib-cf ] && {
+                echo "### git pull zlib-cf ###"
                 git -c /usr/local/src/zlib-cf pull
             } } || {
+            echo "### cloning zlib-cf ###"
             git clone https://github.com/cloudflare/zlib.git -b gcc.amd64 /usr/local/src/zlib-cf
         }
         cd /usr/local/src/zlib-cf || exit 1
+        echo "### make distclean ###"
         make -f Makefile.in distclean
+        echo "### configure zlib-cf ###"
         ./configure --prefix=/usr/local/zlib-cf
     else
+        echo "### downloading zlib 1.2.11 ###"
         rm -rf zlib
         curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
         mv zlib-1.2.11 zlib
@@ -647,19 +657,29 @@ echo -ne '       Downloading openssl                    [..]\r'
 {
     if [ -d /usr/local/src/openssl ]; then
         if [ ! -d /usr/local/src/openssl/.git ]; then
+            echo "### removing openssl extracted archive ###"
             rm -rf /usr/local/src/openssl
+            echo "### cloning openssl ###"
             git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+            cd /usr/local/src/openssl || exit 1
+            echo "### git checkout commit ###"
+            git checkout 03cdfe1efaf2a3b5192b8cb3ef331939af7bfeb8
         else
             cd /usr/local/src/openssl || exit 1
+            echo "### add and commit untracked file ###"
             git add .
             git commit -am "pre-checkout"
             git fetch --all
+            echo "### git reset from origin master ###"
             git reset --hard origin/master
+            echo "### git checkout commit ###"
             git checkout 03cdfe1efaf2a3b5192b8cb3ef331939af7bfeb8
         fi
     else
+        echo "### cloning openssl ###"
         git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
         cd /usr/local/src/openssl || exit 1
+        echo "### git checkout commit ###"
         git checkout 03cdfe1efaf2a3b5192b8cb3ef331939af7bfeb8
     fi
 } >>/tmp/nginx-ee.log 2>&1
@@ -690,10 +710,14 @@ cd "$DIR_SRC" || exit 1
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
-        [ -d "$DIR_SRC/naxsi" ] && {
+        if [ ! -d "$DIR_SRC/naxsi/.git" ]; then
             rm -rf "$DIR_SRC/naxsi"
-        }
-        git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
+            git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
+            git -C ${DIR_SRC}/naxsi checkout 0.56
+        else
+            git -C ${DIR_SRC}/naxsi pull origin master
+            git -C ${DIR_SRC}/naxsi checkout 0.56
+        fi
     } >>/tmp/nginx-ee.log 2>&1
 
     if [ "$?" -eq 0 ]; then
