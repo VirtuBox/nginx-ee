@@ -2,7 +2,7 @@
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
-[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
+[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![stars](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![commits](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
 
 Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, Plesk Onyx or from scratch
 
@@ -58,6 +58,7 @@ Optional modules :
 #### Also compatible
 
 * Debian 9 (Stretch)
+* Debian 8 (Jessie)
 * Raspbian (Stretch)
 
 ### Plesk releases
@@ -151,6 +152,7 @@ You can choose Nginx built-in and third-party modules you want to compile with N
 * [x] Add Nginx modules choice
 * [x] Add support for Debian 9
 * [x] Add support for Raspbian
+* [ ] Add support for config.inc build configuration
 
 ## Credits
 

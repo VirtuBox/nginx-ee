@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Improve Nginx setup from scratch
 
+## [3.5.2] - 2019-02-18
+
+### Changed
+
+- fix debian 8 build
+- fix dynamic modules choice
+
 ## [3.5.1] - 2019-02-07
 
 ### Changed

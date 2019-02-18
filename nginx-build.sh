@@ -196,7 +196,7 @@ if [ -z "$RTMP" ]; then
     NGX_RTMP=""
     RTMP_VALID="NO"
 else
-    NGX_RTMP="--add-module=/usr/local/src/nginx-rtmp-module "
+    NGX_RTMP="--add-module=../nginx-rtmp-module "
     RTMP_VALID="YES"
 fi
 
@@ -439,7 +439,7 @@ fi
 
 # clear previous compilation archives
 
-cd "$DIR_SRC" || exit
+cd "$DIR_SRC" || exit 1
 rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis}
 
 echo -ne '       Downloading additionals modules        [..]\r'
