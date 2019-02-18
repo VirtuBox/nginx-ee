@@ -34,7 +34,7 @@
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.5.1"
+NGINX_EE_VER="3.5.2"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
 DISTRO_VERSION="$(lsb_release -sc)"
@@ -922,8 +922,6 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
     else
         ./configure \
         ${NGX_NAXSI} \
-        --with-cc-opt='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
-        --with-ld-opt='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects' \
         ${NGINX_BUILD_OPTIONS} \
         --build='VirtuBox Nginx-ee' \
         ${NGX_USER} \
