@@ -10,7 +10,7 @@ Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, 
 
 ## Features
 
-* Compile the latest Nginx release : stable or mainline
+* Compile the latest Nginx releases : stable or mainline
 * Install Nginx or replace Nginx package previously installed
 * Nginx built-in modules selection
 * Nginx Third-party module selection
@@ -18,7 +18,10 @@ Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, 
 * Brotli Support
 * TLS v1.3 support (Final)
 * Cloudflare HPACK (for Mainline release only)
+* Cloudflare zlib
 * Setup a daily cronjob to automated nginx updates
+* Compilation with GCC-7/8
+* Security hardening and performance optimization enabled with proper GCC flags
 
 ---
 
@@ -30,6 +33,8 @@ Nginx current stable release : **v1.14.2**
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
 * [ngx_brotli](https://github.com/eustas/ngx_brotli)
+* [memc-nginx-module](https://github.com/openresty/memc-nginx-module.git)
+* [ngx-devel-kit](https://github.com/simpl/ngx_devel_kit.git)
 * [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
 * [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
@@ -37,6 +42,8 @@ Nginx current stable release : **v1.14.2**
 * [ipscrub](http://www.ipscrub.org/)
 * [ngx_http_auth_pam_module](https://github.com/sto/ngx_http_auth_pam_module)
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
+* [Cloudflare zlib](https://github.com/cloudflare/zlib.git)
+* [redis2-nginx-module](https://github.com/openresty/redis2-nginx-module.git)
 
 Optional modules :
 
@@ -72,12 +79,13 @@ Optional modules :
 ## Usage
 
 <!-- TOC -->
-- [Default non-interactive install](#default-non-interactive-install)
-- [Interactive install](#interactive-install)
-- [Custom installation](#custom-installation)
-- [Nginx modules](#nginx-modules)
-- [Nginx configurations](#nginx-configurations)
-- [Roadmap](#roadmap)
+
+* [Default non-interactive install](#default-non-interactive-install)
+* [Interactive install](#interactive-install)
+* [Custom installation](#custom-installation)
+* [Nginx modules](#nginx-modules)
+* [Nginx configurations](#nginx-configurations)
+* [Roadmap](#roadmap)
 
 <!-- /TOC -->
 

@@ -371,8 +371,6 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
             {
                 echo "### installing gcc8 ###"
                 apt-get install gcc-8 g++-8 -y
-                update-alternatives --remove-all gcc
-                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
             } >>/tmp/nginx-ee.log 2>&1
             if [ "$?" -eq 0 ]; then
                 echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
@@ -383,6 +381,11 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
                 exit 1
             fi
         fi
+        {
+            # update gcc alternative to use gcc-8 by default
+            update-alternatives --remove-all gcc
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+        } >>/tmp/nginx-ee.log 2>&1
     else
         if [ ! -x /usr/bin/gcc-7 ]; then
             echo -ne '       Installing gcc-7                       [..]\r'
@@ -390,8 +393,6 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
             {
                 echo "### installing gcc7 ###"
                 apt-get install gcc-7 g++-7 -y
-                update-alternatives --remove-all gcc
-                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
             } >>/tmp/nginx-ee.log 2>&1
             if [ "$?" -eq 0 ]; then
                 echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
@@ -402,6 +403,11 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
                 exit 1
             fi
         fi
+        {
+            # update gcc alternative to use gcc-7 by default
+            update-alternatives --remove-all gcc
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+        } >>/tmp/nginx-ee.log 2>&1
     fi
 fi
 
