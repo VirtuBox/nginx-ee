@@ -2,7 +2,7 @@
 
 ![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
 
-[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.com/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![stars](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![commits](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
+[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.org/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![stars](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![commits](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
 
 Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, Plesk Onyx or from scratch
 
