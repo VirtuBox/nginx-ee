@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Improve Nginx setup from scratch
 
+### Fixed
+
+- RTMP variable check
+- Nginx package hold with WordOps
+
 ## [3.5.2] - 2019-02-18
 
 ### Changed

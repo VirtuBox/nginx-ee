@@ -1,10 +1,34 @@
-# Nginx-EE
+<h1 align="center">
+<br>
+<img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee-logo.png">
+<br>
+  Nginx-ee
+  <br>
+</h1>
 
-![nginx-ee](https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png)
+<h4 align="center">
+Automated Nginx compilation from sources with additional modules support
+</h4>
 
-[![Build Status](https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master)](https://travis-ci.org/VirtuBox/nginx-ee) [![](https://img.shields.io/github/license/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) [![stars](https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg)](https://github.com/VirtuBox/nginx-ee) [![release](https://img.shields.io/github/release/virtubox/nginx-ee.svg?style=flat)](https://github.com/VirtuBox/nginx-ee/releases) ![commits](https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat)
+---
 
-Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, Plesk Onyx or from scratch
+<p align="center"><a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build"></a>
+<img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
+<img src="https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg" alt="Stars">
+<img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits"></p>
+
+<p align="center">
+<a href="#features"> Features<a> •
+<a href="#additional-third-party-modules"> Modules</a> •
+<a href="#compatibility"> Compatibility</a> •
+<a href="#usage"> Usage</a> •
+<a href="#wiki"> Wiki</a> •
+<a href="#credits"> Credits</a> •
+<a href="#license"> License</a> •
+
+</p>
+
+<p align="center"><img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png" alt="Nginx-ee"></p>
 
 ---
 
@@ -27,7 +51,7 @@ Automated Nginx compilation with additional modules for WordOps, EasyEngine v3, 
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.15.8**
+Nginx current mainline release : **v1.15.9**
 Nginx current stable release : **v1.14.2**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
@@ -78,16 +102,12 @@ Optional modules :
 
 ## Usage
 
-<!-- TOC -->
 
-* [Default non-interactive install](#default-non-interactive-install)
-* [Interactive install](#interactive-install)
-* [Custom installation](#custom-installation)
-* [Nginx modules](#nginx-modules)
-* [Nginx configurations](#nginx-configurations)
-* [Roadmap](#roadmap)
+  - [Default non-interactive install](#default-non-interactive-install)
+  - [Interactive install](#interactive-install)
+  - [Custom installation](#custom-installation)
+    - [Options available](#options-available)
 
-<!-- /TOC -->
 
 ### Default non-interactive install
 
@@ -159,8 +179,10 @@ You can choose Nginx built-in and third-party modules you want to compile with N
 * [x] Add support for Plesk servers
 * [x] Add Nginx modules choice
 * [x] Add support for Debian 9
-* [x] Add support for Raspbian
 * [ ] Add support for config.inc build configuration
+* [ ] Add openssl release choice
+* [ ] Add more compilation presets
+
 
 ## Credits
 
