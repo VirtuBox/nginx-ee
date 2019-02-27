@@ -22,9 +22,10 @@ Automated Nginx compilation from sources with additional modules support
 <a href="#additional-third-party-modules"> Modules</a> •
 <a href="#compatibility"> Compatibility</a> •
 <a href="#usage"> Usage</a> •
-<a href="#wiki"> Wiki</a> •
+<a href="https://github.com/VirtuBox/nginx-ee/wiki"> Wiki</a> •
+<a href="#related"> Related</a> •
 <a href="#credits"> Credits</a> •
-<a href="#license"> License</a> •
+<a href="#license"> License</a>
 
 </p>
 
@@ -37,13 +38,13 @@ Automated Nginx compilation from sources with additional modules support
 * Compile the latest Nginx releases : stable or mainline
 * Install Nginx or replace Nginx package previously installed
 * Nginx built-in modules selection
-* Nginx Third-party module selection
+* Nginx Third-party modules selection
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
 * Cloudflare HPACK (for Mainline release only)
 * Cloudflare zlib
-* Setup a daily cronjob to automated nginx updates
+* Automated nginx updates cronjob
 * Compilation with GCC-7/8
 * Security hardening and performance optimization enabled with proper GCC flags
 
@@ -71,7 +72,7 @@ Nginx current stable release : **v1.14.2**
 
 Optional modules :
 
-* [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx) (latest-beta or latest-stable)
+* [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx)
 * [naxsi WAF](https://github.com/nbs-system/naxsi)
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
 
@@ -92,7 +93,14 @@ Optional modules :
 * Debian 8 (Jessie)
 * Raspbian (Stretch)
 
-### Plesk releases
+### Applications
+
+#### LEMP Stack
+
+* EasyEngine v3
+* WordOps
+
+#### Plesk
 
 * 17.5.x
 * 17.8.x
@@ -102,11 +110,10 @@ Optional modules :
 
 ## Usage
 
-
-  - [Default non-interactive install](#default-non-interactive-install)
-  - [Interactive install](#interactive-install)
-  - [Custom installation](#custom-installation)
-    - [Options available](#options-available)
+- [Default non-interactive install](#default-non-interactive-install)
+- [Interactive install](#interactive-install)
+- [Custom installation](#custom-installation)
+  - [Options available](#options-available)
 
 
 ### Default non-interactive install
@@ -152,20 +159,6 @@ Extras :
 
 * `--cron` : setup daily cronjob to update nginx each time a new release is available
 
-### Nginx modules
-
-You can choose Nginx built-in and third-party modules you want to compile with Nginx-ee. You can find more informations in the [Wiki](https://github.com/VirtuBox/nginx-ee/wiki/Nginx-modules)
-
----
-
-## Related repositories & pages
-
-* [Nginx-ee Wiki](https://github.com/VirtuBox/nginx-ee/wiki)
-* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server) : repository with all custom nginx configurations used by VirtuBox
-* [Wo-nginx-setup](https://github.com/VirtuBox/wo-nginx-setup) : automated wordops setup script
-* [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template) : Plesk Onyx custom hosting templates with fastcgi_cache support
-* [Nginx-cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
-
 ---
 
 ## Roadmap
@@ -183,10 +176,29 @@ You can choose Nginx built-in and third-party modules you want to compile with N
 * [ ] Add openssl release choice
 * [ ] Add more compilation presets
 
+---
+
+## Related
+
+* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server) : repository with all custom nginx configurations used by VirtuBox
+* [Wo-nginx-setup](https://github.com/VirtuBox/wo-nginx-setup) : automated wordops setup script
+* [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template) : Plesk Onyx custom hosting templates with fastcgi_cache support
+* [Nginx-cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
+* [Advanced Nginx Cheatsheet](https://github.com/VirtuBox/advanced-nginx-cheatsheet)
+
+---
+
+## Contributing
+
+If you have any ideas, just open an issue and describe what you would like to add/change in Nginx-ee.
+
+If you'd like to contribute, please fork the repository and make changes as you'd like. Pull requests are warmly welcome.
 
 ## Credits
 
 * [centminmod](https://github.com/centminmod/centminmod) : Nginx, Nginx modules & various other patches
 * [hakase](https://github.com/hakasenyang/openssl-patch) : OpenSSL-patch
 
-Published & maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a>
+## License
+
+[MIT](https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE) © <a href="https://virtubox.net" title="VirtuBox" target="_blank">VirtuBox</a>
