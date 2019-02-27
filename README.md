@@ -110,18 +110,23 @@ Optional modules :
 
 ## Usage
 
-- [Default non-interactive install](#default-non-interactive-install)
-- [Interactive install](#interactive-install)
-- [Custom installation](#custom-installation)
-  - [Options available](#options-available)
+### One-Step Automated Install
 
-
-### Default non-interactive install
-
-By default, nginx-ee compile Nginx Mainline release without Pagespeed, Naxsi or RTMP
+* mainline release
+* without pagespeed
+* without naxsi
+* without rtmp
 
 ```bash
 bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee)
+```
+
+### Alternative Install Method
+
+```bash
+git clone https://github.com/VirtuBox/nginx-ee
+cd nginx-ee
+sudo bash nginx-build.sh
 ```
 
 ### Interactive install
@@ -134,7 +139,7 @@ bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --inte
 
 ### Custom installation
 
-Exemple : Nginx stable release with pagespeed and naxsi
+Example : Nginx stable release with pagespeed and naxsi
 
 ```bash
 bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --stable --pagespeed --naxsi
@@ -181,9 +186,9 @@ Extras :
 ## Related
 
 * [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server) : repository with all custom nginx configurations used by VirtuBox
-* [Wo-nginx-setup](https://github.com/VirtuBox/wo-nginx-setup) : automated wordops setup script
+* [WO-Nginx-Setup](https://github.com/VirtuBox/wo-nginx-setup) : automated wordops setup script
 * [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template) : Plesk Onyx custom hosting templates with fastcgi_cache support
-* [Nginx-cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
+* [Nginx-Cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
 * [Advanced Nginx Cheatsheet](https://github.com/VirtuBox/advanced-nginx-cheatsheet)
 
 ---
