@@ -25,8 +25,7 @@ Automated Nginx compilation from sources with additional modules support
 <a href="https://github.com/VirtuBox/nginx-ee/wiki"> Wiki</a> •
 <a href="#related"> Related</a> •
 <a href="#credits"> Credits</a> •
-<a href="#license"> License</a>
-</p>
+<a href="#license"> License</a></p>
 <p align="center"><img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png" alt="Nginx-ee"></p>
 <hr />
 <h2 id="features">Features</h2>
