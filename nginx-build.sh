@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.5.2 - 2019-02-18
+# Version 3.5.2 - 2019-02-27
 # -------------------------------------------------------------------------
 
 ##################################
@@ -21,13 +21,13 @@
 }
 
 # checking if curl is installed
-[ -z "$(command -v curl)" ] && { apt-get -y install curl; } >>/tmp/nginx-ee.log 2>&1
+[ -z "$(command -v curl)" ] && { apt-get update; apt-get -y install curl; } >>/tmp/nginx-ee.log 2>&1
 
 # Checking if lsb_release is installed
-[ -z "$(command -v lsb_release)" ] && {    apt-get -y install lsb-release; } >>/tmp/nginx-ee.log 2>&1
+[ -z "$(command -v lsb_release)" ] && { apt-get update; apt-get -y install lsb-release; } >>/tmp/nginx-ee.log 2>&1
 
 # checking if tar is installed
-[ -z "$(command -v tar)" ] && { apt-get -y install tar; } >>/tmp/nginx-ee.log 2>&1
+[ -z "$(command -v tar)" ] && { apt-get update; apt-get -y install tar; } >>/tmp/nginx-ee.log 2>&1
 
 ##################################
 # Variables
@@ -71,7 +71,7 @@ echo "" >/tmp/nginx-ee.log
     WO_VALID="YES"
 }
 
-[ ! -x /usr/sbin/nginx ] && {
+[ -z "$(command -v nginx)" ] && {
     NGINX_FROM_SCRATCH="1"
 }
 
@@ -179,25 +179,24 @@ fi
 # Set nginx release and HPACK
 ##################################
 
-if [ -z "$NGINX_RELEASE" ] || [ "$NGINX_RELEASE" = "1" ]; then
-    NGINX_VER="$NGINX_MAINLINE"
-    NGX_HPACK="--with-http_v2_hpack_enc"
-else
+if [ "$NGINX_RELEASE" = "2" ]; then
     NGINX_VER="$NGINX_STABLE"
     NGX_HPACK=""
+else
+    NGINX_VER="$NGINX_MAINLINE"
+    NGX_HPACK="--with-http_v2_hpack_enc"
 fi
-
 
 ##################################
 # Set RTMP module
 ##################################
 
-if [ -z "$RTMP" ]; then
-    NGX_RTMP=""
-    RTMP_VALID="NO"
-else
+if [ "$RTMP" = "y" ] ; then
     NGX_RTMP="--add-module=../nginx-rtmp-module "
     RTMP_VALID="YES"
+else
+    NGX_RTMP=""
+    RTMP_VALID="NO"
 fi
 
 ##################################
@@ -300,7 +299,9 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
 
     echo -ne '       Setting Up Nginx configurations        [..]\r'
     # clone custom nginx configuration
-    git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx >>/tmp/nginx-ee.log 2>&1
+    [ ! -d /etc/nginx ] && {
+        git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
+    } >>/tmp/nginx-ee.log 2>&1
 
     # create nginx temp directory
     mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
@@ -328,7 +329,7 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
     {
         # download default nginx page
         wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
-        mkdir -p  /etc/nginx/sites-enabled
+        mkdir -p /etc/nginx/sites-enabled
         ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
         # download nginx systemd service
         [ ! -f /lib/systemd/system/nginx.service ] && {
@@ -799,16 +800,15 @@ fi
 cd /usr/local/src/nginx || exit 1
 
 echo -ne '       Applying nginx patches                 [..]\r'
-if [ "$NGINX_RELEASE" = "1" ] || [ -z "$NGINX_RELEASE" ]; then
-    {
+if [ "$NGINX_RELEASE" = "2" ]; then
 
+    curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
+else
+    {
         curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
         curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
         curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
     } >>/tmp/nginx-ee.log 2>&1
-
-else
-    curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 fi
 
 if [ "$?" -eq 0 ]; then
@@ -951,6 +951,7 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
     fi
 else
+
     ./configure \
     ${NGX_NAXSI} \
     ${NGINX_BUILD_OPTIONS} \
@@ -1055,7 +1056,6 @@ fi
 echo -ne '       Performing final steps                 [..]\r'
 
 # block Nginx package update from APT repository
-[ ! -f /etc/apt/preferences.d/nginx-block ] && {
     if [ "$NGINX_PLESK" = "1" ]; then
         {
             # update nginx ciphers_suites
@@ -1068,17 +1068,21 @@ echo -ne '       Performing final steps                 [..]\r'
         {
             # update nginx ciphers_suites
             sed -i "s/ssl_ciphers\ \(\"\|'\)\(.*\)\(\"\|'\)/ssl_ciphers \"$TLS13_CIPHERS\"/" /etc/nginx/nginx.conf
-            # block sw-nginx package updates from APT repository
+            # block nginx package updates from APT repository
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
             apt-mark hold nginx-ee nginx-common nginx-custom
         } >>/tmp/nginx-ee.log
-    else
+    elif [ "$WO_VALID" = "1" ]; then
         {
+            # update nginx ciphers_suites
+            sed -i "s/ssl_ciphers\ \(\"\|'\)\(.*\)\(\"\|'\)/ssl_ciphers \"$TLS13_CIPHERS\"/" /etc/nginx/nginx.conf
+            # block nginx package updates from APT repository
             echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
+            apt-mark hold nginx-ee nginx-common nginx-custom
 
         } >>/tmp/nginx-ee.log
     fi
-}
+
 
 {
     # enable nginx service
