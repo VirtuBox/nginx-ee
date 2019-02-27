@@ -2,7 +2,6 @@
 title: Nginx-ee - Automated Nginx compilation from sources with additional modules support
 layout: default
 ---
-
 <h1 align="center">
 <br>
 <img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee-logo.png">
@@ -23,8 +22,11 @@ Automated Nginx compilation from sources with additional modules support
 <a href="#additional-third-party-modules"> Modules</a> •
 <a href="#compatibility"> Compatibility</a> •
 <a href="#usage"> Usage</a> •
-<a href="https://github.com/VirtuBox/nginx-ee/wiki/Nginx-modules"> Wiki</a> •
-<a href="#credits"> Credits</a>
+<a href="https://github.com/VirtuBox/nginx-ee/wiki"> Wiki</a> •
+<a href="#related"> Related</a> •
+<a href="#credits"> Credits</a> •
+<a href="#license"> License</a>
+</p>
 <p align="center"><img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png" alt="Nginx-ee"></p>
 <hr />
 <h2 id="features">Features</h2>
@@ -32,13 +34,13 @@ Automated Nginx compilation from sources with additional modules support
 <li>Compile the latest Nginx releases : stable or mainline</li>
 <li>Install Nginx or replace Nginx package previously installed</li>
 <li>Nginx built-in modules selection</li>
-<li>Nginx Third-party module selection</li>
+<li>Nginx Third-party modules selection</li>
 <li>Dynamic modules support</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
 <li>Cloudflare HPACK (for Mainline release only)</li>
 <li>Cloudflare zlib</li>
-<li>Setup a daily cronjob to automated nginx updates</li>
+<li>Automated nginx updates cronjob</li>
 <li>Compilation with GCC-7/8</li>
 <li>Security hardening and performance optimization enabled with proper GCC flags</li>
 </ul>
@@ -64,7 +66,7 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 </ul>
 <p>Optional modules :</p>
 <ul>
-<li><a href="https://github.com/apache/incubator-pagespeed-ngx">ngx_pagespeed</a> (latest-beta or latest-stable)</li>
+<li><a href="https://github.com/apache/incubator-pagespeed-ngx">ngx_pagespeed</a></li>
 <li><a href="https://github.com/nbs-system/naxsi">naxsi WAF</a></li>
 <li><a href="https://github.com/arut/nginx-rtmp-module">nginx-rtmp-module</a></li>
 </ul>
@@ -82,7 +84,13 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 <li>Debian 8 (Jessie)</li>
 <li>Raspbian (Stretch)</li>
 </ul>
-<h3 id="plesk-releases">Plesk releases</h3>
+<h3 id="applications">Applications</h3>
+<h4 id="lemp-stack">LEMP Stack</h4>
+<ul>
+<li>EasyEngine v3</li>
+<li>WordOps</li>
+</ul>
+<h4 id="plesk">Plesk</h4>
 <ul>
 <li>17.5.x</li>
 <li>17.8.x</li>
@@ -90,25 +98,26 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 </ul>
 <hr />
 <h2 id="usage">Usage</h2>
+<h3 id="one-step-automated-install">One-Step Automated Install</h3>
 <ul>
-<li><a href="#default-non-interactive-install">Default non-interactive install</a></li>
-<li><a href="#interactive-install">Interactive install</a></li>
-<li><a href="#custom-installation">Custom installation</a>
-<ul>
-<li><a href="#options-available">Options available</a></li>
+<li>mainline release</li>
+<li>without pagespeed</li>
+<li>without naxsi</li>
+<li>without rtmp</li>
 </ul>
-</li>
-</ul>
-<h3 id="default-non-interactive-install">Default non-interactive install</h3>
-<p>By default, nginx-ee compile Nginx Mainline release without Pagespeed, Naxsi or RTMP</p>
 <pre><code class="language-bash">bash &lt;(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee)
+</code></pre>
+<h3 id="alternative-install-method">Alternative Install Method</h3>
+<pre><code class="language-bash">git clone https://github.com/VirtuBox/nginx-ee
+cd nginx-ee
+sudo bash nginx-build.sh
 </code></pre>
 <h3 id="interactive-install">Interactive install</h3>
 <p>Interactive installation is available with arguments <code>-i</code> or <code>--interactive</code></p>
 <pre><code class="language-bash">bash &lt;(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --interactive
 </code></pre>
 <h3 id="custom-installation">Custom installation</h3>
-<p>Exemple : Nginx stable release with pagespeed and naxsi</p>
+<p>Example : Nginx stable release with pagespeed and naxsi</p>
 <pre><code class="language-bash">bash &lt;(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --stable --pagespeed --naxsi
 </code></pre>
 <h4 id="options-available">Options available</h4>
@@ -129,17 +138,6 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 <ul>
 <li><code>--cron</code> : setup daily cronjob to update nginx each time a new release is available</li>
 </ul>
-<h3 id="nginx-modules">Nginx modules</h3>
-<p>You can choose Nginx built-in and third-party modules you want to compile with Nginx-ee. You can find more informations in the <a href="https://github.com/VirtuBox/nginx-ee/wiki/Nginx-modules">Wiki</a></p>
-<hr />
-<h2 id="related-repositories--pages">Related repositories &amp; pages</h2>
-<ul>
-<li><a href="https://github.com/VirtuBox/nginx-ee/wiki">Nginx-ee Wiki</a></li>
-<li><a href="https://github.com/VirtuBox/ubuntu-nginx-web-server">Ubuntu-nginx-web-server</a> : repository with all custom nginx configurations used by VirtuBox</li>
-<li><a href="https://github.com/VirtuBox/wo-nginx-setup">Wo-nginx-setup</a> : automated wordops setup script</li>
-<li><a href="https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template">Plesk-nginx-fastcgi-cache-template</a> : Plesk Onyx custom hosting templates with fastcgi_cache support</li>
-<li><a href="https://github.com/VirtuBox/nginx-cloudflare-real-ip">Nginx-cloudflare-real-ip</a> : Bash script to restore visitor real IP under Cloudflare with Nginx</li>
-</ul>
 <hr />
 <h2 id="roadmap">Roadmap</h2>
 <ul class="contains-task-list">
@@ -156,9 +154,23 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add openssl release choice</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add more compilation presets</li>
 </ul>
+<hr />
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="https://github.com/VirtuBox/ubuntu-nginx-web-server">Ubuntu-nginx-web-server</a> : repository with all custom nginx configurations used by VirtuBox</li>
+<li><a href="https://github.com/VirtuBox/wo-nginx-setup">WO-Nginx-Setup</a> : automated wordops setup script</li>
+<li><a href="https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template">Plesk-nginx-fastcgi-cache-template</a> : Plesk Onyx custom hosting templates with fastcgi_cache support</li>
+<li><a href="https://github.com/VirtuBox/nginx-cloudflare-real-ip">Nginx-Cloudflare-real-ip</a> : Bash script to restore visitor real IP under Cloudflare with Nginx</li>
+<li><a href="https://github.com/VirtuBox/advanced-nginx-cheatsheet">Advanced Nginx Cheatsheet</a></li>
+</ul>
+<hr />
+<h2 id="contributing">Contributing</h2>
+<p>If you have any ideas, just open an issue and describe what you would like to add/change in Nginx-ee.</p>
+<p>If you'd like to contribute, please fork the repository and make changes as you'd like. Pull requests are warmly welcome.</p>
 <h2 id="credits">Credits</h2>
 <ul>
 <li><a href="https://github.com/centminmod/centminmod">centminmod</a> : Nginx, Nginx modules &amp; various other patches</li>
 <li><a href="https://github.com/hakasenyang/openssl-patch">hakase</a> : OpenSSL-patch</li>
 </ul>
-<p>Published &amp; maintained by <a href="https://virtubox.net" title="VirtuBox">VirtuBox</a></p>
+<h2 id="license">License</h2>
+<p><a href="https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE">MIT</a> © <a href="https://virtubox.net" title="VirtuBox" target="_blank">VirtuBox</a></p>
