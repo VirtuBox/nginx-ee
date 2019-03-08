@@ -178,6 +178,7 @@ Extras :
 * [ ] Add support for config.inc build configuration
 * [ ] Add openssl release choice
 * [ ] Add more compilation presets
+* [ ] Add support for LibreSSL
 
 ---
 
