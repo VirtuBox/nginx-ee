@@ -302,6 +302,8 @@ _install_dependencies() {
     fi
 }
 
+_install_dependencies
+
 ##################################
 # Setup Nginx from scratch
 ##################################
