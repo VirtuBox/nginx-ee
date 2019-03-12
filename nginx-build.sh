@@ -743,10 +743,8 @@ if [ "$NAXSI" = "y" ]; then
         if [ ! -d "$DIR_SRC/naxsi/.git" ]; then
             rm -rf "$DIR_SRC/naxsi"
             git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
-            git -C ${DIR_SRC}/naxsi checkout 0.56
         else
             git -C ${DIR_SRC}/naxsi pull origin master
-            git -C ${DIR_SRC}/naxsi checkout 0.56
         fi
         [ ! -f /etc/nginx/naxsi_core.rules ] && {
             cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
