@@ -459,7 +459,7 @@ fi
 # clear previous compilation archives
 
 cd "$DIR_SRC" || exit 1
-rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis}
+rm -rf /usr/local/src/{*.tar.gz,nginx,nginx-1.*,pcre,zlib,incubator-pagespeed-*,build_ngx_pagespeed.sh,install,ngx_http_redis,naxsi}
 
 echo -ne '       Downloading additionals modules        [..]\r'
 
@@ -739,16 +739,9 @@ cd "$DIR_SRC" || exit 1
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
-        if [ ! -d "$DIR_SRC/naxsi" ]; then
-            git clone -q https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
-        else
-            if [ -d "$DIR_SRC/naxsi/.git" ]; then
-                git -C ${DIR_SRC}/naxsi pull -q origin master
-            else
-                rm -rf "$DIR_SRC/naxsi"
-                git clone -q https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
-            fi
-        fi
+
+        git clone -q https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi
+
         [ ! -f /etc/nginx/naxsi_core.rules ] && {
             cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
         }
