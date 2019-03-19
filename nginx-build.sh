@@ -286,12 +286,13 @@ echo ""
 _install_dependencies() {
     echo -ne '       Installing dependencies               [..]\r'
     if ! {
-        apt-get update && apt-get install -y git build-essential libtool automake autoconf zlib1g-dev \
-            libpcre3 libpcre3-dev libgd3 libgd-dev libssl-dev libxslt1.1 libxslt1-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
-            libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
-            libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libluajit-5.1-common \
-            libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 libxml2-dev
-    } >>/dev/null 2>&1; then
+        apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install git build-essential libtool automake autoconf zlib1g-dev \
+        libpcre3 libpcre3-dev libgd3 libgd-dev libssl-dev libxslt1.1 libxslt1-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
+        libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common sudo tar zlibc zlib1g zlib1g-dbg \
+        libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libluajit-5.1-common \
+        libluajit-5.1-dev libmhash-dev libexpat-dev libgmp-dev autotools-dev bc checkinstall ccache debhelper dh-systemd libxml2 libxml2-dev
+        } >>/dev/null 2>&1; then
         echo -e "        Installing dependencies              [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
@@ -655,10 +656,8 @@ echo -ne '       Downloading brotli                     [..]\r'
     if [ -d "$DIR_SRC/ngx_brotli" ]; then
         git -C "$DIR_SRC/ngx_brotli" pull origin master
     else
-        git clone https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli
+        git clone --recursive https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
     fi
-    cd "$DIR_SRC/ngx_brotli" || exit 1
-    git submodule update --init --recursive
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$?" -eq 0 ]; then
@@ -744,7 +743,7 @@ if [ "$NAXSI" = "y" ]; then
 
         [ ! -f /etc/nginx/naxsi_core.rules ] && {
             cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
-        }
+        fi
     } >>/tmp/nginx-ee.log 2>&1
 
     if [ "$?" -eq 0 ]; then
@@ -1099,8 +1098,12 @@ elif [ "$WO_VALID" = "1" ]; then
         sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/nginx.conf
         # block nginx package updates from APT repository
         echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
-        apt-mark hold nginx-ee nginx-common nginx-custom
-
+        CHECK_NGINX_WO=$(dpkg --list | grep nginx-wo)
+        if [ -z "$CHECK_NGINX_WO" ]; then
+            apt-mark hold nginx-ee nginx-common nginx-custom
+        else
+            apt-mark hold nginx-ee nginx-common nginx-custom
+        fi
     } >>/tmp/nginx-ee.log
 fi
 

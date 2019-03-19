@@ -13,10 +13,12 @@ layout: default
 Automated Nginx compilation from sources with additional modules support
 </h4>
 <hr />
-<p align="center"><a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build"></a>
+<p align="center">
+<a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build" /></a>
 <img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
 <img src="https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg" alt="Stars">
-<img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits"></p>
+<img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits">
+</p>
 <p align="center">
 <a href="#features"> Features<a> •
 <a href="#additional-third-party-modules"> Modules</a> •
@@ -152,6 +154,7 @@ sudo bash nginx-build.sh
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add support for config.inc build configuration</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add openssl release choice</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add more compilation presets</li>
+<li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add support for LibreSSL</li>
 </ul>
 <hr />
 <h2 id="related">Related</h2>
