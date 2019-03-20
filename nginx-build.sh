@@ -736,7 +736,7 @@ echo -ne '       Downloading openssl                    [..]\r'
     if [ "$OPENSSL_RELEASE" = "1" ]; then
         patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
     else
-        patch -p1 <../openssl-patch/openssl-1.1.1b-chacha_draft.patch
+        patch -p1 <../openssl-patch/openssl-equal-1.1.1b_ciphers.patch
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
