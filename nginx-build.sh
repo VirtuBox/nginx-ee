@@ -51,7 +51,7 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 OS_ARCH="$(uname -m)"
 #OS_DISTRO="$(lsb_release -is)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
-DEB_CFLAGS="$(dpkg-buildflags --get CFLAGS) $(dpkg-buildflags --get CPPFLAGS)"
+DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 
 # Colors
