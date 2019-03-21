@@ -720,6 +720,7 @@ echo -ne '       Downloading openssl                    [..]\r'
             git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
         fi
     else
+        rm -rf /usr/local/src/openssl
         git clone https://github.com/openssl/openssl.git /usr/local/src/openssl --branch OpenSSL_1_1_1-stable -q
 
     fi
@@ -738,7 +739,7 @@ echo -ne '       Downloading openssl                    [..]\r'
     if [ "$OPENSSL_RELEASE" = "1" ]; then
         patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
     else
-        patch -p1 <../openssl-patch/openssl-1.1.1b-chacha_draft.patch
+        patch -p1 -f <../openssl-patch/openssl-1.1.1b-chacha_draft.patch
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
