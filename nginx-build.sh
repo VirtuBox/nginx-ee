@@ -51,6 +51,8 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 OS_ARCH="$(uname -m)"
 #OS_DISTRO="$(lsb_release -is)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
+DEB_CFLAGS="$(dpkg-buildflags --get CFLAGS) $(dpkg-buildflags --get CPPFLAGS)"
+DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 
 # Colors
 CSI='\033['
@@ -960,9 +962,6 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
     else
 
-DEB_CFLAGS="$(dpkg-buildflags --get CFLAGS) $(dpkg-buildflags --get CPPFLAGS)"
-DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
-
         ./configure \
         --with-cc-opt="$DEB_CFLAGS" \
         --with-ld-opt="$DEB_LFLAGS" \
@@ -993,6 +992,8 @@ else
 
     ./configure \
     ${NGX_NAXSI} \
+    --with-cc-opt="$DEB_CFLAGS" \
+    --with-ld-opt="$DEB_LFLAGS" \
     ${NGINX_BUILD_OPTIONS} \
     --build='VirtuBox Nginx-ee' \
     ${NGX_USER} \
