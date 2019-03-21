@@ -115,9 +115,9 @@ else
             --naxsi)
                 NAXSI="y"
             ;;
-            --openssl-dev)
-                OPENSSL_RELEASE="1"
-            ;;
+            # --openssl-dev)
+            #    OPENSSL_RELEASE="1"
+            #;;
             --rtmp)
                 RTMP="y"
             ;;
@@ -158,12 +158,12 @@ else
             read -p "Select an option [1-2]: " NGINX_RELEASE
         done
         echo ""
-        echo -e '\nWhat OpenSSL release do you want ?\n'
-        echo -e '  [1] OpenSSL dev (3.0.0)'
-        echo -e '  [2] OpenSSL Stable (1.1.1b)\n'
-        while [[ "$OPENSSL_RELEASE" != "1" && "$OPENSSL_RELEASE" != "2" ]]; do
-            read -p "Select an option [1-2]: " OPENSSL_RELEASE
-        done
+        # echo -e '\nWhat OpenSSL release do you want ?\n'
+        # echo -e '  [1] OpenSSL dev (3.0.0)'
+        # echo -e '  [2] OpenSSL Stable (1.1.1b)\n'
+        # while [[ "$OPENSSL_RELEASE" != "1" && "$OPENSSL_RELEASE" != "2" ]]; do
+        #   read -p "Select an option [1-2]: " OPENSSL_RELEASE
+        # done
         echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
         while [[ "$PAGESPEED" != "y" && "$PAGESPEED" != "n" ]]; do
             read -p "Select an option [y/n]: " PAGESPEED
@@ -691,38 +691,32 @@ cd "$DIR_SRC" || exit 1
 echo -ne '       Downloading openssl                    [..]\r'
 
 {
-    if [ "$OPENSSL_RELEASE" = "1" ]; then
-        if [ -d /usr/local/src/openssl ]; then
-            if [ ! -d /usr/local/src/openssl/.git ]; then
-                echo "### removing openssl extracted archive ###"
-                rm -rf /usr/local/src/openssl
-                echo "### cloning openssl ###"
-                git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
-                cd /usr/local/src/openssl || exit 1
-                echo "### git checkout commit ###"
-                git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
-            else
-                cd /usr/local/src/openssl || exit 1
-                echo "### add and commit untracked file ###"
-                git add .
-                git commit -am "pre-checkout"
-                git fetch --all
-                echo "### git reset from origin master ###"
-                git reset --hard origin/master
-                echo "### git checkout commit ###"
-                git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
-            fi
-        else
+    if [ -d /usr/local/src/openssl ]; then
+        if [ ! -d /usr/local/src/openssl/.git ]; then
+            echo "### removing openssl extracted archive ###"
+            rm -rf /usr/local/src/openssl
             echo "### cloning openssl ###"
             git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
             cd /usr/local/src/openssl || exit 1
             echo "### git checkout commit ###"
             git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+        else
+            cd /usr/local/src/openssl || exit 1
+            echo "### add and commit untracked file ###"
+            git add .
+            git commit -am "pre-checkout"
+            git fetch --all
+            echo "### git reset from origin master ###"
+            git reset --hard origin/master
+            echo "### git checkout commit ###"
+            git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
         fi
     else
-        rm -rf /usr/local/src/openssl
-        git clone https://github.com/openssl/openssl.git /usr/local/src/openssl --branch OpenSSL_1_1_1-stable -q
-
+        echo "### cloning openssl ###"
+        git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+        cd /usr/local/src/openssl || exit 1
+        echo "### git checkout commit ###"
+        git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -736,11 +730,7 @@ echo -ne '       Downloading openssl                    [..]\r'
     cd /usr/local/src/openssl || exit 1
     # apply openssl ciphers patch
     echo "### openssl ciphers patch ###"
-    if [ "$OPENSSL_RELEASE" = "1" ]; then
-        patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
-    else
-        patch -p1 -f <../openssl-patch/openssl-1.1.1b-chacha_draft.patch
-    fi
+    patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$?" -eq 0 ]; then
