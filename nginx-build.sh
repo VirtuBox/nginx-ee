@@ -85,15 +85,15 @@ echo "" >/tmp/nginx-ee.log
 }
 
 if [ -f ./config.inc ]; then
-    
+
     . ./config.inc
-    
+
 else
-    
+
     ##################################
     # Parse script arguments
     ##################################
-    
+
     while [ "$#" -gt 0 ]; do
         case "$1" in
             --pagespeed)
@@ -138,15 +138,15 @@ else
         esac
         shift
     done
-    
+
     ##################################
     # Installation menu
     ##################################
-    
+
     echo ""
     echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
     echo ""
-    
+
     # interactive
     if [ "$INTERACTIVE_SETUP" = "1" ]; then
         clear
@@ -192,7 +192,7 @@ else
         done
         echo ""
     fi
-    
+
 fi
 
 ##################################
@@ -320,13 +320,13 @@ _install_dependencies
 ##################################
 
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
-    
+
     echo -ne '       Setting Up Nginx configurations        [..]\r'
     # clone custom nginx configuration
     [ ! -d /etc/nginx ] && {
         git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
     } >>/tmp/nginx-ee.log 2>&1
-    
+
     # create nginx temp directory
     mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
     # create nginx cache directory
@@ -341,15 +341,15 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
         chmod 640 /var/log/nginx
         chown -R www-data:adm /var/log/nginx
     }
-    
+
     # set proper permissions
     chown -R www-data:root /var/lib/nginx /var/cache/nginx /var/run/nginx-cache
-    
+
     # create websites directory
     [ ! -d /var/www/html ] && {
         mkdir -p /var/www/html
     }
-    
+
     {
         # download default nginx page
         wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
@@ -360,12 +360,12 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
             wget -O /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
             systemctl enable nginx.service
         }
-        
+
         # download logrotate configuration
         wget -O /etc/logrotate.d/nginx https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/logrotate.d/nginx
-        
+
     } >>/tmp/nginx-ee.log 2>&1
-    
+
     if [ "$?" -eq 0 ]; then
         echo -ne "       Setting Up Nginx configurations        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -414,7 +414,7 @@ if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
     else
         if [ ! -x /usr/bin/gcc-7 ]; then
             echo -ne '       Installing gcc-7                       [..]\r'
-            
+
             {
                 echo "### installing gcc7 ###"
                 apt-get install gcc-7 g++-7 -y
@@ -443,7 +443,7 @@ fi
 if [ "$RTMP" = "y" ]; then
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
-        
+
         if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
                 add-apt-repository -y ppa:jonathonf/ffmpeg-4
@@ -555,14 +555,14 @@ echo -ne '       Downloading additionals modules        [..]\r'
             git clone https://github.com/arut/nginx-rtmp-module.git
         }
     fi
-    
+
     # ipscrub module
     { [ -d "$DIR_SRC/ipscrubtmp" ] && {
             git -C "$DIR_SRC/ipscrubtmp" pull origin master
         }; } || {
         git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
     }
-    
+
     echo "### additionals modules downloaded ###"
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -602,7 +602,7 @@ echo -ne '       Downloading zlib                       [..]\r'
         curl -sL http://zlib.net/zlib-1.2.11.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
         mv zlib-1.2.11 zlib
     fi
-    
+
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$?" -eq 0 ]; then
@@ -627,7 +627,7 @@ if [ ! -x /usr/bin/pcretest ]; then
         {
             curl -sL https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
             mv pcre-8.42 pcre
-            
+
             cd "$DIR_SRC/pcre" || exit 1
             ./configure --prefix=/usr \
             --enable-utf8 \
@@ -638,12 +638,12 @@ if [ ! -x /usr/bin/pcretest ]; then
             --enable-pcregrep-libbz2 \
             --enable-pcretest-libreadline \
             --enable-jit
-            
+
             make -j "$(nproc)"
             make install
             mv -v /usr/lib/libpcre.so.* /lib
             ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
-            
+
         } >>/tmp/nginx-ee.log 2>&1
         if [ "$?" -eq 0 ]; then
             echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
@@ -718,8 +718,8 @@ echo -ne '       Downloading openssl                    [..]\r'
             git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
         fi
     else
-        curl -sL https://github.com/openssl/openssl/archive/OpenSSL_1_1_1b.tar.gz | /bin/tar -I pigz -xf - -C "$DIR_SRC"
-        mv /usr/local/src/openssl-OpenSSL_1_1_1b /usr/local/src/openssl
+        git clone https://github.com/openssl/openssl.git /usr/local/src/openssl --branch OpenSSL_1_1_1-stable -q
+
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -736,7 +736,7 @@ echo -ne '       Downloading openssl                    [..]\r'
     if [ "$OPENSSL_RELEASE" = "1" ]; then
         patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
     else
-        patch -p1 <../openssl-patch/openssl-equal-1.1.1b_ciphers.patch
+        patch -p1 <../openssl-patch/openssl-1.1.1b-chacha_draft.patch
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -758,13 +758,13 @@ cd "$DIR_SRC" || exit 1
 if [ "$NAXSI" = "y" ]; then
     echo -ne '       Downloading naxsi                      [..]\r'
     {
-        
+
         git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi -q
-        
+
         cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
-        
+
     } >>/tmp/nginx-ee.log 2>&1
-    
+
     if [ "$?" -eq 0 ]; then
         echo -ne "       Downloading naxsi                      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -773,7 +773,7 @@ if [ "$NAXSI" = "y" ]; then
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
-    
+
 fi
 
 ##################################
@@ -783,7 +783,7 @@ fi
 cd "$DIR_SRC" || exit 1
 if [ "$PAGESPEED" = "y" ]; then
     echo -ne '       Downloading pagespeed                  [..]\r'
-    
+
     {
         wget -O build_ngx_pagespeed.sh https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
         chmod +x build_ngx_pagespeed.sh
@@ -793,7 +793,7 @@ if [ "$PAGESPEED" = "y" ]; then
             ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b "$DIR_SRC"
         fi
     } >>/tmp/nginx-ee.log 2>&1
-    
+
     if [ "$?" -eq 0 ]; then
         echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -834,7 +834,7 @@ cd /usr/local/src/nginx || exit 1
 
 echo -ne '       Applying nginx patches                 [..]\r'
 if [ "$NGINX_RELEASE" = "2" ]; then
-    
+
     curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 else
     {
@@ -984,7 +984,7 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
     fi
 else
-    
+
     ./configure \
     ${NGX_NAXSI} \
     ${NGINX_BUILD_OPTIONS} \
@@ -1028,7 +1028,7 @@ echo -ne '       Compiling nginx                        [..]\r'
 {
     make -j "$(nproc)"
     make install
-    
+
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$?" -eq 0 ]; then
@@ -1054,7 +1054,7 @@ echo -ne '       Updating Nginx manual                  [..]\r'
 {
     cp -f ${DIR_SRC}/nginx/man/nginx.8 /usr/share/man/man8
     gzip /usr/share/man/man8/nginx.8
-    
+
 } >>/tmp/nginx-ee.log
 
 # update mime.types
@@ -1071,10 +1071,10 @@ fi
 
 if [ "$CRON_SETUP" = "y" ]; then
     echo -ne '       Installing Nginx-ee Cronjob            [..]\r'
-    
+
     wget -O /etc/cron.daily/nginx-ee https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/cron.daily/nginx-ee >>/tmp/nginx-ee.log
     chmod +x /etc/cron.daily/nginx-ee
-    
+
     if [ "$?" -eq 0 ]; then
         echo -ne "       Installing Nginx-ee Cronjob            [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -1083,7 +1083,7 @@ if [ "$CRON_SETUP" = "y" ]; then
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
-    
+
 fi
 
 echo -ne '       Performing final steps                 [..]\r'
