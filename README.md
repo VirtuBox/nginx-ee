@@ -12,10 +12,12 @@ Automated Nginx compilation from sources with additional modules support
 
 ---
 
-<p align="center"><a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build"></a>
+<p align="center">
+<a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build" /></a>
 <img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
 <img src="https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg" alt="Stars">
-<img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits"></p>
+<img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits">
+</p>
 
 <p align="center">
 <a href="#features"> Features<a> •
