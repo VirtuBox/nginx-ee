@@ -959,7 +959,13 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc' \
         --sbin-path=/usr/sbin/nginx >>/tmp/nginx-ee.log 2>&1
     else
+
+DEB_CFLAGS="$(dpkg-buildflags --get CFLAGS) $(dpkg-buildflags --get CPPFLAGS)"
+DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
+
         ./configure \
+        --with-cc-opt="$DEB_CFLAGS" \
+        --with-ld-opt="$DEB_LFLAGS" \
         ${NGX_NAXSI} \
         ${NGINX_BUILD_OPTIONS} \
         --build='VirtuBox Nginx-ee' \
