@@ -702,13 +702,10 @@ echo -ne '       Downloading openssl                    [..]\r'
             git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
         else
             cd /usr/local/src/openssl || exit 1
-            echo "### add and commit untracked file ###"
-            git add .
-            git commit -am "pre-checkout"
+            echo "### reset openssl to master and clean patches ###"
             git fetch --all
-            echo "### git reset from origin master ###"
             git reset --hard origin/master
-            echo "### git checkout commit ###"
+            git clean -f
             git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
         fi
     else
