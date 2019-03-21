@@ -60,6 +60,7 @@ CRED="${CSI}1;31m"
 CGREEN="${CSI}1;32m"
 CEND="${CSI}0m"
 
+
 ##################################
 # Initial check & cleanup
 ##################################
@@ -1114,7 +1115,7 @@ elif [ "$WO_VALID" = "1" ]; then
         echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
         CHECK_NGINX_WO=$(dpkg --list | grep nginx-wo)
         if [ -z "$CHECK_NGINX_WO" ]; then
-            apt-mark hold nginx-ee nginx-common nginx-custom
+            apt-mark hold nginx-wo nginx-common nginx-custom
         else
             apt-mark hold nginx-ee nginx-common nginx-custom
         fi
