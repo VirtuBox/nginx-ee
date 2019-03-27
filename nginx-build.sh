@@ -53,6 +53,7 @@ OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
+OPENSSL_COMMIT="9c0cf214e7836eb5aaf1ea5d3cbf6720533f86b5"
 
 # Colors
 CSI='\033['
@@ -700,21 +701,21 @@ echo -ne '       Downloading openssl                    [..]\r'
             git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
             cd /usr/local/src/openssl || exit 1
             echo "### git checkout commit ###"
-            git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+            git checkout "$OPENSSL_COMMIT"
         else
             cd /usr/local/src/openssl || exit 1
             echo "### reset openssl to master and clean patches ###"
             git fetch --all
             git reset --hard origin/master
             git clean -f
-            git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+            git checkout "$OPENSSL_COMMIT"
         fi
     else
         echo "### cloning openssl ###"
         git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
         cd /usr/local/src/openssl || exit 1
         echo "### git checkout commit ###"
-        git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+        git checkout "$OPENSSL_COMMIT"
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
