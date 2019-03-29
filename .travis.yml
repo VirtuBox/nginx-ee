@@ -14,8 +14,8 @@ before_install:
   - rm -rf ~/.gnupg
 
 before_script:
-  - sudo apt-get -qq autoremove
-  - sudo apt-get update -q
+  - sudo apt-get -qq autoremove --purge
+  - sudo apt-get update -qq
 
 script:
   - lsb_release -a
