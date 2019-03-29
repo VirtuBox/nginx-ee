@@ -106,7 +106,7 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 <li>without naxsi</li>
 <li>without rtmp</li>
 </ul>
-<pre><code class="language-bash">bash &lt;(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee)
+<pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee)
 </code></pre>
 <h3 id="alternative-install-method">Alternative Install Method</h3>
 <pre><code class="language-bash">git clone https://github.com/VirtuBox/nginx-ee
@@ -115,11 +115,11 @@ sudo bash nginx-build.sh
 </code></pre>
 <h3 id="interactive-install">Interactive install</h3>
 <p>Interactive installation is available with arguments <code>-i</code> or <code>--interactive</code></p>
-<pre><code class="language-bash">bash &lt;(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --interactive
+<pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 </code></pre>
 <h3 id="custom-installation">Custom installation</h3>
 <p>Example : Nginx stable release with pagespeed and naxsi</p>
-<pre><code class="language-bash">bash &lt;(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --stable --pagespeed --naxsi
+<pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --pagespeed --naxsi
 </code></pre>
 <h4 id="options-available">Options available</h4>
 <p>Nginx build options :</p>

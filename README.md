@@ -118,7 +118,7 @@ Optional modules :
 * without rtmp
 
 ```bash
-bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee)
+bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee)
 ```
 
 ### Alternative Install Method
@@ -134,7 +134,7 @@ sudo bash nginx-build.sh
 Interactive installation is available with arguments `-i` or `--interactive`
 
 ```bash
-bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --interactive
+bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 ```
 
 ### Custom installation
@@ -142,7 +142,7 @@ bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --inte
 Example : Nginx stable release with pagespeed and naxsi
 
 ```bash
-bash <(wget -O - virtubox.net/nginx-ee || curl -sL virtubox.net/nginx-ee) --stable --pagespeed --naxsi
+bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --pagespeed --naxsi
 ```
 
 #### Options available

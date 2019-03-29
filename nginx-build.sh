@@ -53,6 +53,7 @@ OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
+OPENSSL_COMMIT="9c0cf214e7836eb5aaf1ea5d3cbf6720533f86b5"
 
 # Colors
 CSI='\033['
@@ -75,11 +76,11 @@ echo "" >/tmp/nginx-ee.log
 }
 
 # detect easyengine
-[ -d /etc/ee ] && {
+[ -f /var/lib/ee/ee.db ] && {
     EE_VALID="YES"
 }
 
-[ -d /etc/wo ] && {
+[ -f /var/lib/wo/dbase.db ] && {
     WO_VALID="YES"
 }
 
@@ -700,21 +701,21 @@ echo -ne '       Downloading openssl                    [..]\r'
             git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
             cd /usr/local/src/openssl || exit 1
             echo "### git checkout commit ###"
-            git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+            git checkout $OPENSSL_COMMIT
         else
             cd /usr/local/src/openssl || exit 1
             echo "### reset openssl to master and clean patches ###"
             git fetch --all
             git reset --hard origin/master
             git clean -f
-            git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+            git checkout $OPENSSL_COMMIT
         fi
     else
         echo "### cloning openssl ###"
         git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
         cd /usr/local/src/openssl || exit 1
         echo "### git checkout commit ###"
-        git checkout 62ca15650576f3953103b27e220e4ff4cc4abed5
+        git checkout $OPENSSL_COMMIT
     fi
 } >>/tmp/nginx-ee.log 2>&1
 
@@ -728,7 +729,7 @@ echo -ne '       Downloading openssl                    [..]\r'
     cd /usr/local/src/openssl || exit 1
     # apply openssl ciphers patch
     echo "### openssl ciphers patch ###"
-    patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
+    patch -p1 < ../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
 } >>/tmp/nginx-ee.log 2>&1
 
 if [ "$?" -eq 0 ]; then
@@ -829,9 +830,13 @@ if [ "$NGINX_RELEASE" = "2" ]; then
     curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >>/tmp/nginx-ee.log 2>&1
 else
     {
+        echo "### nginx_hpack_push patch"
+
+        echo "### nginx_dynamic_tls_records patch"
         curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
         curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
         curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+
     } >>/tmp/nginx-ee.log 2>&1
 fi
 
@@ -933,12 +938,12 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         ${NGX_USER} \
         --with-file-aio \
         --with-threads \
+        ${NGX_HPACK} \
         --with-http_v2_module \
         --with-http_ssl_module \
         --with-pcre-jit \
         ${NGINX_INCLUDED_MODULES} \
         ${NGINX_THIRD_MODULES} \
-        ${NGX_HPACK} \
         ${NGX_PAGESPEED} \
         ${NGX_RTMP} \
         --add-module=../echo-nginx-module \
@@ -960,12 +965,12 @@ if [ "$OS_ARCH" = 'x86_64' ]; then
         ${NGX_USER} \
         --with-file-aio \
         --with-threads \
+        ${NGX_HPACK} \
         --with-http_v2_module \
         --with-http_ssl_module \
         --with-pcre-jit \
         ${NGINX_INCLUDED_MODULES} \
         ${NGINX_THIRD_MODULES} \
-        ${NGX_HPACK} \
         ${NGX_PAGESPEED} \
         ${NGX_RTMP} \
         --add-module=../echo-nginx-module \
