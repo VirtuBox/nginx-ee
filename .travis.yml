@@ -2,10 +2,6 @@ language: bash
 
 dist: xenial
 
-branches:
-  only:
-  - develop
-
 cache:
   directories:
   - /usr/local/src
