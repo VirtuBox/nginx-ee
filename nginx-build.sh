@@ -54,7 +54,7 @@ OS_DISTRO_FULL="$(lsb_release -ds)"
 DISTRO_ID="$(lsb_release -si)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
-OPENSSL_COMMIT="9c0cf214e7836eb5aaf1ea5d3cbf6720533f86b5"
+OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
 
 # Colors
 CSI='\033['
