@@ -46,16 +46,14 @@ DIR_SRC="/usr/local/src"
 NGINX_EE_VER="3.5.2"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
-DISTRO_VERSION="$(lsb_release -sc)"
-LIBRESSL_VER=2.7.5
+LIBRESSL_VER="2.7.5"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 OS_ARCH="$(uname -m)"
-#OS_DISTRO="$(lsb_release -is)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 DISTRO_ID="$(lsb_release -si)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
-OPENSSL_COMMIT="9c0cf214e7836eb5aaf1ea5d3cbf6720533f86b5"
+OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
 
 # Colors
 CSI='\033['
@@ -245,9 +243,11 @@ fi
 
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
+    NGX_SSL_OPT=""
     LIBRESSL_VALID="YES"
 else
     NGX_SSL_LIB="--with-openssl=../openssl"
+    NGX_SSL_OPT="--with-openssl-opt=enable-tls1_3"
     OPENSSL_VALID="YES"
 fi
 
@@ -295,6 +295,12 @@ echo " Detected OS : $OS_DISTRO_FULL"
 echo " Detected Arch : $OS_ARCH"
 echo ""
 echo -e "  - Nginx release : $NGINX_VER"
+[ -n "$OPENSSL_VALID" ] && {
+    echo -e "  - OPENSSL : $OPENSSL_VALID"
+}
+[ -n "$LIBRESSL_VALID" ] && {
+    echo -e "  - LIBRESSL : $LIBRESSL_VALID"
+}
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
 echo "  - Pagespeed : $PAGESPEED_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
@@ -461,7 +467,7 @@ _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
 
-        if [ "$DISTRO_VERSION" == "bionic" ] || [ "$DISTRO_VERSION" == "xenial" ]; then
+       if [ "$DISTRO_ID" = "Ubuntu" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
                 add-apt-repository -y ppa:jonathonf/ffmpeg-4
                 apt-get update
@@ -1005,7 +1011,7 @@ _configure_nginx() {
     fi
 
     if [ "$OS_ARCH" = 'x86_64' ]; then
-        if [ "$DISTRO_VERSION" == "xenial" ] || [ "$DISTRO_VERSION" == "bionic" ]; then
+        if [ "$DISTRO_ID" = "Ubuntu" ]; then
             ./configure \
                 ${NGX_NAXSI} \
                 --with-cc-opt='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
@@ -1029,7 +1035,7 @@ _configure_nginx() {
                 --add-module=../ngx_brotli \
                 --with-zlib=../zlib-cf \
                 ${NGX_SSL_LIB} \
-                --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc' \
+                ${NGX_SSL_OPT} \
                 --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
         else
 

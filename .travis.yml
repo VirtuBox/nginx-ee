@@ -17,6 +17,6 @@ script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo apt-get install -y --force-yes git nginx curl wget ccze
-  - sudo bash nginx-build.sh && sudo bash nginx-build.sh --stable && sudo bash nginx-build.sh --full || sudo bash -c 'tail -n 100 /tmp/nginx-ee.log | ccze -A'
+  - sudo bash nginx-build.sh --libressl && sudo bash nginx-build.sh && sudo bash nginx-build.sh --full --libressl || sudo bash -c 'tail -n 100 /tmp/nginx-ee.log | ccze -A'
   - sudo chown -R travis /usr/local/src
   - sudo chmod 755 /usr/local/src
