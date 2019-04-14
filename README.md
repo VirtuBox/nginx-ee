@@ -42,6 +42,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
+* OpenSSL or LibreSSL
 * Cloudflare HPACK (for Mainline release only)
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -63,12 +64,16 @@ Nginx current stable release : **v1.14.2**
 * [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
 * [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
-* [OpenSSL](https://github.com/openssl/openssl)
 * [ipscrub](http://www.ipscrub.org/)
 * [ngx_http_auth_pam_module](https://github.com/sto/ngx_http_auth_pam_module)
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
 * [Cloudflare zlib](https://github.com/cloudflare/zlib.git)
 * [redis2-nginx-module](https://github.com/openresty/redis2-nginx-module.git)
+
+For Nginx http_ssl_module :
+
+* [OpenSSL](https://github.com/openssl/openssl)
+* [LibreSSL](https://github.com/libressl-portable)
 
 Optional modules :
 
@@ -159,6 +164,7 @@ Optional third-party modules :
 * `--pagespeed-beta`: compile nginx with ngx_pagespeed latest-beta
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
+* `--libressl` : compile nginx with LibreSSL instead of OpenSSL
 
 Extras :
 
