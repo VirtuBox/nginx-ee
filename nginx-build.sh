@@ -467,7 +467,7 @@ _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     {
 
-       if [ "$DISTRO_ID" = "Ubuntu" ]; then
+        if [ "$DISTRO_ID" = "Ubuntu" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
                 add-apt-repository -y ppa:jonathonf/ffmpeg-4
                 apt-get update
@@ -905,17 +905,16 @@ _patch_nginx() {
 
     echo -ne '       Applying nginx patches                 [..]\r'
     if [ "$NGINX_RELEASE" = "2" ]; then
-
-        curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1 >> /tmp/nginx-ee.log 2>&1
+        curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >> /tmp/nginx-ee.log 2>&1
     else
         {
             echo "### nginx_hpack_push patch"
 
             echo "### nginx_dynamic_tls_records patch"
-#            curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
-#            curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
-             curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
-             curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+            #            curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
+            #            curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
         } >> /tmp/nginx-ee.log 2>&1
     fi
 
