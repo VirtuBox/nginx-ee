@@ -127,6 +127,7 @@ DISTRO_ID="$(lsb_release -si)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
+PCRE_VER="8.43"
 
 # Colors
 CSI='\033['
@@ -264,26 +265,26 @@ fi
 # Set OPENSSL/LIBRESSL lib
 ##################################
 
-if [ "$OS_ARCH" = 'x86_64' ]; then
-    if [ "$DISTRO_ID" = "Ubuntu" ]; then
-        OPENSSL_OPT="--with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc'"
-    else
-        OPENSSL_OPT="--with-openssl-opt=enable-tls1_3"
-    fi
-fi
-
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
     LIBRESSL_VALID="YES"
+    OPENSSL_OPT=""
 else
+    if [ "$OS_ARCH" = 'x86_64' ]; then
+        if [ "$DISTRO_ID" = "Ubuntu" ]; then
+            OPENSSL_OPT="enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc"
+        else
+            OPENSSL_OPT="enable-tls1_3"
+        fi
+    fi
     if [ "$OPENSSL_LIB" = "2" ]; then
-        NGX_SSL_LIB="--with-openssl=../openssl $OPENSSL_OPT"
+        NGX_SSL_LIB="--with-openssl=../openssl"
         OPENSSL_VALID="3.0.0-dev"
     elif [ "$OPENSSL_LIB" = "3" ]; then
         NGX_SSL_LIB=""
         OPENSSL_VALID="from system"
     else
-        NGX_SSL_LIB="--with-openssl=../openssl $OPENSSL_OPT"
+        NGX_SSL_LIB="--with-openssl=../openssl"
         OPENSSL_VALID="1.1.1b Stable"
     fi
 fi
@@ -700,11 +701,11 @@ _download_pcre() {
 
     if [ ! -x /usr/bin/pcretest ]; then
         PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
-        if [ "$PCRE_VERSION" != "8.42" ]; then
+        if [ "$PCRE_VERSION" != "$PCRE_VER" ]; then
             echo -ne '       Downloading pcre                       [..]\r'
             {
-                curl -sL https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-                mv pcre-8.42 pcre
+                curl -sL https://ftp.pcre.org/pub/pcre/pcre-${PCRE_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+                mv pcre-${PCRE_VER} pcre
 
                 cd "$DIR_SRC/pcre" || exit 1
                 ./configure --prefix=/usr \
@@ -1113,6 +1114,7 @@ _configure_nginx() {
                 --add-module=../ngx_brotli \
                 --with-zlib=../zlib-cf \
                 ${NGX_SSL_LIB} \
+                --with-openssl-opt="$OPENSSL_OPT" \
                 --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
         else
 
@@ -1139,7 +1141,7 @@ _configure_nginx() {
                 --add-module=../ngx_brotli \
                 --with-zlib=../zlib-cf \
                 ${NGX_SSL_LIB} \
-                --with-openssl-opt='enable-tls1_3' \
+                --with-openssl-opt="$OPENSSL_OPT" \
                 --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
         fi
     else
@@ -1167,6 +1169,7 @@ _configure_nginx() {
             --add-module=../ngx_brotli \
             --with-zlib=../zlib \
             ${NGX_SSL_LIB} \
+            --with-openssl-opt="$OPENSSL_OPT" \
             --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
     fi
 

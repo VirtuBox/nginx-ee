@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Improve Nginx setup from scratch
 - Update openssl-patch
 - Nginx is compiled with OpenSSL 1.1.1b stable by default
+- Update PCRE LIB to v8.43
 
 ### Fixed
 
