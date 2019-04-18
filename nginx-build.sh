@@ -266,9 +266,9 @@ fi
 
 if [ "$OS_ARCH" = 'x86_64' ]; then
     if [ "$DISTRO_ID" = "Ubuntu" ]; then
-        OPENSSL_OPT="enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc"
+        OPENSSL_OPT="--with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc'"
     else
-        OPENSSL_OPT="enable-tls1_3"
+        OPENSSL_OPT="--with-openssl-opt=enable-tls1_3"
     fi
 fi
 
@@ -277,14 +277,13 @@ if [ "$LIBRESSL" = "y" ]; then
     LIBRESSL_VALID="YES"
 else
     if [ "$OPENSSL_LIB" = "2" ]; then
-        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=\"$OPENSSL_OPT\""
-        OPENSSL_VALID="1.1.1b Stable"
+        NGX_SSL_LIB="--with-openssl=../openssl $OPENSSL_OPT"
         OPENSSL_VALID="3.0.0-dev"
     elif [ "$OPENSSL_LIB" = "3" ]; then
         NGX_SSL_LIB=""
         OPENSSL_VALID="from system"
     else
-        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=\"$OPENSSL_OPT\""
+        NGX_SSL_LIB="--with-openssl=../openssl $OPENSSL_OPT"
         OPENSSL_VALID="1.1.1b Stable"
     fi
 fi
@@ -1114,7 +1113,6 @@ _configure_nginx() {
                 --add-module=../ngx_brotli \
                 --with-zlib=../zlib-cf \
                 ${NGX_SSL_LIB} \
-                ${NGX_SSL_OPT} \
                 --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
         else
 
@@ -1169,7 +1167,6 @@ _configure_nginx() {
             --add-module=../ngx_brotli \
             --with-zlib=../zlib \
             ${NGX_SSL_LIB} \
-            --with-openssl-opt='enable-tls1_3' \
             --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
     fi
 
