@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.5.2 - 2019-04-09
+# Version 3.6.0 - 2019-04-18
 # -------------------------------------------------------------------------
 
 ##################################
@@ -20,9 +20,81 @@
     exit 1
 }
 
-# updating packages list
-apt-get update -qq
+##################################
+# Use config.inc if available
+##################################
 
+if [ -f ./config.inc ]; then
+
+    . ./config.inc
+
+else
+
+    ##################################
+    # Parse script arguments
+    ##################################
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+        --pagespeed)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="2"
+            ;;
+        --pagespeed-beta)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="1"
+            ;;
+        --full)
+            PAGESPEED="y"
+            PAGESPEED_RELEASE="2"
+            NAXSI="y"
+            RTMP="y"
+            ;;
+        --naxsi)
+            NAXSI="y"
+            ;;
+        --openssl-dev)
+            OPENSSL_RELEASE="2"
+            ;;
+        --openssl-system)
+            OPENSSL_RELEASE="3"
+            ;;
+        --libressl)
+            LIBRESSL="y"
+            ;;
+        --rtmp)
+            RTMP="y"
+            ;;
+        --latest | --mainline)
+            NGINX_RELEASE="1"
+            ;;
+        --stable)
+            NGINX_RELEASE="2"
+            OPENSSL_RELEASE="1"
+            ;;
+        -i | --interactive)
+            INTERACTIVE_SETUP="1"
+            ;;
+        --dynamic)
+            DYNAMIC_MODULES="y"
+            ;;
+        --cron | --cronjob)
+            CRON_SETUP="y"
+            ;;
+        --travis)
+            TRAVIS_BUILD="1"
+            ;;
+        *) ;;
+        esac
+        shift
+    done
+
+fi
+
+# updating packages list
+[ -z "$TRAVIS_BUILD" ] && {
+    apt-get update -qq
+}
 # checking if curl is installed
 [ -z "$(command -v curl)" ] && {
     apt-get -y install curl
@@ -43,10 +115,11 @@ apt-get update -qq
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.5.2"
+NGINX_EE_VER="3.6.0"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
 LIBRESSL_VER="2.7.5"
+OPENSSL_VER="1.1.1b"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
@@ -87,118 +160,68 @@ echo "" > /tmp/nginx-ee.log
     NGINX_FROM_SCRATCH="1"
 }
 
-if [ -f ./config.inc ]; then
+##################################
+# Installation menu
+##################################
 
-    . ./config.inc
+echo ""
+echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
+echo ""
 
-else
-
-    ##################################
-    # Parse script arguments
-    ##################################
-
-    while [ "$#" -gt 0 ]; do
-        case "$1" in
-        --pagespeed)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="2"
-            ;;
-        --pagespeed-beta)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="1"
-            ;;
-        --full)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="2"
-            NAXSI="y"
-            RTMP="y"
-            ;;
-        --naxsi)
-            NAXSI="y"
-            ;;
-        # --openssl-dev)
-        #    OPENSSL_RELEASE="1"
-        #;;
-        --libressl)
-            LIBRESSL="y"
-            ;;
-        --rtmp)
-            RTMP="y"
-            ;;
-        --latest | --mainline)
-            NGINX_RELEASE="1"
-            ;;
-        --stable)
-            NGINX_RELEASE="2"
-            ;;
-        -i | --interactive)
-            INTERACTIVE_SETUP="1"
-            ;;
-        --dynamic)
-            DYNAMIC_MODULES="y"
-            ;;
-        --cron | --cronjob)
-            CRON_SETUP="y"
-            ;;
-        *) ;;
-        esac
-        shift
+# interactive
+if [ "$INTERACTIVE_SETUP" = "1" ]; then
+    clear
+    echo ""
+    echo "Do you want to compile the latest Nginx [1] Mainline v${NGINX_MAINLINE} or [2] Stable v${NGINX_STABLE} Release ?"
+    while [[ "$NGINX_RELEASE" != "1" && "$NGINX_RELEASE" != "2" ]]; do
+        read -p "Select an option [1-2]: " NGINX_RELEASE
     done
-
-    ##################################
-    # Installation menu
-    ##################################
-
-    echo ""
-    echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
-    echo ""
-
-    # interactive
-    if [ "$INTERACTIVE_SETUP" = "1" ]; then
-        clear
-        echo ""
-        echo "Do you want to compile the latest Nginx [1] Mainline v${NGINX_MAINLINE} or [2] Stable v${NGINX_STABLE} Release ?"
-        while [[ "$NGINX_RELEASE" != "1" && "$NGINX_RELEASE" != "2" ]]; do
-            read -p "Select an option [1-2]: " NGINX_RELEASE
+    echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
+    while [[ "$PAGESPEED" != "y" && "$PAGESPEED" != "n" ]]; do
+        read -p "Select an option [y/n]: " PAGESPEED
+    done
+    if [ "$PAGESPEED" = "y" ]; then
+        echo -e '\nWhat Ngx_Pagespeed release do you want ?\n'
+        echo -e '  [1] Beta Release'
+        echo -e '  [2] Stable Release\n'
+        while [[ "$PAGESPEED_RELEASE" != "1" && "$PAGESPEED_RELEASE" != "2" ]]; do
+            read -p "Select an option [1-2]: " PAGESPEED_RELEASE
         done
-        echo ""
-        # echo -e '\nWhat OpenSSL release do you want ?\n'
-        # echo -e '  [1] OpenSSL dev (3.0.0)'
-        # echo -e '  [2] OpenSSL Stable (1.1.1b)\n'
-        # while [[ "$OPENSSL_RELEASE" != "1" && "$OPENSSL_RELEASE" != "2" ]]; do
-        #   read -p "Select an option [1-2]: " OPENSSL_RELEASE
-        # done
-        echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
-        while [[ "$PAGESPEED" != "y" && "$PAGESPEED" != "n" ]]; do
-            read -p "Select an option [y/n]: " PAGESPEED
-        done
-        if [ "$PAGESPEED" = "y" ]; then
-            echo -e '\nWhat Ngx_Pagespeed release do you want ?\n'
-            echo -e '  [1] Beta Release'
-            echo -e '  [2] Stable Release\n'
-            while [[ "$PAGESPEED_RELEASE" != "1" && "$PAGESPEED_RELEASE" != "2" ]]; do
-                read -p "Select an option [1-2]: " PAGESPEED_RELEASE
-            done
-        fi
-        echo -e '\nDo you want NAXSI WAF (still experimental)? (y/n)'
-        while [[ "$NAXSI" != "y" && "$NAXSI" != "n" ]]; do
-            read -p "Select an option [y/n]: " NAXSI
-        done
-        echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
-        while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
-            read -p "Select an option [y/n]: " RTMP
-        done
-        echo -e '\nDo you want to build modules as dynamic modules? (y/n)'
-        while [[ "$DYNAMIC_MODULES" != "y" && "$DYNAMIC_MODULES" != "n" ]]; do
-            read -p "Select an option [y/n]: " DYNAMIC_MODULES
-        done
-        echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
-        while [[ "$CRON_SETUP" != "y" && "$CRON_SETUP" != "n" ]]; do
-            read -p "Select an option [y/n]: " CRON_SETUP
-        done
-        echo ""
     fi
-
+    echo -e '\nDo you prefer to compile Nginx with OpenSSL [1] or LibreSSL [2] ? (y/n)'
+    echo -e '  [1] OpenSSL'
+    echo -e '  [2] LibreSSL\n'
+    while [[ "$SSL_LIB_CHOICE" != "1" && "$SSL_LIB_CHOICE" != "2" ]]; do
+        read -p "Select an option [1-2]: " SSL_LIB_CHOICE
+    done
+    if [ "$SSL_LIB_CHOICE" = "1" ]; then
+        echo -e '\nWhat OpenSSL release do you want ?\n'
+        echo -e '  [1] OpenSSL stable 1.1.1b'
+        echo -e '  [2] OpenSSL dev 3.0.0-dev\n'
+        echo -e '  [3] OpenSSL from system lib\n'
+        while [[ "$OPENSSL_LIB" != "1" && "$OPENSSL_LIB" != "2" && "$OPENSSL_LIB" != "3" ]]; do
+            read -p "Select an option [1-2-3]: " OPENSSL_LIB
+        done
+    else
+        LIBRESSL="y"
+    fi
+    echo -e '\nDo you want NAXSI WAF (still experimental)? (y/n)'
+    while [[ "$NAXSI" != "y" && "$NAXSI" != "n" ]]; do
+        read -p "Select an option [y/n]: " NAXSI
+    done
+    echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
+    while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
+        read -p "Select an option [y/n]: " RTMP
+    done
+    echo -e '\nDo you want to build modules as dynamic modules? (y/n)'
+    while [[ "$DYNAMIC_MODULES" != "y" && "$DYNAMIC_MODULES" != "n" ]]; do
+        read -p "Select an option [y/n]: " DYNAMIC_MODULES
+    done
+    echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
+    while [[ "$CRON_SETUP" != "y" && "$CRON_SETUP" != "n" ]]; do
+        read -p "Select an option [y/n]: " CRON_SETUP
+    done
+    echo ""
 fi
 
 ##################################
@@ -238,29 +261,37 @@ else
 fi
 
 ##################################
-# Set LibreSSL module
+# Set OPENSSL/LIBRESSL lib
 ##################################
 
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
-    NGX_SSL_OPT=""
     LIBRESSL_VALID="YES"
 else
-    NGX_SSL_LIB="--with-openssl=../openssl"
-    NGX_SSL_OPT="--with-openssl-opt=enable-tls1_3"
-    OPENSSL_VALID="YES"
+    if [ "$OPENSSL_LIB" = "2" ]; then
+        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=enable-tls1_3"
+        OPENSSL_VALID="3.0.0-dev"
+    elif [ "$OPENSSL_LIB" = "3" ]; then
+        NGX_SSL_LIB=""
+        OPENSSL_VALID="from system"
+    else
+        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=enable-tls1_3"
+        OPENSSL_VALID="1.1.1b Stable"
+    fi
 fi
 
 ##################################
 # Set Pagespeed module
 ##################################
 
-if [ "$PAGESPEED_RELEASE" = "1" ]; then
-    NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-beta "
-    PAGESPEED_VALID="beta"
-elif [ "$PAGESPEED_RELEASE" = "2" ]; then
-    NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-stable "
-    PAGESPEED_VALID="stable"
+if [ -n "$PAGESPEED_RELEASE" ]; then
+    if [ "$PAGESPEED_RELEASE" = "1" ]; then
+        NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-beta "
+        PAGESPEED_VALID="beta"
+    elif [ "$PAGESPEED_RELEASE" = "2" ]; then
+        NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-stable "
+        PAGESPEED_VALID="stable"
+    fi
 else
     NGX_PAGESPEED=""
     PAGESPEED_VALID="NO"
@@ -729,7 +760,7 @@ _download_brotli() {
 # Download and patch OpenSSL
 ##################################
 
-_download_openssl() {
+_download_openssl_dev() {
 
     cd "$DIR_SRC" || exit 1
 
@@ -778,6 +809,46 @@ _download_openssl() {
     if [ "$?" -eq 0 ]; then
         echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
+    else
+        echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+        exit 1
+    fi
+
+}
+
+##################################
+# Download and patch OpenSSL
+##################################
+
+_download_openssl() {
+
+    cd "$DIR_SRC" || exit 1
+    echo -ne '       Downloading openssl                    [..]\r'
+    {
+        rm -rf /usr/local/src/openssl
+        curl -sL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
+        mv /usr/local/src/openssl-${OPENSSL_VER} /usr/local/src/openssl
+    } >> /tmp/nginx-ee.log 2>&1
+
+    if [ -d /usr/local/src/openssl-patch/.git ]; then
+        cd /usr/local/src/openssl-patch || exit 1
+        git pull origin master
+    else
+        rm -rf /usr/local/src/openssl-patch
+        git clone https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
+    fi
+    {
+        cd /usr/local/src/openssl || exit 1
+        # apply openssl ciphers patch
+        echo "### openssl ciphers patch ###"
+        patch -p1 < ../openssl-patch/openssl-equal-${OPENSSL_VER}_ciphers.patch
+    } >> /tmp/nginx-ee.log 2>&1
+
+    if [ "$?" -eq 0 ]; then
+        echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+
     else
         echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
@@ -1285,7 +1356,13 @@ fi
 if [ "$LIBRESSL" = "y" ]; then
     _download_libressl
 else
-    _download_openssl
+    if [ "$OPENSSL_LIB" = "2" ]; then
+        _download_openssl_dev
+    elif [ "$OPENSSL_LIB" = "3" ]; then
+        sleep 1
+    else
+        _download_openssl
+    fi
 fi
 if [ "$PAGESPEED" = "y" ]; then
     _download_pagespeed

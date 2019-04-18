@@ -9,14 +9,19 @@ cache:
 before_install:
   - rm -rf ~/.gnupg
 
+git:
+  quiet: true
+
 before_script:
   - sudo apt-get -qq autoremove --purge
-  - sudo apt-get update -qq
+addons:
+  apt:
+    update: true
 
 script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo apt-get install -y --force-yes git nginx curl wget ccze
-  - sudo bash nginx-build.sh && sudo bash nginx-build.sh --stable --libressl && sudo bash nginx-build.sh --full || sudo bash -c 'tail -n 100 /tmp/nginx-ee.log | ccze -A'
+  - sudo bash nginx-build.sh --travis && sudo bash nginx-build.sh --stable --travis && sudo bash nginx-build.sh --openssl-system --travis || sudo bash -c 'tail -n 100 /tmp/nginx-ee.log | ccze -A'
   - sudo chown -R travis /usr/local/src
   - sudo chmod 755 /usr/local/src
