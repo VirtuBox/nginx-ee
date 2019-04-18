@@ -264,18 +264,27 @@ fi
 # Set OPENSSL/LIBRESSL lib
 ##################################
 
+if [ "$OS_ARCH" = 'x86_64' ]; then
+    if [ "$DISTRO_ID" = "Ubuntu" ]; then
+        OPENSSL_OPT="enable-ec_nistp_64_gcc_128 enable-tls1_3 no-ssl3-method -march=native -ljemalloc"
+    else
+        OPENSSL_OPT="enable-tls1_3"
+    fi
+fi
+
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
     LIBRESSL_VALID="YES"
 else
     if [ "$OPENSSL_LIB" = "2" ]; then
-        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=enable-tls1_3"
+        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=\"$OPENSSL_OPT\""
+        OPENSSL_VALID="1.1.1b Stable"
         OPENSSL_VALID="3.0.0-dev"
     elif [ "$OPENSSL_LIB" = "3" ]; then
         NGX_SSL_LIB=""
         OPENSSL_VALID="from system"
     else
-        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=enable-tls1_3"
+        NGX_SSL_LIB="--with-openssl=../openssl --with-openssl-opt=\"$OPENSSL_OPT\""
         OPENSSL_VALID="1.1.1b Stable"
     fi
 fi
@@ -832,13 +841,13 @@ _download_openssl() {
     } >> /tmp/nginx-ee.log 2>&1
 
     {
-    if [ -d /usr/local/src/openssl-patch/.git ]; then
-        cd /usr/local/src/openssl-patch || exit 1
-        git pull origin master
-    else
-        rm -rf /usr/local/src/openssl-patch
-        git clone https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
-    fi
+        if [ -d /usr/local/src/openssl-patch/.git ]; then
+            cd /usr/local/src/openssl-patch || exit 1
+            git pull origin master
+        else
+            rm -rf /usr/local/src/openssl-patch
+            git clone https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
+        fi
         cd /usr/local/src/openssl || exit 1
         # apply openssl ciphers patch
         echo "### openssl ciphers patch ###"
