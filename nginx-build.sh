@@ -831,6 +831,7 @@ _download_openssl() {
         mv /usr/local/src/openssl-${OPENSSL_VER} /usr/local/src/openssl
     } >> /tmp/nginx-ee.log 2>&1
 
+    {
     if [ -d /usr/local/src/openssl-patch/.git ]; then
         cd /usr/local/src/openssl-patch || exit 1
         git pull origin master
@@ -838,7 +839,6 @@ _download_openssl() {
         rm -rf /usr/local/src/openssl-patch
         git clone https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
     fi
-    {
         cd /usr/local/src/openssl || exit 1
         # apply openssl ciphers patch
         echo "### openssl ciphers patch ###"
