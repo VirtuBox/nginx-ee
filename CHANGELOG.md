@@ -8,7 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 # Changed
 
-## [3.6.0] - 2019-04-19
+## [3.6.1] - 2019-04-19
+
+# Fixed
+
+- OpenSSL selection from script arguments
+- Pcre library update
+
+## [3.6.0] - 2019-04-18
 
 ### Added
 
