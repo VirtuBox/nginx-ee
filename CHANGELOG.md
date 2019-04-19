@@ -4,12 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
-## [Unreleased]
+## [Unreleased] - XX-XX-XX
+
+# Changed
+
+## [3.6.0] - 2019-04-19
+
+### Added
+
+- LibreSSL support with the flag --libressl
+- OpenSSL release choice : 1.1.1b by default, or 3.0.0-dev or system lib
 
 ### Changed
 
 - Improve Nginx setup from scratch
 - Update openssl-patch
+- Nginx is compiled with OpenSSL 1.1.1b stable by default
+- Update PCRE LIB to v8.43
 
 ### Fixed
 

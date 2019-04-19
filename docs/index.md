@@ -39,6 +39,7 @@ Automated Nginx compilation from sources with additional modules support
 <li>Dynamic modules support</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
+<li>OpenSSL or LibreSSL</li>
 <li>Cloudflare HPACK (for Mainline release only)</li>
 <li>Cloudflare zlib</li>
 <li>Automated nginx updates cronjob</li>
@@ -58,12 +59,16 @@ Nginx current stable release : <strong>v1.14.2</strong></p>
 <li><a href="https://github.com/openresty/srcache-nginx-module">srcache-nginx-module</a></li>
 <li><a href="https://github.com/yaoweibin/ngx_http_substitutions_filter_module">ngx_http_substitutions_filter_module</a></li>
 <li><a href="https://github.com/nginx-modules/ngx_http_tls_dyn_size">nginx_dynamic_tls_records</a></li>
-<li><a href="https://github.com/openssl/openssl">OpenSSL</a></li>
 <li><a href="http://www.ipscrub.org/">ipscrub</a></li>
 <li><a href="https://github.com/sto/ngx_http_auth_pam_module">ngx_http_auth_pam_module</a></li>
 <li><a href="https://github.com/vozlt/nginx-module-vts">virtual-host-traffic-status</a></li>
 <li><a href="https://github.com/cloudflare/zlib.git">Cloudflare zlib</a></li>
 <li><a href="https://github.com/openresty/redis2-nginx-module.git">redis2-nginx-module</a></li>
+</ul>
+<p>For Nginx http_ssl_module :</p>
+<ul>
+<li><a href="https://github.com/openssl/openssl">OpenSSL</a></li>
+<li><a href="https://github.com/libressl-portable">LibreSSL</a></li>
 </ul>
 <p>Optional modules :</p>
 <ul>
@@ -134,6 +139,7 @@ sudo bash nginx-build.sh
 <li><code>--pagespeed-beta</code>: compile nginx with ngx_pagespeed latest-beta</li>
 <li><code>--naxsi</code> : compile nginx with naxsi</li>
 <li><code>--rtmp</code> : compile nginx with rtmp module</li>
+<li><code>--libressl</code> : compile nginx with LibreSSL instead of OpenSSL</li>
 </ul>
 <p>Extras :</p>
 <ul>
@@ -152,15 +158,15 @@ sudo bash nginx-build.sh
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add Nginx modules choice</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for Debian 9</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add support for config.inc build configuration</li>
-<li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add openssl release choice</li>
+<li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add openssl release choice</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add more compilation presets</li>
-<li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add support for LibreSSL</li>
+<li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for LibreSSL</li>
 </ul>
 <hr />
 <h2 id="related">Related</h2>
 <ul>
 <li><a href="https://github.com/VirtuBox/ubuntu-nginx-web-server">Ubuntu-nginx-web-server</a> : repository with all custom nginx configurations used by VirtuBox</li>
-<li><a href="https://github.com/VirtuBox/wo-nginx-setup">WO-Nginx-Setup</a> : automated wordops setup script</li>
+<li><a href="https://github.com/WordOps/WordOps">WordOps</a></li>
 <li><a href="https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template">Plesk-nginx-fastcgi-cache-template</a> : Plesk Onyx custom hosting templates with fastcgi_cache support</li>
 <li><a href="https://github.com/VirtuBox/nginx-cloudflare-real-ip">Nginx-Cloudflare-real-ip</a> : Bash script to restore visitor real IP under Cloudflare with Nginx</li>
 <li><a href="https://github.com/VirtuBox/advanced-nginx-cheatsheet">Advanced Nginx Cheatsheet</a></li>
@@ -173,6 +179,7 @@ sudo bash nginx-build.sh
 <ul>
 <li><a href="https://github.com/centminmod/centminmod">centminmod</a> : Nginx, Nginx modules &amp; various other patches</li>
 <li><a href="https://github.com/hakasenyang/openssl-patch">hakase</a> : OpenSSL-patch</li>
+<li><a href="https://github.com/kn007/patch">Karl Chen</a> : Nginx patches</li>
 </ul>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE">MIT</a> © <a href="https://virtubox.net" title="VirtuBox" target="_blank">VirtuBox</a></p>

@@ -42,6 +42,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
+* OpenSSL (1.1.1b or 3.0.0-dev) or LibreSSL
 * Cloudflare HPACK (for Mainline release only)
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -52,7 +53,7 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.15.11**
+Nginx current mainline release : **v1.15.12**
 Nginx current stable release : **v1.14.2**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
@@ -63,12 +64,16 @@ Nginx current stable release : **v1.14.2**
 * [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
 * [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
-* [OpenSSL](https://github.com/openssl/openssl)
 * [ipscrub](http://www.ipscrub.org/)
 * [ngx_http_auth_pam_module](https://github.com/sto/ngx_http_auth_pam_module)
 * [virtual-host-traffic-status](https://github.com/vozlt/nginx-module-vts)
 * [Cloudflare zlib](https://github.com/cloudflare/zlib.git)
 * [redis2-nginx-module](https://github.com/openresty/redis2-nginx-module.git)
+
+For Nginx http_ssl_module :
+
+* [OpenSSL](https://github.com/openssl/openssl)
+* [LibreSSL](https://github.com/libressl-portable)
 
 Optional modules :
 
@@ -159,6 +164,7 @@ Optional third-party modules :
 * `--pagespeed-beta`: compile nginx with ngx_pagespeed latest-beta
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
+* `--libressl` : compile nginx with LibreSSL instead of OpenSSL
 
 Extras :
 
@@ -178,16 +184,16 @@ Extras :
 * [x] Add Nginx modules choice
 * [x] Add support for Debian 9
 * [ ] Add support for config.inc build configuration
-* [ ] Add openssl release choice
+* [x] Add openssl release choice
 * [ ] Add more compilation presets
-* [ ] Add support for LibreSSL
+* [x] Add support for LibreSSL
 
 ---
 
 ## Related
 
 * [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server) : repository with all custom nginx configurations used by VirtuBox
-* [WO-Nginx-Setup](https://github.com/VirtuBox/wo-nginx-setup) : automated wordops setup script
+* [WordOps](https://github.com/WordOps/WordOps)
 * [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template) : Plesk Onyx custom hosting templates with fastcgi_cache support
 * [Nginx-Cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
 * [Advanced Nginx Cheatsheet](https://github.com/VirtuBox/advanced-nginx-cheatsheet)
@@ -204,6 +210,7 @@ If you'd like to contribute, please fork the repository and make changes as you'
 
 * [centminmod](https://github.com/centminmod/centminmod) : Nginx, Nginx modules & various other patches
 * [hakase](https://github.com/hakasenyang/openssl-patch) : OpenSSL-patch
+* [Karl Chen](https://github.com/kn007/patch) : Nginx patches
 
 ## License
 
