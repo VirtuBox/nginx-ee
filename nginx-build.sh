@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.0 - 2019-04-18
+# Version 3.6.1 - 2019-04-19
 # -------------------------------------------------------------------------
 
 ##################################
@@ -54,10 +54,10 @@ else
             NAXSI="y"
             ;;
         --openssl-dev)
-            OPENSSL_RELEASE="2"
+            OPENSSL_LIB="2"
             ;;
         --openssl-system)
-            OPENSSL_RELEASE="3"
+            OPENSSL_LIB="3"
             ;;
         --libressl)
             LIBRESSL="y"
@@ -70,7 +70,6 @@ else
             ;;
         --stable)
             NGINX_RELEASE="2"
-            OPENSSL_RELEASE="1"
             ;;
         -i | --interactive)
             INTERACTIVE_SETUP="1"
@@ -127,7 +126,7 @@ DISTRO_ID="$(lsb_release -si)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
-PCRE_VER="8.43"
+PCRE_VER=$(curl -sL https://ftp.pcre.org/pub/pcre/ | grep -E -o 'pcre\-[0-9.]+\.tar[.a-z]*gz' | awk -F "pcre-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | tail -n 1 2>&1)
 
 # Colors
 CSI='\033['
@@ -616,7 +615,7 @@ _download_modules() {
         }
         # http redis module
         [ ! -d /usr/local/src/ngx_http_redis ] && {
-            sudo curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+            curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
             mv ngx_http_redis-0.3.8 ngx_http_redis
         }
         if [ "$RTMP" = "y" ]; then
@@ -699,7 +698,30 @@ _download_pcre() {
 
     cd "$DIR_SRC" || exit 1
 
-    if [ ! -x /usr/bin/pcretest ]; then
+    if [ -z "$(command -v pcretest)" ]; then
+        echo -ne '       Downloading pcre                       [..]\r'
+        {
+            curl -sL https://ftp.pcre.org/pub/pcre/pcre-${PCRE_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+            mv pcre-${PCRE_VER} pcre
+
+            cd "$DIR_SRC/pcre" || exit 1
+            ./configure --prefix=/usr \
+                --enable-utf8 \
+                --enable-unicode-properties \
+                --enable-pcre16 \
+                --enable-pcre32 \
+                --enable-pcregrep-libz \
+                --enable-pcregrep-libbz2 \
+                --enable-pcretest-libreadline \
+                --enable-jit
+
+            make -j "$(nproc)"
+            make install
+            mv -v /usr/lib/libpcre.so.* /lib
+            ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
+
+        } >> /tmp/nginx-ee.log 2>&1
+    else
         PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
         if [ "$PCRE_VERSION" != "$PCRE_VER" ]; then
             echo -ne '       Downloading pcre                       [..]\r'
@@ -724,14 +746,15 @@ _download_pcre() {
                 ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
 
             } >> /tmp/nginx-ee.log 2>&1
-            if [ "$?" -eq 0 ]; then
-                echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
-                echo -ne '\n'
-            else
-                echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
-                echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-                exit 1
-            fi
+
+        fi
+        if [ "$?" -eq 0 ]; then
+            echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
+            echo -ne '\n'
+        else
+            echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
+            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+            exit 1
         fi
     fi
 
