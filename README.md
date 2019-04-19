@@ -17,7 +17,7 @@ Automated Nginx compilation from sources with additional modules support
 <img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
 <img src="https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg" alt="Stars">
 <img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits">
-</p>
+<img src="https://img.shields.io/github/release/VirtuBox/nginx-ee.svg?style=flat" alt="GitHub release"></p>
 
 <p align="center">
 <a href="#features"> Features<a> •
@@ -165,6 +165,8 @@ Optional third-party modules :
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 * `--libressl` : compile nginx with LibreSSL instead of OpenSSL
+* `--openssl-dev` : compile nginx with OpenSSL 3.0.0-dev
+* `--openssl-system` : compile nginx with OpenSSL system lib
 
 Extras :
 
