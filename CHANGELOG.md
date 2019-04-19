@@ -10,7 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [3.6.1] - 2019-04-19
 
-# Fixed
+### Added
+
+- Latest Pcre version auto-update
+
+### Fixed
 
 - OpenSSL selection from script arguments
 - Pcre library update
