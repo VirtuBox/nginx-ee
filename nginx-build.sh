@@ -123,7 +123,7 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 DISTRO_ID="$(lsb_release -si)"
-DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS)"
+DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
 PCRE_VER=$(curl -sL https://ftp.pcre.org/pub/pcre/ | grep -E -o 'pcre\-[0-9.]+\.tar[.a-z]*gz' | awk -F "pcre-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | tail -n 1 2>&1)
