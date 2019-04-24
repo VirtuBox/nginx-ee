@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.1 - 2019-04-23
+# Version 3.6.2 - 2019-04-24
 # -------------------------------------------------------------------------
 
 ##################################
@@ -114,9 +114,9 @@ fi
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.6.1"
+NGINX_EE_VER="3.6.2"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
-NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
+NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
 LIBRESSL_VER="2.9.1"
 OPENSSL_VER="1.1.1b"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
@@ -230,7 +230,7 @@ fi
 
 if [ "$NGINX_RELEASE" = "2" ]; then
     NGINX_VER="$NGINX_STABLE"
-    NGX_HPACK=""
+    NGX_HPACK="--with-http_v2_hpack_enc"
 else
     NGINX_VER="$NGINX_MAINLINE"
     NGX_HPACK="--with-http_v2_hpack_enc"
@@ -279,12 +279,15 @@ else
     if [ "$OPENSSL_LIB" = "2" ]; then
         NGX_SSL_LIB="--with-openssl=../openssl"
         OPENSSL_VALID="3.0.0-dev"
+        LIBSSL_DEV=""
     elif [ "$OPENSSL_LIB" = "3" ]; then
         NGX_SSL_LIB=""
         OPENSSL_VALID="from system"
+        LIBSSL_DEV="libssl-dev"
     else
         NGX_SSL_LIB="--with-openssl=../openssl"
         OPENSSL_VALID="1.1.1b Stable"
+        LIBSSL_DEV=""
     fi
 fi
 
@@ -363,11 +366,11 @@ _install_dependencies() {
     echo -ne '       Installing dependencies               [..]\r'
     if ! {
         DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
-            git build-essential libtool automake autoconf zlib1g-dev \
-            libpcre3 libpcre3-dev libgd3 libgd-dev libssl-dev libxslt1.1 libxslt1-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
-            libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar zlibc zlib1g zlib1g-dbg \
-            libcurl4-openssl-dev libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev checkinstall ccache libxml2 libxml2-dev
+            git build-essential libtool automake autoconf \
+            libgd3 libgd-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
+            libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
+            libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
+            libgmp-dev autotools-dev checkinstall ccache libxml2 libxml2-dev "$LIBSSL_DEV"
     } >> /dev/null 2>&1; then
         echo -e "        Installing dependencies              [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
@@ -1008,7 +1011,10 @@ _patch_nginx() {
 
     echo -ne '       Applying nginx patches                 [..]\r'
     if [ "$NGINX_RELEASE" = "2" ]; then
-        curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.13.0%2B.patch | patch -p1 >> /tmp/nginx-ee.log 2>&1
+        {
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+        } >> /tmp/nginx-ee.log 2>&1
     else
         {
             echo "### nginx_hpack_push patch"
