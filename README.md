@@ -12,6 +12,8 @@ Automated Nginx compilation from sources with additional modules support
 
 ---
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4755fe17202f4a5c9df402c04c3f4048)](https://app.codacy.com/app/VirtuBox/nginx-ee?utm_source=github.com&utm_medium=referral&utm_content=VirtuBox/nginx-ee&utm_campaign=Badge_Grade_Dashboard)
+
 <p align="center">
 <a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build" /></a>
 <img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
