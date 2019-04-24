@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 # [3.6.2] - 2019-04-24
 
+### Added
+
+- Additional GCC flags : "-Wno-error=date-time for Debian" : PR [#52](https://github.com/VirtuBox/nginx-ee/pull/52)
+
 ### Changed
 
 - Update LibreSSL to v2.9.1
