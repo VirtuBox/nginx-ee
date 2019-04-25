@@ -16,7 +16,7 @@
 
 CURRENT_NGINX="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}')"
 NGINX_MAINLINE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
-NGINX_STABLE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.14 2>&1)"
+NGINX_STABLE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
 CURRENT_STABLE="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}' | grep 1.14)"
 PAGESPEED="$(/usr/sbin/nginx -V 2>&1 | grep pagespeed)"
 NAXSI="$(/usr/sbin/nginx -V 2>&1 | grep naxsi)"
