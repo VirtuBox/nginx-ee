@@ -14,11 +14,12 @@ Automated Nginx compilation from sources with additional modules support
 </h4>
 <hr />
 <p align="center">
-<a href="https://travis-ci.com/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build" /></a>
+<a href="https://travis-ci.org/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build" /></a>
 <img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
 <img src="https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg" alt="Stars">
 <img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits">
-</p>
+<img src="https://img.shields.io/github/release/VirtuBox/nginx-ee.svg?style=flat" alt="GitHub release">
+<img src="https://api.codacy.com/project/badge/Grade/61fe95d2311241b6b5051a04493a43c2" alt="Codacy Badge"></p>
 <p align="center">
 <a href="#features"> Features<a> •
 <a href="#additional-third-party-modules"> Modules</a> •
@@ -39,7 +40,7 @@ Automated Nginx compilation from sources with additional modules support
 <li>Dynamic modules support</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
-<li>OpenSSL or LibreSSL</li>
+<li>OpenSSL (1.1.1b or 3.0.0-dev) or LibreSSL</li>
 <li>Cloudflare HPACK (for Mainline release only)</li>
 <li>Cloudflare zlib</li>
 <li>Automated nginx updates cronjob</li>
@@ -48,8 +49,8 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.15.9</strong>
-Nginx current stable release : <strong>v1.14.2</strong></p>
+<p>Nginx current mainline release : <strong>v1.15.12</strong>
+Nginx current stable release : <strong>v1.16.0</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
 <li><a href="https://github.com/openresty/headers-more-nginx-module">headers-more-nginx-module</a></li>
@@ -140,6 +141,8 @@ sudo bash nginx-build.sh
 <li><code>--naxsi</code> : compile nginx with naxsi</li>
 <li><code>--rtmp</code> : compile nginx with rtmp module</li>
 <li><code>--libressl</code> : compile nginx with LibreSSL instead of OpenSSL</li>
+<li><code>--openssl-dev</code> : compile nginx with OpenSSL 3.0.0-dev</li>
+<li><code>--openssl-system</code> : compile nginx with OpenSSL system lib</li>
 </ul>
 <p>Extras :</p>
 <ul>
@@ -183,3 +186,4 @@ sudo bash nginx-build.sh
 </ul>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE">MIT</a> © <a href="https://virtubox.net" title="VirtuBox" target="_blank">VirtuBox</a></p>
+
