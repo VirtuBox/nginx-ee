@@ -507,7 +507,7 @@ _gcc_ubuntu_setup() {
 
 _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
-    {
+    if {
 
         if [ "$DISTRO_ID" = "Ubuntu" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
@@ -518,8 +518,7 @@ _rtmp_setup() {
         else
             apt-get install ffmpeg -y
         fi
-    } >> /dev/null 2>&1
-    if [ "$?" -eq 0 ]; then
+    } >> /dev/null 2>&1; then
         echo -ne "       Installing FFMPEG for RMTP module      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -548,7 +547,7 @@ _download_modules() {
 
     echo -ne '       Downloading additionals modules        [..]\r'
 
-    {
+    if {
         echo "### downloading additionals modules ###"
         # cache_purge module
         { [ -d "$DIR_SRC/ngx_cache_purge" ] && {
@@ -637,9 +636,7 @@ _download_modules() {
         }
 
         echo "### additionals modules downloaded ###"
-    } >> /tmp/nginx-ee.log 2>&1
-
-    if [ "$?" -eq 0 ]; then
+    } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
