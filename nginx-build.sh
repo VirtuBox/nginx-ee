@@ -388,51 +388,52 @@ _install_dependencies() {
 _nginx_from_scratch_setup() {
 
     echo -ne '       Setting Up Nginx configurations        [..]\r'
-    # clone custom nginx configuration
-    [ ! -d /etc/nginx ] && {
-        git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
-    } >> /tmp/nginx-ee.log 2>&1
+    if {
+        # clone custom nginx configuration
+        [ ! -d /etc/nginx ] && {
+            git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
+        } >> /tmp/nginx-ee.log 2>&1
 
-    # create nginx temp directory
-    mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
-    # create nginx cache directory
-    [ ! -d /var/cache/nginx ] && {
-        mkdir -p /var/cache/nginx
-    }
-    [ ! -d /var/run/nginx-cache ] && {
-        mkdir -p /var/run/nginx-cache
-    }
-    [ ! -d /var/log/nginx ] && {
-        mkdir -p /var/log/nginx
-        chmod 640 /var/log/nginx
-        chown -R www-data:adm /var/log/nginx
-    }
-
-    # set proper permissions
-    chown -R www-data:root /var/lib/nginx /var/cache/nginx /var/run/nginx-cache
-
-    # create websites directory
-    [ ! -d /var/www/html ] && {
-        mkdir -p /var/www/html
-    }
-
-    {
-        # download default nginx page
-        wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
-        mkdir -p /etc/nginx/sites-enabled
-        ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-        # download nginx systemd service
-        [ ! -f /lib/systemd/system/nginx.service ] && {
-            wget -O /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
-            systemctl enable nginx.service
+        # create nginx temp directory
+        mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
+        # create nginx cache directory
+        [ ! -d /var/cache/nginx ] && {
+            mkdir -p /var/cache/nginx
+        }
+        [ ! -d /var/run/nginx-cache ] && {
+            mkdir -p /var/run/nginx-cache
+        }
+        [ ! -d /var/log/nginx ] && {
+            mkdir -p /var/log/nginx
+            chmod 640 /var/log/nginx
+            chown -R www-data:adm /var/log/nginx
         }
 
-        # download logrotate configuration
-        wget -O /etc/logrotate.d/nginx https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/logrotate.d/nginx
+        # set proper permissions
+        chown -R www-data:root /var/lib/nginx /var/cache/nginx /var/run/nginx-cache
 
-    } >> /tmp/nginx-ee.log 2>&1
+        # create websites directory
+        [ ! -d /var/www/html ] && {
+            mkdir -p /var/www/html
+        }
 
-    if [ "$?" -eq 0 ]; then
+        {
+            # download default nginx page
+            wget -O /var/www/html/index.nginx-debian.html https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/var/www/html/index.nginx-debian.html
+            mkdir -p /etc/nginx/sites-enabled
+            ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+            # download nginx systemd service
+            [ ! -f /lib/systemd/system/nginx.service ] && {
+                wget -O /lib/systemd/system/nginx.service https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/systemd/system/nginx.service
+                systemctl enable nginx.service
+            }
+
+            # download logrotate configuration
+            wget -O /etc/logrotate.d/nginx https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/logrotate.d/nginx
+
+        } >> /tmp/nginx-ee.log 2>&1
+
+    }; then
         echo -ne "       Setting Up Nginx configurations        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
