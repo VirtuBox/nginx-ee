@@ -123,6 +123,7 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 DISTRO_ID="$(lsb_release -si)"
+DISTRO_CODENAME=$(lsb_release -sc)
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
@@ -325,6 +326,16 @@ else
 fi
 
 ##################################
+# Set Libjemalloc
+##################################
+
+if [ "$DISTRO_CODENAME" = "disco" ]; then
+    LIBJEMALLOC="libjemalloc2"
+else
+    LIBJEMALLOC="libjemalloc1"
+fi
+
+##################################
 # Display Compilation Summary
 ##################################
 
@@ -364,20 +375,21 @@ echo ""
 
 _install_dependencies() {
     echo -ne '       Installing dependencies               [..]\r'
-    if ! {
+    if {
         DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
             git build-essential libtool automake autoconf \
-            libgd3 libgd-dev libgeoip-dev libjemalloc1 libjemalloc-dev \
+            libgd3 libgd-dev libgeoip-dev "$LIBJEMALLOC" libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
             libgmp-dev autotools-dev checkinstall ccache libxml2 libxml2-dev "$LIBSSL_DEV"
-    } >> /dev/null 2>&1; then
+    } >> /tmp/nginx-ee.log 2>&1; then
+        echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
         echo -e "        Installing dependencies              [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
-    else
-        echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
-        echo -ne '\n'
+
     fi
 }
 
