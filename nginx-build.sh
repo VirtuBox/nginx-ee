@@ -174,25 +174,25 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     echo ""
     echo "Do you want to compile the latest Nginx [1] Mainline v${NGINX_MAINLINE} or [2] Stable v${NGINX_STABLE} Release ?"
     while [[ "$NGINX_RELEASE" != "1" && "$NGINX_RELEASE" != "2" ]]; do
-        read -p "Select an option [1-2]: " NGINX_RELEASE
+        echo -e "Select an option [1-2]: " && read -r NGINX_RELEASE
     done
     echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
     while [[ "$PAGESPEED" != "y" && "$PAGESPEED" != "n" ]]; do
-        read -p "Select an option [y/n]: " PAGESPEED
+        echo -e "Select an option [y/n]: " && read -r PAGESPEED
     done
     if [ "$PAGESPEED" = "y" ]; then
         echo -e '\nWhat Ngx_Pagespeed release do you want ?\n'
         echo -e '  [1] Beta Release'
         echo -e '  [2] Stable Release\n'
         while [[ "$PAGESPEED_RELEASE" != "1" && "$PAGESPEED_RELEASE" != "2" ]]; do
-            read -p "Select an option [1-2]: " PAGESPEED_RELEASE
+            echo -e "Select an option [1-2]: " && read -r PAGESPEED_RELEASE
         done
     fi
     echo -e '\nDo you prefer to compile Nginx with OpenSSL [1] or LibreSSL [2] ? (y/n)'
     echo -e '  [1] OpenSSL'
     echo -e '  [2] LibreSSL\n'
     while [[ "$SSL_LIB_CHOICE" != "1" && "$SSL_LIB_CHOICE" != "2" ]]; do
-        read -p "Select an option [1-2]: " SSL_LIB_CHOICE
+        echo -e "Select an option [1-2]: " && read -r SSL_LIB_CHOICE
     done
     if [ "$SSL_LIB_CHOICE" = "1" ]; then
         echo -e '\nWhat OpenSSL release do you want ?\n'
@@ -200,26 +200,26 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
         echo -e '  [2] OpenSSL dev 3.0.0-dev\n'
         echo -e '  [3] OpenSSL from system lib\n'
         while [[ "$OPENSSL_LIB" != "1" && "$OPENSSL_LIB" != "2" && "$OPENSSL_LIB" != "3" ]]; do
-            read -p "Select an option [1-2-3]: " OPENSSL_LIB
+            echo -e "Select an option [1-2-3]: " && read -r  OPENSSL_LIB
         done
     else
         LIBRESSL="y"
     fi
     echo -e '\nDo you want NAXSI WAF (still experimental)? (y/n)'
     while [[ "$NAXSI" != "y" && "$NAXSI" != "n" ]]; do
-        read -p "Select an option [y/n]: " NAXSI
+        echo -e "Select an option [y/n]: " && read -r NAXSI
     done
     echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
-        read -p "Select an option [y/n]: " RTMP
+        echo -e "Select an option [y/n]: " && read -r  RTMP
     done
     echo -e '\nDo you want to build modules as dynamic modules? (y/n)'
     while [[ "$DYNAMIC_MODULES" != "y" && "$DYNAMIC_MODULES" != "n" ]]; do
-        read -p "Select an option [y/n]: " DYNAMIC_MODULES
+        echo -e "Select an option [y/n]: " && read -r  DYNAMIC_MODULES
     done
     echo -e '\nDo you want to setup nginx-ee auto-update cronjob ? (y/n)'
     while [[ "$CRON_SETUP" != "y" && "$CRON_SETUP" != "n" ]]; do
-        read -p "Select an option [y/n]: " CRON_SETUP
+        echo -e "Select an option [y/n]: " && read -r CRON_SETUP
     done
     echo ""
 fi
