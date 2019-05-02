@@ -31,7 +31,7 @@ Automated Nginx compilation from sources with additional modules support
 <a href="https://github.com/VirtuBox/nginx-ee/wiki"> Wiki</a> •
 <a href="#related"> Related</a> •
 <a href="#credits"> Credits</a> •
-<a href="#license"> License</a></p>
+<a href="#license"> License</a>
 <p align="center"><img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png" alt="Nginx-ee"></p>
 <hr />
 <h2 id="features">Features</h2>
@@ -90,6 +90,7 @@ Nginx current stable release : <strong>v1.16.0</strong></p>
 </ul>
 <h4 id="also-compatible">Also compatible</h4>
 <ul>
+<li>Ubuntu 19.04 (Disco)</li>
 <li>Debian 9 (Stretch)</li>
 <li>Debian 8 (Jessie)</li>
 <li>Raspbian (Stretch)</li>
@@ -111,6 +112,7 @@ Nginx current stable release : <strong>v1.16.0</strong></p>
 <h3 id="one-step-automated-install">One-Step Automated Install</h3>
 <ul>
 <li>mainline release</li>
+<li>Openssl stable 1.1.1b</li>
 <li>without pagespeed</li>
 <li>without naxsi</li>
 <li>without rtmp</li>
