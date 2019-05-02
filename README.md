@@ -99,6 +99,7 @@ Optional modules :
 
 #### Also compatible
 
+* Ubuntu 19.04 (Disco)
 * Debian 9 (Stretch)
 * Debian 8 (Jessie)
 * Raspbian (Stretch)
@@ -123,6 +124,7 @@ Optional modules :
 ### One-Step Automated Install
 
 * mainline release
+* openssl stable : 1.1.1b
 * without pagespeed
 * without naxsi
 * without rtmp
@@ -192,17 +194,17 @@ Extras :
 * [x] Add support for Debian 9
 * [ ] Add support for config.inc build configuration
 * [x] Add openssl release choice
-* [ ] Add more compilation presets
+* [x] Add more compilation presets
 * [x] Add support for LibreSSL
 
 ---
 
 ## Related
 
-* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server) : repository with all custom nginx configurations used by VirtuBox
+* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server)
 * [WordOps](https://github.com/WordOps/WordOps)
-* [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template) : Plesk Onyx custom hosting templates with fastcgi_cache support
-* [Nginx-Cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip) : Bash script to restore visitor real IP under Cloudflare with Nginx
+* [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template)
+* [Nginx-Cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip)
 * [Advanced Nginx Cheatsheet](https://github.com/VirtuBox/advanced-nginx-cheatsheet)
 
 ---

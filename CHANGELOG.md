@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+### Added
+
+- Ubuntu 19.04 (disco) support
+
 ### Changed
 
 - Improve code quality according to codacy checkup
