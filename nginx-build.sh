@@ -197,7 +197,7 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     done
     if [ "$SSL_LIB_CHOICE" = "1" ]; then
         echo -e '\nWhat OpenSSL release do you want ?\n'
-        echo -e '  [1] OpenSSL stable 1.1.1b'
+        echo -e "  [1] OpenSSL stable $OPENSSL_VER\n"
         echo -e '  [2] OpenSSL dev 3.0.0-dev\n'
         echo -e '  [3] OpenSSL from system lib\n'
         while [[ "$OPENSSL_LIB" != "1" && "$OPENSSL_LIB" != "2" && "$OPENSSL_LIB" != "3" ]]; do
@@ -287,7 +287,7 @@ else
         LIBSSL_DEV="libssl-dev"
     else
         NGX_SSL_LIB="--with-openssl=../openssl"
-        OPENSSL_VALID="1.1.1b Stable"
+        OPENSSL_VALID="$OPENSSL_VER Stable"
         LIBSSL_DEV=""
     fi
 fi
@@ -1234,8 +1234,13 @@ _compile_nginx() {
         echo -ne '       Compiling nginx                        [..]\r'
 
         {
+            # compile Nginx
             make -j "$(nproc)"
+            # Strip debug symbols
+            strip --strip-unneeded /usr/local/src/nginx/objs/nginx
+            # install Nginx
             make install
+
 
         } >> /tmp/nginx-ee.log 2>&1
 
