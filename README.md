@@ -47,7 +47,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
-* OpenSSL (1.1.1b or 3.0.0-dev) or LibreSSL
+* OpenSSL (1.1.1b or 3.0.0-dev or from system-lib) or LibreSSL
 * Cloudflare HPACK (for Mainline release only)
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -58,7 +58,7 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.15.12**
+Nginx current mainline release : **v1.17.0**
 Nginx current stable release : **v1.16.0**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
