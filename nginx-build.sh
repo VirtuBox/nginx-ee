@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.2 - 2019-05-01
+# Version 3.6.3 - 2019-06-25
 # -------------------------------------------------------------------------
 
 ##################################
@@ -114,11 +114,11 @@ fi
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.6.2"
+NGINX_EE_VER="3.6.3"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
 LIBRESSL_VER="2.9.1"
-OPENSSL_VER="1.1.1b"
+OPENSSL_VER="1.1.1c"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
@@ -885,7 +885,7 @@ _download_openssl() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 < ../openssl-patch/openssl-equal-${OPENSSL_VER}_ciphers.patch
+            patch -p1 < ../openssl-patch/openssl-${OPENSSL_VER}-chacha_draft.patch
         } >> /tmp/nginx-ee.log 2>&1
 
     }; then

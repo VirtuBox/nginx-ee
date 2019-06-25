@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Ubuntu 19.04 (disco) support
 - Strip Nginx binary to remove debug symbols
+- Update OpenSSL to release 1.1.1c
 
 ### Changed
 
