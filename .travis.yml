@@ -15,7 +15,7 @@ git:
   quiet: true
 
 before_script:
-  - apt-get -qq autoremove --purge
+  - sudo apt-get -qq autoremove --purge
 addons:
   apt:
     update: true
