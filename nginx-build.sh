@@ -20,6 +20,30 @@
     exit 1
 }
 
+_help() {
+    echo " -------------------------------------------------------------------- "
+    echo "   Nginx-ee : automated Nginx compilation with additional modules  "
+    echo " -------------------------------------------------------------------- "
+    echo ""
+    echo "Usage: ./nginx-ee <options> [modules]"
+    echo "By default, Nginx-ee will compile the latest Nginx mainline release without Pagespeed, Naxsi or RTMP module"
+    echo "  Options:"
+    echo "       -h, --help ..... display this help"
+    echo "       -i, --interactive ....... interactive installation"
+    echo "       --stable ..... Nginx stable release"
+    echo "       --full ..... Nginx mainline release with Pagespeed, Nasxi and RTMP module"
+    echo "       --dynamic ..... Compile Nginx modules as dynamic"
+    echo "  Modules:"
+    echo "       --pagespeed ..... Pagespeed module stable release"
+    echo "       --pagespeed-beta .....  Pagespeed module beta release"
+    echo "       --naxsi ..... Naxsi WAF module"
+    echo "       --rtmp ..... RTMP video streaming module"
+    echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
+    echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
+    echo ""
+    return 0
+}
+
 ##################################
 # Use config.inc if available
 ##################################
@@ -82,6 +106,10 @@ else
             ;;
         --travis)
             TRAVIS_BUILD="1"
+            ;;
+        -h | --help)
+            _help
+            exit 1
             ;;
         *) ;;
         esac
@@ -467,8 +495,7 @@ _gcc_ubuntu_setup() {
     if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
         {
             echo "### adding gcc repository ###"
-            add-apt-repository -y ppa:jonathonf/gcc
-            apt-get update
+            add-apt-repository -y ppa:jonathonf/gcc -u
         } >> /dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
@@ -522,8 +549,7 @@ _rtmp_setup() {
 
         if [ "$DISTRO_ID" = "Ubuntu" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
-                add-apt-repository -y ppa:jonathonf/ffmpeg-4
-                apt-get update
+                add-apt-repository -y ppa:jonathonf/ffmpeg-4 -u
                 apt-get install ffmpeg -y
             fi
         else
@@ -703,6 +729,29 @@ _download_zlib() {
 # Download & compile pcre
 ##################################
 
+_compile_pcre() {
+
+    {
+
+        cd "$DIR_SRC/pcre" || exit 1
+        ./configure --prefix=/usr \
+            --enable-utf8 \
+            --enable-unicode-properties \
+            --enable-pcre16 \
+            --enable-pcre32 \
+            --enable-pcregrep-libz \
+            --enable-pcregrep-libbz2 \
+            --enable-pcretest-libreadline \
+            --enable-jit
+
+        make -j "$(nproc)"
+        make install
+        mv -v /usr/lib/libpcre.so.* /lib
+        ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
+
+    } >> /tmp/nginx-ee.log 2>&1
+}
+
 _download_pcre() {
 
     cd "$DIR_SRC" || exit 1
@@ -714,23 +763,10 @@ _download_pcre() {
                 curl -sL https://ftp.pcre.org/pub/pcre/pcre-${PCRE_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
                 mv pcre-${PCRE_VER} pcre
 
-                cd "$DIR_SRC/pcre" || exit 1
-                ./configure --prefix=/usr \
-                    --enable-utf8 \
-                    --enable-unicode-properties \
-                    --enable-pcre16 \
-                    --enable-pcre32 \
-                    --enable-pcregrep-libz \
-                    --enable-pcregrep-libbz2 \
-                    --enable-pcretest-libreadline \
-                    --enable-jit
+                _compile_pcre
 
-                make -j "$(nproc)"
-                make install
-                mv -v /usr/lib/libpcre.so.* /lib
-                ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
-
-            } >> /tmp/nginx-ee.log 2>&1
+            } \
+                >> /tmp/nginx-ee.log 2>&1
         else
             PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
             if [ "$PCRE_VERSION" != "$PCRE_VER" ]; then
@@ -739,20 +775,8 @@ _download_pcre() {
                     curl -sL https://ftp.pcre.org/pub/pcre/pcre-${PCRE_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
                     mv pcre-${PCRE_VER} pcre
 
-                    cd "$DIR_SRC/pcre" || exit 1
-                    ./configure --prefix=/usr \
-                        --enable-utf8 \
-                        --enable-unicode-properties \
-                        --enable-pcre16 \
-                        --enable-pcre32 \
-                        --enable-pcregrep-libz \
-                        --enable-pcregrep-libbz2 \
-                        --enable-pcretest-libreadline \
-                        --enable-jit
+                    _compile_pcre
 
-                    make -j "$(nproc)"
-                    make install
-                    mv -v /usr/lib/libpcre.so.* /lib
                     ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
 
                 } >> /tmp/nginx-ee.log 2>&1
@@ -780,11 +804,9 @@ _download_brotli() {
     if {
         echo -ne '       Downloading brotli                     [..]\r'
         {
-            if [ -d "$DIR_SRC/ngx_brotli" ]; then
-                git -C "$DIR_SRC/ngx_brotli" pull origin master
-            else
-                git clone --recursive https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
-            fi
+            rm /usr/local/src/ngx_brotli -rf
+            git clone --recursive https://github.com/VirtuBox/ngx_brotli.git /usr/local/src/ngx_brotli -q
+
         } >> /tmp/nginx-ee.log 2>&1
 
     }; then
@@ -1021,22 +1043,11 @@ _patch_nginx() {
     cd /usr/local/src/nginx || exit 1
     if {
         echo -ne '       Applying nginx patches                 [..]\r'
-        if [ "$NGINX_RELEASE" = "2" ]; then
-            {
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
-            } >> /tmp/nginx-ee.log 2>&1
-        else
-            {
-                echo "### nginx_hpack_push patch"
 
-                echo "### nginx_dynamic_tls_records patch"
-                #            curl -sL https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_1.15.5%2B.patch | patch -p1
-                #            curl -sL https://raw.githubusercontent.com/centminmod/centminmod/123.09beta01/patches/cloudflare/nginx-1.15.3_http2-hpack.patch | patch -p1
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
-            } >> /tmp/nginx-ee.log 2>&1
-        fi
+        {
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+        } >> /tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
@@ -1241,8 +1252,8 @@ _compile_nginx() {
             # install Nginx
             make install
 
-
-        } >> /tmp/nginx-ee.log 2>&1
+        } \
+            >> /tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Compiling nginx                        [${CGREEN}OK${CEND}]\\r"
