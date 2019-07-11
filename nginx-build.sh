@@ -1085,21 +1085,7 @@ _configure_nginx() {
 
         # built-in modules
         if [ -z "$OVERRIDE_NGINX_MODULES" ]; then
-            if [ "$DYNAMIC_MODULES" = "y" ]; then
-                NGINX_INCLUDED_MODULES="--with-http_stub_status_module \
-        --with-http_realip_module \
-        --with-http_auth_request_module \
-        --with-http_addition_module \
-        --with-http_gzip_static_module \
-        --with-http_gunzip_module \
-        --with-http_mp4_module \
-        --with-http_sub_module
-        --with-mail=dynamic \
-        --with-stream=dynamic \
-        --with-http_geoip_module=dynamic \
-        --with-http_image_filter_module=dynamic "
-            else
-                NGINX_INCLUDED_MODULES="--with-http_stub_status_module \
+            NGINX_INCLUDED_MODULES="--with-http_stub_status_module \
         --with-http_realip_module \
         --with-http_auth_request_module \
         --with-http_addition_module \
@@ -1107,7 +1093,6 @@ _configure_nginx() {
         --with-http_gunzip_module \
         --with-http_mp4_module \
         --with-http_sub_module"
-            fi
         else
             NGINX_INCLUDED_MODULES="$OVERRIDE_NGINX_MODULES"
         fi
@@ -1249,6 +1234,9 @@ _compile_nginx() {
             make -j "$(nproc)"
             # Strip debug symbols
             strip --strip-unneeded /usr/local/src/nginx/objs/nginx
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                strip --strip-unneeded /usr/local/src/nginx/objs/*.so
+            fi
             # install Nginx
             make install
 
