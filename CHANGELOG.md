@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Brotli bumped to v1.0.7
 - Only third party modules are compiled as dynamic modules
 
+### Fixed
+
+- Missing OpenSSL patch
+
 # [3.6.2] - 2019-04-24
 
 ### Added

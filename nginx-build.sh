@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.3 - 2019-06-25
+# Version 3.6.3 - 2019-07-14
 # -------------------------------------------------------------------------
 
 ##################################
@@ -907,7 +907,7 @@ _download_openssl() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 < ../openssl-patch/openssl-${OPENSSL_VER}-chacha_draft.patch
+            patch -p1 < ../openssl-patch/openssl-${OPENSSL_VER}-prioritize_chacha_draft
         } >> /tmp/nginx-ee.log 2>&1
 
     }; then
@@ -1046,7 +1046,7 @@ _patch_nginx() {
 
         {
             curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
-            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+            #curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
         } >> /tmp/nginx-ee.log 2>&1
 
     }; then
@@ -1100,7 +1100,8 @@ _configure_nginx() {
         # third party modules
         if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
             if [ "$DYNAMIC_MODULES" = "y" ]; then
-                NGINX_THIRD_MODULES="--add-module=../ngx_http_substitutions_filter_module \
+                NGINX_THIRD_MODULES="--with-compat \
+         --add-module=../ngx_http_substitutions_filter_module \
         --add-dynamic-module=../srcache-nginx-module \
         --add-dynamic-module=../ngx_http_redis \
         --add-dynamic-module=../redis2-nginx-module \
