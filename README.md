@@ -116,6 +116,7 @@ Optional modules :
 * 17.5.x
 * 17.8.x
 * 17.9.x
+* 18.x (Obsidian)
 
 ---
 
@@ -123,8 +124,10 @@ Optional modules :
 
 ### One-Step Automated Install
 
+**Default settings** :
+
 * mainline release
-* openssl stable : 1.1.1b
+* openssl stable : 1.1.1c
 * without pagespeed
 * without naxsi
 * without rtmp
