@@ -11,10 +11,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Ubuntu 19.04 (disco) support
 - Strip Nginx binary to remove debug symbols
 - Update OpenSSL to release 1.1.1c
+- Added help menu
 
 ### Changed
 
 - Improve code quality according to codacy checkup
+- Brotli bumped to v1.0.7
+- Only third party modules are compiled as dynamic modules
+
+### Fixed
+
+- Missing OpenSSL patch
 
 # [3.6.2] - 2019-04-24
 
