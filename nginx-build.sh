@@ -907,7 +907,7 @@ _download_openssl() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 < ../openssl-patch/openssl-${OPENSSL_VER}-prioritize_chacha_draft
+            patch -p1 < ../openssl-patch/openssl-${OPENSSL_VER}-chacha_draft.patch
         } >> /tmp/nginx-ee.log 2>&1
 
     }; then
