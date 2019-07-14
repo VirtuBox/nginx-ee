@@ -22,7 +22,6 @@ Automated Nginx compilation from sources with additional modules support
 <img src="https://img.shields.io/github/release/VirtuBox/nginx-ee.svg?style=flat" alt="GitHub release">
 <a href="https://www.codacy.com/app/VirtuBox/nginx-ee?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=VirtuBox/nginx-ee&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/61fe95d2311241b6b5051a04493a43c2" alt="codacy"/></a>
 <a href="https://www.codefactor.io/repository/github/virtubox/nginx-ee"><img src="https://www.codefactor.io/repository/github/virtubox/nginx-ee/badge" alt="CodeFactor" /></a></p>
-
 <p align="center">
 <a href="#features"> Features<a> •
 <a href="#additional-third-party-modules"> Modules</a> •
@@ -43,7 +42,7 @@ Automated Nginx compilation from sources with additional modules support
 <li>Dynamic modules support</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
-<li>OpenSSL (1.1.1b or 3.0.0-dev) or LibreSSL</li>
+<li>OpenSSL (1.1.1c or 3.0.0-dev or from system-lib) or LibreSSL</li>
 <li>Cloudflare HPACK (for Mainline release only)</li>
 <li>Cloudflare zlib</li>
 <li>Automated nginx updates cronjob</li>
@@ -52,7 +51,7 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.15.12</strong>
+<p>Nginx current mainline release : <strong>v1.17.1</strong>
 Nginx current stable release : <strong>v1.16.0</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
@@ -106,13 +105,15 @@ Nginx current stable release : <strong>v1.16.0</strong></p>
 <li>17.5.x</li>
 <li>17.8.x</li>
 <li>17.9.x</li>
+<li>18.x (Obsidian)</li>
 </ul>
 <hr />
 <h2 id="usage">Usage</h2>
 <h3 id="one-step-automated-install">One-Step Automated Install</h3>
+<p><strong>Default settings</strong> :</p>
 <ul>
 <li>mainline release</li>
-<li>Openssl stable 1.1.1b</li>
+<li>openssl stable : 1.1.1c</li>
 <li>without pagespeed</li>
 <li>without naxsi</li>
 <li>without rtmp</li>
@@ -167,16 +168,16 @@ sudo bash nginx-build.sh
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for Debian 9</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add support for config.inc build configuration</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add openssl release choice</li>
-<li class="task-list-item"><input disabled="disabled" type="checkbox" /> Add more compilation presets</li>
+<li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add more compilation presets</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for LibreSSL</li>
 </ul>
 <hr />
 <h2 id="related">Related</h2>
 <ul>
-<li><a href="https://github.com/VirtuBox/ubuntu-nginx-web-server">Ubuntu-nginx-web-server</a> : repository with all custom nginx configurations used by VirtuBox</li>
+<li><a href="https://github.com/VirtuBox/ubuntu-nginx-web-server">Ubuntu-nginx-web-server</a></li>
 <li><a href="https://github.com/WordOps/WordOps">WordOps</a></li>
-<li><a href="https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template">Plesk-nginx-fastcgi-cache-template</a> : Plesk Onyx custom hosting templates with fastcgi_cache support</li>
-<li><a href="https://github.com/VirtuBox/nginx-cloudflare-real-ip">Nginx-Cloudflare-real-ip</a> : Bash script to restore visitor real IP under Cloudflare with Nginx</li>
+<li><a href="https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template">Plesk-nginx-fastcgi-cache-template</a></li>
+<li><a href="https://github.com/VirtuBox/nginx-cloudflare-real-ip">Nginx-Cloudflare-real-ip</a></li>
 <li><a href="https://github.com/VirtuBox/advanced-nginx-cheatsheet">Advanced Nginx Cheatsheet</a></li>
 </ul>
 <hr />
@@ -191,3 +192,4 @@ sudo bash nginx-build.sh
 </ul>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE">MIT</a> © <a href="https://virtubox.net" title="VirtuBox" target="_blank">VirtuBox</a></p>
+
