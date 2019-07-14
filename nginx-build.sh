@@ -154,7 +154,7 @@ DISTRO_ID="$(lsb_release -si)"
 DISTRO_CODENAME=$(lsb_release -sc)
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
-OPENSSL_COMMIT="ee215c7eea91f193d4765127eb31332758753058"
+OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
 PCRE_VER=$(curl -sL https://ftp.pcre.org/pub/pcre/ | grep -E -o 'pcre\-[0-9.]+\.tar[.a-z]*gz' | awk -F "pcre-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | tail -n 1 2>&1)
 
 # Colors
