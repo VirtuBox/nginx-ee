@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+### Added
+
+- Debian 10 (buster) support
+
 # [3.6.3] - 2019-07-15
 
 ### Added
