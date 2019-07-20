@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.3 - 2019-07-14
+# Version 3.6.3 - 2019-07-20
 # -------------------------------------------------------------------------
 
 ##################################
@@ -357,7 +357,7 @@ fi
 # Set Libjemalloc
 ##################################
 
-if [ "$DISTRO_CODENAME" = "disco" ]; then
+if [ "$DISTRO_CODENAME" = "disco" ] || [ "$DISTRO_CODENAME" = "buster" ]; then
     LIBJEMALLOC="libjemalloc2"
 else
     LIBJEMALLOC="libjemalloc1"
@@ -409,7 +409,7 @@ _install_dependencies() {
             libgd3 libgd-dev libgeoip-dev "$LIBJEMALLOC" libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev checkinstall ccache libxml2 libxml2-dev "$LIBSSL_DEV"
+            libgmp-dev autotools-dev libxml2 libxml2-dev "$LIBSSL_DEV"
     } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
