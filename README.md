@@ -95,11 +95,12 @@ Optional modules :
 #### Recommended
 
 * Ubuntu 18.04 LTS (Bionic)
-* Ubuntu 16.04 LTS (Xenial)
+* Debian 10 (Buster)
 
 #### Also compatible
 
 * Ubuntu 19.04 (Disco)
+* Ubuntu 16.04 LTS (Xenial)
 * Debian 9 (Stretch)
 * Debian 8 (Jessie)
 * Raspbian (Stretch)
