@@ -21,7 +21,8 @@ Automated Nginx compilation from sources with additional modules support
 <br>
 <img src="https://img.shields.io/github/release/VirtuBox/nginx-ee.svg?style=flat" alt="GitHub release">
 <a href="https://www.codacy.com/app/VirtuBox/nginx-ee?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=VirtuBox/nginx-ee&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/61fe95d2311241b6b5051a04493a43c2" alt="codacy"/></a>
-<a href="https://www.codefactor.io/repository/github/virtubox/nginx-ee"><img src="https://www.codefactor.io/repository/github/virtubox/nginx-ee/badge" alt="CodeFactor" /></a></p>
+<a href="https://www.codefactor.io/repository/github/virtubox/nginx-ee"><img src="https://www.codefactor.io/repository/github/virtubox/nginx-ee/badge" alt="CodeFactor" /></a>
+<img src="https://status.virtubox.net/netdata/api/v1/badge.svg?chart=web_log_vtb.cx.requests_per_url&options=unaligned&dimensions=nginx-ee&group=sum&after=-86400&label=today&units=installations&precision=0&color=%2300AA00" alt="nginx-ee-badge"/></p>
 <p align="center">
 <a href="#features"> Features<a> •
 <a href="#additional-third-party-modules"> Modules</a> •
@@ -30,7 +31,7 @@ Automated Nginx compilation from sources with additional modules support
 <a href="https://github.com/VirtuBox/nginx-ee/wiki"> Wiki</a> •
 <a href="#related"> Related</a> •
 <a href="#credits"> Credits</a> •
-<a href="#license"> License</a>
+<a href="#license"> License</a></p>
 <p align="center"><img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png" alt="Nginx-ee"></p>
 <hr />
 <h2 id="features">Features</h2>
@@ -51,7 +52,7 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.17.1</strong>
+<p>Nginx current mainline release : <strong>v1.17.2</strong>
 Nginx current stable release : <strong>v1.16.0</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
@@ -85,11 +86,13 @@ Nginx current stable release : <strong>v1.16.0</strong></p>
 <h4 id="recommended">Recommended</h4>
 <ul>
 <li>Ubuntu 18.04 LTS (Bionic)</li>
-<li>Ubuntu 16.04 LTS (Xenial)</li>
+<li>Debian 10 (Buster)</li>
 </ul>
 <h4 id="also-compatible">Also compatible</h4>
 <ul>
 <li>Ubuntu 19.04 (Disco)</li>
+<li>Ubuntu 18.10 (Cosmic)</li>
+<li>Ubuntu 16.04 LTS (Xenial)</li>
 <li>Debian 9 (Stretch)</li>
 <li>Debian 8 (Jessie)</li>
 <li>Raspbian (Stretch)</li>
@@ -192,4 +195,3 @@ sudo bash nginx-build.sh
 </ul>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/VirtuBox/nginx-ee/blob/master/LICENSE">MIT</a> © <a href="https://virtubox.net" title="VirtuBox" target="_blank">VirtuBox</a></p>
-
