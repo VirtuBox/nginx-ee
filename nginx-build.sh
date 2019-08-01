@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.3 - 2019-07-20
+# Version 3.6.3 - 2019-08-01
 # -------------------------------------------------------------------------
 
 ##################################
@@ -588,69 +588,69 @@ _download_modules() {
         echo "### downloading additionals modules ###"
         # cache_purge module
         { [ -d "$DIR_SRC/ngx_cache_purge" ] && {
-            git -C "$DIR_SRC/ngx_cache_purge" pull origin master
+            git -C "$DIR_SRC/ngx_cache_purge" pull
         }; } || {
-            git clone https://github.com/FRiCKLE/ngx_cache_purge.git
+            git clone --depth=50 https://github.com/FRiCKLE/ngx_cache_purge.git
         }
         # memcached module
         { [ -d "$DIR_SRC/memc-nginx-module" ] && {
-            git -C "$DIR_SRC/memc-nginx-module" pull origin master
+            git -C "$DIR_SRC/memc-nginx-module" pull
         }; } || {
-            git clone https://github.com/openresty/memc-nginx-module.git
+            git clone --depth=50 https://github.com/openresty/memc-nginx-module.git
         }
         # devel kit
         { [ -d "$DIR_SRC/ngx_devel_kit" ] && {
-            git -C "$DIR_SRC/ngx_devel_kit" pull origin master
+            git -C "$DIR_SRC/ngx_devel_kit" pull
         }; } || {
-            git clone https://github.com/simpl/ngx_devel_kit.git
+            git clone --depth=50 https://github.com/simpl/ngx_devel_kit.git
         }
         # headers-more module
         { [ -d "$DIR_SRC/headers-more-nginx-module" ] && {
-            git -C "$DIR_SRC/headers-more-nginx-module" pull origin master
+            git -C "$DIR_SRC/headers-more-nginx-module" pull
         }; } || {
-            git clone https://github.com/openresty/headers-more-nginx-module.git
+            git clone --depth=50 https://github.com/openresty/headers-more-nginx-module.git
         }
         # echo module
         { [ -d "$DIR_SRC/echo-nginx-module" ] && {
-            git -C "$DIR_SRC/echo-nginx-module" pull origin master
+            git -C "$DIR_SRC/echo-nginx-module" pull
         }; } || {
-            git clone https://github.com/openresty/echo-nginx-module.git
+            git clone --depth=50 https://github.com/openresty/echo-nginx-module.git
         }
         # http_substitutions_filter module
         { [ -d "$DIR_SRC/ngx_http_substitutions_filter_module" ] && {
-            git -C "$DIR_SRC/ngx_http_substitutions_filter_module" pull origin master
+            git -C "$DIR_SRC/ngx_http_substitutions_filter_module" pull
         }; } || {
-            git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
+            git clone --depth=50 https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
         }
         # redis2 module
         { [ -d "$DIR_SRC/redis2-nginx-module" ] && {
-            git -C "$DIR_SRC/redis2-nginx-module" pull origin master
+            git -C "$DIR_SRC/redis2-nginx-module" pull
         }; } || {
-            git clone https://github.com/openresty/redis2-nginx-module.git
+            git clone --depth=50 https://github.com/openresty/redis2-nginx-module.git
         }
         # srcache module
         { [ -d "$DIR_SRC/srcache-nginx-module" ] && {
-            git -C "$DIR_SRC/srcache-nginx-module" pull origin master
+            git -C "$DIR_SRC/srcache-nginx-module" pull
         }; } || {
-            git clone https://github.com/openresty/srcache-nginx-module.git
+            git clone --depth=50 https://github.com/openresty/srcache-nginx-module.git
         }
         # set-misc module
         { [ -d "$DIR_SRC/set-misc-nginx-module" ] && {
-            git -C "$DIR_SRC/set-misc-nginx-module" pull origin master
+            git -C "$DIR_SRC/set-misc-nginx-module" pull
         }; } || {
-            git clone https://github.com/openresty/set-misc-nginx-module.git
+            git clone --depth=50 https://github.com/openresty/set-misc-nginx-module.git
         }
         # auth_pam module
         { [ -d "$DIR_SRC/ngx_http_auth_pam_module" ] && {
-            git -C "$DIR_SRC/ngx_http_auth_pam_module" pull origin master
+            git -C "$DIR_SRC/ngx_http_auth_pam_module" pull
         }; } || {
-            git clone https://github.com/sto/ngx_http_auth_pam_module.git
+            git clone --depth=50 https://github.com/sto/ngx_http_auth_pam_module.git
         }
         # nginx-vts module
         { [ -d "$DIR_SRC/nginx-module-vts" ] && {
-            git -C "$DIR_SRC/nginx-module-vts" pull origin master
+            git -C "$DIR_SRC/nginx-module-vts" pull
         }; } || {
-            git clone https://github.com/vozlt/nginx-module-vts.git
+            git clone --depth=50 https://github.com/vozlt/nginx-module-vts.git
         }
         # http redis module
         [ ! -d /usr/local/src/ngx_http_redis ] && {
@@ -659,9 +659,9 @@ _download_modules() {
         }
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
-                git -C "$DIR_SRC/nginx-rtmp-module" pull origin master
+                git -C "$DIR_SRC/nginx-rtmp-module" pull
             }; } || {
-                git clone https://github.com/arut/nginx-rtmp-module.git
+                git clone --depth=50 https://github.com/arut/nginx-rtmp-module.git
             }
         fi
 
@@ -669,7 +669,7 @@ _download_modules() {
         { [ -d "$DIR_SRC/ipscrubtmp" ] && {
             git -C "$DIR_SRC/ipscrubtmp" pull origin master
         }; } || {
-            git clone https://github.com/masonicboom/ipscrub.git ipscrubtmp
+            git clone --depth=50 https://github.com/masonicboom/ipscrub.git ipscrubtmp
         }
 
         echo "### additionals modules downloaded ###"
@@ -836,7 +836,7 @@ _download_openssl_dev() {
                     echo "### removing openssl extracted archive ###"
                     rm -rf /usr/local/src/openssl
                     echo "### cloning openssl ###"
-                    git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+                    git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
                     cd /usr/local/src/openssl || exit 1
                     echo "### git checkout commit ###"
                     git checkout $OPENSSL_COMMIT
@@ -850,7 +850,7 @@ _download_openssl_dev() {
                 fi
             else
                 echo "### cloning openssl ###"
-                git clone https://github.com/openssl/openssl.git /usr/local/src/openssl
+                git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
                 cd /usr/local/src/openssl || exit 1
                 echo "### git checkout commit ###"
                 git checkout $OPENSSL_COMMIT
@@ -960,7 +960,7 @@ _download_naxsi() {
         echo -ne '       Downloading naxsi                      [..]\r'
         {
 
-            git clone https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi -q
+            git clone --depth=50 https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi -q
 
             cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
 

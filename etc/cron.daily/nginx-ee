@@ -7,21 +7,27 @@
 # Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.5.0 - 2019-01-01
+# Version 3.6.3 - 2019-07-24
 # -------------------------------------------------------------------------
 
 ##################################
 # Check Nginx version and modules
 ##################################
 
-CURRENT_NGINX="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}')"
-NGINX_MAINLINE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
-NGINX_STABLE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
-CURRENT_STABLE="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}' | grep 1.14)"
-PAGESPEED="$(/usr/sbin/nginx -V 2>&1 | grep pagespeed)"
-NAXSI="$(/usr/sbin/nginx -V 2>&1 | grep naxsi)"
-RTMP="$(/usr/sbin/nginx -V 2>&1 | grep rtmp)"
-PAGESPEED_BETA="$(/usr/sbin/nginx -V 2>&1 | grep latest-beta)"
+if [ -x /usr/sbin/nginx ]; then
+
+    CURRENT_NGINX="$(/usr/sbin/nginx -v 2>&1 | awk -F "/" '{print $2}' | awk -F " " '{print $1}')"
+    NGINX_MAINLINE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
+    NGINX_STABLE="$(/usr/bin/curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
+    PAGESPEED="$(/usr/sbin/nginx -V 2>&1 | grep pagespeed)"
+    NAXSI="$(/usr/sbin/nginx -V 2>&1 | grep naxsi)"
+    RTMP="$(/usr/sbin/nginx -V 2>&1 | grep rtmp)"
+    PAGESPEED_BETA="$(/usr/sbin/nginx -V 2>&1 | grep latest-beta)"
+
+else
+    echo "Nginx is not installed"
+    exit 1
+fi
 
 ##################################
 # Check if new release is available
@@ -31,7 +37,7 @@ if [ "$CURRENT_NGINX" != "$NGINX_MAINLINE" ] && [ "$CURRENT_NGINX" != "$NGINX_ST
     [ ! -d $HOME/.scripts ] && {
         mkdir -p $HOME/.scripts
     }
-    wget -O $HOME/.scripts/nginx-build.sh https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh >/dev/null 2>&1
+    wget -O $HOME/.scripts/nginx-build.sh https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-build.sh > /dev/null 2>&1
     chmod +x $HOME/.scripts/nginx-build.sh
 
     if [ -n "$PAGESPEED" ]; then
@@ -57,8 +63,8 @@ if [ "$CURRENT_NGINX" != "$NGINX_MAINLINE" ] && [ "$CURRENT_NGINX" != "$NGINX_ST
     fi
 
     if [ -n "$CURRENT_STABLE" ]; then
-        $HOME/.scripts/nginx-build.sh --stable "$PAGESPEED_ARG" "$NAXSI_ARG" "$RTMP_ARG" >/dev/null 2>&1
+        $HOME/.scripts/nginx-build.sh --stable "$PAGESPEED_ARG" "$NAXSI_ARG" "$RTMP_ARG" > /dev/null 2>&1
     else
-        $HOME/.scripts/nginx-build.sh "$PAGESPEED_ARG" "$NAXSI_ARG" "$RTMP_ARG" >/dev/null 2>&1
+        $HOME/.scripts/nginx-build.sh "$PAGESPEED_ARG" "$NAXSI_ARG" "$RTMP_ARG" > /dev/null 2>&1
     fi
 fi

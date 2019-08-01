@@ -20,7 +20,8 @@ Automated Nginx compilation from sources with additional modules support
 <br>
 <img src="https://img.shields.io/github/release/VirtuBox/nginx-ee.svg?style=flat" alt="GitHub release">
 <a href="https://www.codacy.com/app/VirtuBox/nginx-ee?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=VirtuBox/nginx-ee&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/61fe95d2311241b6b5051a04493a43c2" alt="codacy"/></a>
-<a href="https://www.codefactor.io/repository/github/virtubox/nginx-ee"><img src="https://www.codefactor.io/repository/github/virtubox/nginx-ee/badge" alt="CodeFactor" /></a></p>
+<a href="https://www.codefactor.io/repository/github/virtubox/nginx-ee"><img src="https://www.codefactor.io/repository/github/virtubox/nginx-ee/badge" alt="CodeFactor" /></a>
+<img src="https://status.virtubox.net/netdata/api/v1/badge.svg?chart=web_log_vtb.cx.requests_per_url&options=unaligned&dimensions=nginx-ee&group=sum&after=-86400&label=today&units=installations&precision=0"/></p>
 
 
 
@@ -58,7 +59,7 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.1**
+Nginx current mainline release : **v1.17.2**
 Nginx current stable release : **v1.16.0**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
@@ -100,6 +101,7 @@ Optional modules :
 #### Also compatible
 
 * Ubuntu 19.04 (Disco)
+* Ubuntu 18.10 (Cosmic)
 * Ubuntu 16.04 LTS (Xenial)
 * Debian 9 (Stretch)
 * Debian 8 (Jessie)
