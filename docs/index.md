@@ -2,9 +2,10 @@
 title: Nginx-ee - Automated Nginx compilation from sources with additional modules support
 layout: default
 ---
+
 <h1 align="center">
 <br>
-<img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee-logo.png">
+<img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee-logo.png" alt="nginx-ee">
 <br>
   Nginx-ee
   <br>
@@ -31,7 +32,7 @@ Automated Nginx compilation from sources with additional modules support
 <a href="https://github.com/VirtuBox/nginx-ee/wiki"> Wiki</a> •
 <a href="#related"> Related</a> •
 <a href="#credits"> Credits</a> •
-<a href="#license"> License</a></p>
+<a href="#license"> License</a>
 <p align="center"><img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee.png" alt="Nginx-ee"></p>
 <hr />
 <h2 id="features">Features</h2>
@@ -52,8 +53,8 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.17.2</strong>
-Nginx current stable release : <strong>v1.16.0</strong></p>
+<p>Nginx current mainline release : <strong>v1.17.3</strong>
+Nginx current stable release : <strong>v1.16.1</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
 <li><a href="https://github.com/openresty/headers-more-nginx-module">headers-more-nginx-module</a></li>
@@ -158,6 +159,16 @@ sudo bash nginx-build.sh
 <li><code>--cron</code> : setup daily cronjob to update nginx each time a new release is available</li>
 </ul>
 <hr />
+<h2 class="atx" id="packages">Packages</h2>
+<p>You are looking for an up-to-date version of Nginx with additional modules but without having to recompile Nginx after new releases ?
+Feel free to use the custom Nginx package built for WordOps and available on <a href="https://launchpad.net/~wordops/+archive/ubuntu/nginx-wo">Launchpad.net</a>.</p>
+<p>Add the repository</p>
+<pre><code class="language-bash">sudo add-apt-repository ppa:wordops/nginx-wo -uy
+</code></pre>
+<p>Install Nginx</p>
+<pre><code class="language-bash">sudo apt install nginx-custom nginx-wo -y
+</code></pre>
+<hr />
 <h2 id="roadmap">Roadmap</h2>
 <ul class="contains-task-list">
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add choice between stable &amp; mainline release</li>
@@ -175,6 +186,7 @@ sudo bash nginx-build.sh
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for LibreSSL</li>
 </ul>
 <hr />
+
 <h2 id="related">Related</h2>
 <ul>
 <li><a href="https://github.com/VirtuBox/ubuntu-nginx-web-server">Ubuntu-nginx-web-server</a></li>
