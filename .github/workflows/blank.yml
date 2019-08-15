@@ -6,8 +6,12 @@ jobs:
   build:
 
     runs-on: ubuntu-18.04
-    
+
     steps:
     - uses: actions/checkout@master
-    - name: Run a one-line script
+    - name: Mainline build
       run: sudo bash nginx-build.sh
+    - name: Stable build
+      run: sudo bash nginx-build.sh --stable
+    - name: Full build
+      run: sudo bash nginx-build.sh --full

@@ -59,8 +59,8 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.2**
-Nginx current stable release : **v1.16.0**
+Nginx current mainline release : **v1.17.3**
+Nginx current stable release : **v1.16.1**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
@@ -205,10 +205,27 @@ Extras :
 
 ---
 
+## Packages
+
+You are looking for an up-to-date version of Nginx with additional modules but without having to recompile Nginx after new releases ?
+Feel free to use the custom Nginx package built for WordOps and available on [Launchpad.net](https://launchpad.net/~wordops/+archive/ubuntu/nginx-wo).
+
+Add the repository
+
+```bash
+sudo add-apt-repository ppa:wordops/nginx-wo -uy
+```
+
+Install Nginx
+
+```bash
+sudo apt install nginx-custom nginx-wo -y
+```
+
 ## Related
 
-* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server)
 * [WordOps](https://github.com/WordOps/WordOps)
+* [Ubuntu-nginx-web-server](https://github.com/VirtuBox/ubuntu-nginx-web-server)
 * [Plesk-nginx-fastcgi-cache-template](https://github.com/VirtuBox/plesk-nginx-fascgi-cache-template)
 * [Nginx-Cloudflare-real-ip](https://github.com/VirtuBox/nginx-cloudflare-real-ip)
 * [Advanced Nginx Cheatsheet](https://github.com/VirtuBox/advanced-nginx-cheatsheet)

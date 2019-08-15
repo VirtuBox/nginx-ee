@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.3 - 2019-08-01
+# Version 3.6.3 - 2019-08-15
 # -------------------------------------------------------------------------
 
 ##################################
@@ -151,11 +151,11 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 DISTRO_ID="$(lsb_release -si)"
-DISTRO_CODENAME=$(lsb_release -sc)
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
 PCRE_VER=$(curl -sL https://ftp.pcre.org/pub/pcre/ | grep -E -o 'pcre\-[0-9.]+\.tar[.a-z]*gz' | awk -F "pcre-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | tail -n 1 2>&1)
+export DEBIAN_FRONTEND=noninteractive
 
 # Colors
 CSI='\033['
@@ -354,16 +354,6 @@ else
 fi
 
 ##################################
-# Set Libjemalloc
-##################################
-
-if [ "$DISTRO_CODENAME" = "disco" ] || [ "$DISTRO_CODENAME" = "buster" ]; then
-    LIBJEMALLOC="libjemalloc2"
-else
-    LIBJEMALLOC="libjemalloc1"
-fi
-
-##################################
 # Display Compilation Summary
 ##################################
 
@@ -404,12 +394,12 @@ echo ""
 _install_dependencies() {
     echo -ne '       Installing dependencies               [..]\r'
     if {
-        DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
+            apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
             git build-essential libtool automake autoconf \
-            libgd3 libgd-dev libgeoip-dev "$LIBJEMALLOC" libjemalloc-dev \
+            libgd-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2 libxml2-dev "$LIBSSL_DEV"
+            libgmp-dev autotools-dev libxml2-dev "$LIBSSL_DEV"
     } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -805,7 +795,7 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            git clone --recursive https://github.com/VirtuBox/ngx_brotli.git /usr/local/src/ngx_brotli -q
+            git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
 
         } >> /tmp/nginx-ee.log 2>&1
 
@@ -862,7 +852,7 @@ _download_openssl_dev() {
                 cd /usr/local/src/openssl-patch || exit 1
                 git pull origin master
             else
-                git clone https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
+                git clone --depth=50 https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
             fi
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
@@ -902,7 +892,7 @@ _download_openssl() {
                 git pull origin master
             else
                 rm -rf /usr/local/src/openssl-patch
-                git clone https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
+                git clone --depth=50 https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
             fi
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch

@@ -1,5 +1,5 @@
 sudo: required
-dist: xenial
+dist: bionic
 
 language: bash
 
@@ -13,6 +13,10 @@ before_install:
 
 git:
   quiet: true
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
 
 before_script:
   - sudo apt-get -qq autoremove --purge
