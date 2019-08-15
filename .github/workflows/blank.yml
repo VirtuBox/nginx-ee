@@ -2,19 +2,13 @@ name: CI
 
 on: [push]
 
-push:
-  branches:    # Array of patterns that match refs/heads
-  - master     # Push events on master branch
-  - develop/* # Push events to branches matching refs/heads/releases/*
-  paths:       # Push events containing matching files
-  - *.sh
-
 jobs:
   build:
 
     runs-on: ubuntu-18.04
 
     steps:
+    - uses: actions/checkout@master
     - name: Mainline build
       run: sudo bash nginx-build.sh
     - name: Stable build
