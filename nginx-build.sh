@@ -156,7 +156,6 @@ readonly DISTRO_NUMBER="$(lsb_release -sr)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
-PCRE_VER=$(curl -sL https://ftp.pcre.org/pub/pcre/ | grep -E -o 'pcre\-[0-9.]+\.tar[.a-z]*gz' | awk -F "pcre-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | tail -n 1 2>&1)
 export DEBIAN_FRONTEND=noninteractive
 
 # Colors
@@ -326,7 +325,7 @@ fi
 # Set Brotli lib
 ##################################
 
-if [ $DISTRO_CODENAME = "jessie" ]; then
+if [ "$DISTRO_CODENAME" = "jessie" ]; then
     LIBBROTLI_DEV=""
 else
     LIBBROTLI_DEV="libbrotli-dev"
@@ -770,7 +769,11 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+            if [ "$DISTRO_CODENAME" = "jessie" ]; then
+                git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+            else
+                git clone --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+            fi
 
         } >> /tmp/nginx-ee.log 2>&1
 
