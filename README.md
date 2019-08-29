@@ -49,7 +49,7 @@ Automated Nginx compilation from sources with additional modules support
 * Brotli Support
 * TLS v1.3 support (Final)
 * OpenSSL (1.1.1c or 3.0.0-dev or from system-lib) or LibreSSL
-* Cloudflare HPACK (for Mainline release only)
+* Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
 * Compilation with GCC-7/8
@@ -102,6 +102,7 @@ Optional modules :
 
 * Ubuntu 19.04 (Disco)
 * Ubuntu 18.10 (Cosmic)
+* Ubuntu 17.10 ()
 * Ubuntu 16.04 LTS (Xenial)
 * Debian 9 (Stretch)
 * Debian 8 (Jessie)

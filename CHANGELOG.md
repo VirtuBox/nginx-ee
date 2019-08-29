@@ -9,11 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Debian 10 (buster) support
+- Raspbian 10 (buster) support
 
 ### Changes
 
 - Updated cronjob
 - Improve module cloning duration by adding `--depth=50` to `git clone`
+- PCRE, OPENSSL & Brotli are not compiled anymore. But are installed from [APT repository](https://build.opensuse.org/project/show/home:virtubox:nginx-ee) excepted Brotli on Debian 8 (jessie)
 
 # [3.6.3] - 2019-07-15
 

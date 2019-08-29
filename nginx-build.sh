@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.3 - 2019-08-15
+# Version 3.6.4 - 2019-08-29
 # -------------------------------------------------------------------------
 
 ##################################
@@ -142,15 +142,17 @@ fi
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.6.3"
+NGINX_EE_VER="3.6.4"
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
 LIBRESSL_VER="2.9.1"
 OPENSSL_VER="1.1.1c"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
-OS_ARCH="$(uname -m)"
+readonly OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
-DISTRO_ID="$(lsb_release -si)"
+readonly DISTRO_ID="$(lsb_release -si)"
+readonly DISTRO_CODENAME="$(lsb_release -sc)"
+readonly DISTRO_NUMBER="$(lsb_release -sr)"
 DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
 DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
@@ -314,10 +316,20 @@ else
         OPENSSL_VALID="from system"
         LIBSSL_DEV="libssl-dev"
     else
-        NGX_SSL_LIB="--with-openssl=../openssl"
+        NGX_SSL_LIB=""
         OPENSSL_VALID="$OPENSSL_VER Stable"
-        LIBSSL_DEV=""
+        LIBSSL_DEV="libssl-dev"
     fi
+fi
+
+##################################
+# Set Brotli lib
+##################################
+
+if [ $DISTRO_CODENAME = "jessie" ]; then
+    LIBBROTLI_DEV = ""
+else
+    LIBBROTLI_DEV = "libbrotli-dev"
 fi
 
 ##################################
@@ -394,12 +406,12 @@ echo ""
 _install_dependencies() {
     echo -ne '       Installing dependencies               [..]\r'
     if {
-            apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
+        apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
             git build-essential libtool automake autoconf \
             libgd-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev "$LIBSSL_DEV"
+            libgmp-dev autotools-dev libxml2-dev libpcre3-dev "$LIBBROTLI_DEV" "$LIBSSL_DEV"
     } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -485,7 +497,7 @@ _gcc_ubuntu_setup() {
     if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
         {
             echo "### adding gcc repository ###"
-            add-apt-repository -y ppa:jonathonf/gcc -u
+            add-apt-repository ppa:jonathonf/gcc -yu
         } >> /dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
@@ -527,6 +539,37 @@ _gcc_ubuntu_setup() {
         } >> /dev/null 2>&1
     fi
 
+}
+
+_dependencies_repo() {
+    {
+        curl -sL https://build.opensuse.org/projects/home:virtubox:nginx-ee/public_key | apt-key add -
+        if [ ! -f /etc/apt/sources.list.d/nginx-ee.list ]; then
+            if [ "$DISTRO_ID" = "Ubuntu" ]; then
+                if [ "$DISTRO_CODENAME" = "xenial" ]; then
+                    add-apt-repository ppa:virtubox/brotli -yu
+                fi
+                echo "deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/xUbuntu_${DISTRO_NUMBER}/ /" > /etc/apt/sources.list.d/nginx-ee.list
+
+            elif [ "$DISTRO_ID" = "Debian" ]; then
+                if [ "$DISTRO_CODENAME" = "jessie" ]; then
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_8.0/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                elif [ "$DISTRO_CODENAME" = "strech" ]; then
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_9.0/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                else
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_10/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                fi
+            else
+                if [ "$DISTRO_CODENAME" = "strech" ]; then
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_9.0/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                else
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_10/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                fi
+            fi
+
+        fi
+        apt-get update -qq
+    } >> /tmp/nginx-ee.log 2>&1
 }
 
 ##################################
@@ -715,74 +758,6 @@ _download_zlib() {
 
 }
 
-##################################
-# Download & compile pcre
-##################################
-
-_compile_pcre() {
-
-    {
-
-        cd "$DIR_SRC/pcre" || exit 1
-        ./configure --prefix=/usr \
-            --enable-utf8 \
-            --enable-unicode-properties \
-            --enable-pcre16 \
-            --enable-pcre32 \
-            --enable-pcregrep-libz \
-            --enable-pcregrep-libbz2 \
-            --enable-pcretest-libreadline \
-            --enable-jit
-
-        make -j "$(nproc)"
-        make install
-        mv -v /usr/lib/libpcre.so.* /lib
-        ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
-
-    } >> /tmp/nginx-ee.log 2>&1
-}
-
-_download_pcre() {
-
-    cd "$DIR_SRC" || exit 1
-
-    echo -ne '       Downloading pcre                       [..]\r'
-    if {
-        if [ -z "$(command -v pcretest)" ]; then
-            {
-                curl -sL https://ftp.pcre.org/pub/pcre/pcre-${PCRE_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-                mv pcre-${PCRE_VER} pcre
-
-                _compile_pcre
-
-            } \
-                >> /tmp/nginx-ee.log 2>&1
-        else
-            PCRE_VERSION=$(pcretest -C 2>&1 | grep version | awk -F " " '{print $3}')
-            if [ "$PCRE_VERSION" != "$PCRE_VER" ]; then
-
-                {
-                    curl -sL https://ftp.pcre.org/pub/pcre/pcre-${PCRE_VER}.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-                    mv pcre-${PCRE_VER} pcre
-
-                    _compile_pcre
-
-                    ln -sfv ../../lib/"$(readlink /usr/lib/libpcre.so)" /usr/lib/libpcre.so
-
-                } >> /tmp/nginx-ee.log 2>&1
-
-            fi
-        fi
-    }; then
-        echo -ne "       Downloading pcre                       [${CGREEN}OK${CEND}]\\r"
-        echo -ne '\n'
-    else
-        echo -e "       Downloading pcre                       [${CRED}FAIL${CEND}]"
-        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-        exit 1
-    fi
-
-}
 
 ##################################
 # Download ngx_broti
@@ -795,7 +770,11 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+            if [ "$DISTRO_CODENAME" = "jessie" ]; then
+                git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+            else
+                git clone --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+            fi
 
         } >> /tmp/nginx-ee.log 2>&1
 
@@ -863,47 +842,6 @@ _download_openssl_dev() {
     }; then
         echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
-    else
-        echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
-        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-        exit 1
-    fi
-
-}
-
-##################################
-# Download and patch OpenSSL
-##################################
-
-_download_openssl() {
-
-    cd "$DIR_SRC" || exit 1
-    if {
-        echo -ne '       Downloading openssl                    [..]\r'
-        {
-            rm -rf /usr/local/src/openssl
-            curl -sL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
-            mv /usr/local/src/openssl-${OPENSSL_VER} /usr/local/src/openssl
-        } >> /tmp/nginx-ee.log 2>&1
-
-        {
-            if [ -d /usr/local/src/openssl-patch/.git ]; then
-                cd /usr/local/src/openssl-patch || exit 1
-                git pull origin master
-            else
-                rm -rf /usr/local/src/openssl-patch
-                git clone --depth=50 https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
-            fi
-            cd /usr/local/src/openssl || exit 1
-            # apply openssl ciphers patch
-            echo "### openssl ciphers patch ###"
-            patch -p1 < ../openssl-patch/openssl-${OPENSSL_VER}-chacha_draft.patch
-        } >> /tmp/nginx-ee.log 2>&1
-
-    }; then
-        echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
-        echo -ne '\n'
-
     else
         echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
@@ -1380,6 +1318,7 @@ _final_tasks() {
 # Main Setup
 ##################################
 
+_dependencies_repo
 _install_dependencies
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
     _nginx_from_scratch_setup
