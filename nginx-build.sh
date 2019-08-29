@@ -757,7 +757,6 @@ _download_zlib() {
 
 }
 
-
 ##################################
 # Download ngx_broti
 ##################################
@@ -1056,87 +1055,38 @@ _configure_nginx() {
 
         if [ "$OS_ARCH" = 'x86_64' ]; then
             if [ "$DISTRO_ID" = "Ubuntu" ]; then
-                ./configure \
-                    ${NGX_NAXSI} \
-                    --with-cc-opt='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
-                    --with-ld-opt='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects' \
-                    ${NGINX_BUILD_OPTIONS} \
-                    --build='VirtuBox Nginx-ee' \
-                    ${NGX_USER} \
-                    --with-file-aio \
-                    --with-threads \
-                    ${NGX_HPACK} \
-                    --with-http_v2_module \
-                    --with-http_ssl_module \
-                    --with-pcre-jit \
-                    ${NGINX_INCLUDED_MODULES} \
-                    ${NGINX_THIRD_MODULES} \
-                    ${NGX_PAGESPEED} \
-                    ${NGX_RTMP} \
-                    --add-module=../echo-nginx-module \
-                    --add-module=../headers-more-nginx-module \
-                    --add-module=../ngx_cache_purge \
-                    --add-module=../ngx_brotli \
-                    --with-zlib=../zlib-cf \
-                    ${NGX_SSL_LIB} \
-                    --with-openssl-opt="$OPENSSL_OPT" \
-                    --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
-            else
-
-                ./configure \
-                    --with-cc-opt="$DEB_CFLAGS" \
-                    --with-ld-opt="$DEB_LFLAGS" \
-                    ${NGX_NAXSI} \
-                    ${NGINX_BUILD_OPTIONS} \
-                    --build='VirtuBox Nginx-ee' \
-                    ${NGX_USER} \
-                    --with-file-aio \
-                    --with-threads \
-                    ${NGX_HPACK} \
-                    --with-http_v2_module \
-                    --with-http_ssl_module \
-                    --with-pcre-jit \
-                    ${NGINX_INCLUDED_MODULES} \
-                    ${NGINX_THIRD_MODULES} \
-                    ${NGX_PAGESPEED} \
-                    ${NGX_RTMP} \
-                    --add-module=../echo-nginx-module \
-                    --add-module=../headers-more-nginx-module \
-                    --add-module=../ngx_cache_purge \
-                    --add-module=../ngx_brotli \
-                    --with-zlib=../zlib-cf \
-                    ${NGX_SSL_LIB} \
-                    --with-openssl-opt="$OPENSSL_OPT" \
-                    --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
+                DEB_CFLAGS='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf'
+                DEB_LFLAGS='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects'
             fi
+            ZLIB_PATH='../zlib-cf'
         else
-
-            ./configure \
-                ${NGX_NAXSI} \
-                --with-cc-opt="$DEB_CFLAGS" \
-                --with-ld-opt="$DEB_LFLAGS" \
-                ${NGINX_BUILD_OPTIONS} \
-                --build='VirtuBox Nginx-ee' \
-                ${NGX_USER} \
-                --with-file-aio \
-                --with-threads \
-                --with-http_v2_module \
-                --with-http_ssl_module \
-                --with-pcre-jit \
-                ${NGINX_INCLUDED_MODULES} \
-                ${NGINX_THIRD_MODULES} \
-                ${NGX_HPACK} \
-                ${NGX_PAGESPEED} \
-                ${NGX_RTMP} \
-                --add-module=../echo-nginx-module \
-                --add-module=../headers-more-nginx-module \
-                --add-module=../ngx_cache_purge \
-                --add-module=../ngx_brotli \
-                --with-zlib=../zlib \
-                ${NGX_SSL_LIB} \
-                --with-openssl-opt="$OPENSSL_OPT" \
-                --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
+            ZLIB_PATH='../zlib'
         fi
+        bash -c "./configure \
+                    '${NGX_NAXSI}' \
+                    --with-cc-opt='$DEB_CFLAGS' \
+                    --with-ld-opt='$DEB_LFLAGS' \
+                    '$NGINX_BUILD_OPTIONS' \
+                    --build='VirtuBox Nginx-ee' \
+                    '$NGX_USER' \
+                    --with-file-aio \
+                    --with-threads \
+                    '$NGX_HPACK' \
+                    --with-http_v2_module \
+                    --with-http_ssl_module \
+                    --with-pcre-jit \
+                    '$NGINX_INCLUDED_MODULES' \
+                    '$NGINX_THIRD_MODULES' \
+                    '$NGX_PAGESPEED' \
+                    '$NGX_RTMP' \
+                    --add-module=../echo-nginx-module \
+                    --add-module=../headers-more-nginx-module \
+                    --add-module=../ngx_cache_purge \
+                    --add-module=../ngx_brotli \
+                    --with-zlib=$ZLIB_PATH \
+                    '$NGX_SSL_LIB' \
+                    --with-openssl-opt='$OPENSSL_OPT' \
+                    --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1"
 
     }; then
         echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
