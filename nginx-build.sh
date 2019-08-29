@@ -770,11 +770,7 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            if [ "$DISTRO_CODENAME" = "jessie" ]; then
-                git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
-            else
-                git clone --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
-            fi
+            git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
 
         } >> /tmp/nginx-ee.log 2>&1
 
