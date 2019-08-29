@@ -45,7 +45,7 @@ Automated Nginx compilation from sources with additional modules support
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
 <li>OpenSSL (1.1.1c or 3.0.0-dev or from system-lib) or LibreSSL</li>
-<li>Cloudflare HPACK (for Mainline release only)</li>
+<li>Cloudflare HPACK</li>
 <li>Cloudflare zlib</li>
 <li>Automated nginx updates cronjob</li>
 <li>Compilation with GCC-7/8</li>
