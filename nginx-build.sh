@@ -1332,7 +1332,6 @@ fi
 _cleanup_modules
 _download_modules
 _download_zlib
-_download_pcre
 _download_brotli
 if [ "$NAXSI" = "y" ]; then
     _download_naxsi
@@ -1345,7 +1344,7 @@ else
     elif [ "$OPENSSL_LIB" = "3" ]; then
         sleep 1
     else
-        _download_openssl
+        sleep 1
     fi
 fi
 if [ "$PAGESPEED" = "y" ]; then
