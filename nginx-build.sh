@@ -327,9 +327,9 @@ fi
 ##################################
 
 if [ $DISTRO_CODENAME = "jessie" ]; then
-    LIBBROTLI_DEV = ""
+    LIBBROTLI_DEV=""
 else
-    LIBBROTLI_DEV = "libbrotli-dev"
+    LIBBROTLI_DEV="libbrotli-dev"
 fi
 
 ##################################
