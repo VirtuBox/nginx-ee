@@ -26,7 +26,7 @@ addons:
 
 script:
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
-  - sudo apt-get install -y --force-yes nginx curl wget ccze
+  - sudo apt-get install -y --force-yes curl wget ccze
   - sudo bash nginx-build.sh --travis && sudo bash nginx-build.sh --travis --stable && sudo bash nginx-build.sh --full --travis || sudo bash -c 'tail -n 100 /tmp/nginx-ee.log | ccze -A'
   - sudo ls -alh /usr/sbin/nginx
   - sudo chown -R travis /usr/local/src

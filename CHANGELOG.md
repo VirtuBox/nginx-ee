@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+## [3.6.4] - 2019-08-29
+
 ### Added
 
 - Debian 10 (buster) support
@@ -16,8 +18,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated cronjob
 - Improve module cloning duration by adding `--depth=50` to `git clone`
 - PCRE, OPENSSL & Brotli are not compiled anymore. But are installed from [APT repository](https://build.opensuse.org/project/show/home:virtubox:nginx-ee) excepted Brotli on Debian 8 (jessie)
+- Decrease build duration by 2
 
-# [3.6.3] - 2019-07-15
+## [3.6.3] - 2019-07-15
 
 ### Added
 
@@ -36,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Missing OpenSSL patch
 
-# [3.6.2] - 2019-04-24
+## [3.6.2] - 2019-04-24
 
 ### Added
 
