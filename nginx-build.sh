@@ -1260,4 +1260,4 @@ if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
 fi
 _final_tasks
-wo_lib_echo "Give Nginx-ee a GitHub star : https://github.com/VirtuBox/nginx-ee"
+echo "Give Nginx-ee a GitHub star : https://github.com/VirtuBox/nginx-ee"
