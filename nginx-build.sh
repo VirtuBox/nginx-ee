@@ -1015,28 +1015,28 @@ _configure_nginx() {
             ZLIB_PATH='../zlib'
         fi
         bash -c "./configure \
-                    '${NGX_NAXSI}' \
+                    ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
                     --with-ld-opt='$DEB_LFLAGS' \
-                    '$NGINX_BUILD_OPTIONS' \
+                    $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
-                    '$NGX_USER' \
+                    $NGX_USER \
                     --with-file-aio \
                     --with-threads \
-                    '$NGX_HPACK' \
+                    $NGX_HPACK \
                     --with-http_v2_module \
                     --with-http_ssl_module \
                     --with-pcre-jit \
-                    '$NGINX_INCLUDED_MODULES' \
-                    '$NGINX_THIRD_MODULES' \
-                    '$NGX_PAGESPEED' \
-                    '$NGX_RTMP' \
+                    $NGINX_INCLUDED_MODULES \
+                    $NGINX_THIRD_MODULES \
+                    $NGX_PAGESPEED \
+                    $NGX_RTMP \
                     --add-module=../echo-nginx-module \
                     --add-module=../headers-more-nginx-module \
                     --add-module=../ngx_cache_purge \
                     --add-module=../ngx_brotli \
                     --with-zlib=$ZLIB_PATH \
-                    '$NGX_SSL_LIB' \
+                    $NGX_SSL_LIB \
                     --with-openssl-opt='$OPENSSL_OPT' \
                     --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1;"
 
