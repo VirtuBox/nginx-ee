@@ -48,7 +48,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
-* OpenSSL (1.1.1c or 3.0.0-dev or from system-lib) or LibreSSL
+* OpenSSL (1.1.1d or 3.0.0-dev or from system-lib) or LibreSSL
 * Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -59,12 +59,12 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.3**
+Nginx current mainline release : **v1.17.4**
 Nginx current stable release : **v1.16.1**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
-* [ngx_brotli](https://github.com/eustas/ngx_brotli)
+* [ngx_brotli](https://github.com/google/ngx_brotli)
 * [memc-nginx-module](https://github.com/openresty/memc-nginx-module.git)
 * [ngx-devel-kit](https://github.com/simpl/ngx_devel_kit.git)
 * [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
@@ -131,7 +131,7 @@ Optional modules :
 **Default settings** :
 
 * mainline release
-* openssl stable : 1.1.1c
+* openssl stable : 1.1.1d
 * without pagespeed
 * without naxsi
 * without rtmp
