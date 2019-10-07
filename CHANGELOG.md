@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+### Changed
+
+- OpenSSL updated to 1.1.1d
+- Updated ngx_brotli module
+
+### Fixed
+
+- dpkg-buildflags variable set before installing dpkg-dev
+
 ## [3.6.4] - 2019-08-29
 
 ### Added
@@ -13,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Debian 10 (buster) support
 - Raspbian 10 (buster) support
 
-### Changes
+### Changed
 
 - Updated cronjob
 - Improve module cloning duration by adding `--depth=50` to `git clone`
