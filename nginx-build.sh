@@ -153,8 +153,6 @@ OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
-DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
-DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
 export DEBIAN_FRONTEND=noninteractive
 
@@ -402,12 +400,22 @@ echo ""
 # Install dependencies
 ##################################
 
+_gitget() {
+    REPO="$1"
+    repodir=$(echo "$REPO" | awk -F "/" '{print $2}')
+    if [ -d /usr/local/src/${repodir}/.git ]; then
+        git -C /usr/local/src/${repodir} pull &
+    else
+        git clone --depth 1 https://github.com/${REPO}.git /usr/local/src/${repodir} &
+    fi
+}
+
 _install_dependencies() {
     echo -ne '       Installing dependencies               [..]\r'
     if {
         apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
             git build-essential libtool automake autoconf \
-            libgd-dev libgeoip-dev libjemalloc-dev \
+            libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
             libgmp-dev autotools-dev libxml2-dev libpcre3-dev "$LIBBROTLI_DEV" "$LIBSSL_DEV"
@@ -432,7 +440,7 @@ _nginx_from_scratch_setup() {
     if {
         # clone custom nginx configuration
         [ ! -d /etc/nginx ] && {
-            git clone https://github.com/VirtuBox/nginx-config.git /etc/nginx
+            git clone --depth 50 https://github.com/VirtuBox/nginx-config.git /etc/nginx
         } >> /tmp/nginx-ee.log 2>&1
 
         # create nginx temp directory
@@ -618,72 +626,12 @@ _download_modules() {
 
     if {
         echo "### downloading additionals modules ###"
-        # cache_purge module
-        { [ -d "$DIR_SRC/ngx_cache_purge" ] && {
-            git -C "$DIR_SRC/ngx_cache_purge" pull
-        }; } || {
-            git clone --depth=50 https://github.com/FRiCKLE/ngx_cache_purge.git
-        }
-        # memcached module
-        { [ -d "$DIR_SRC/memc-nginx-module" ] && {
-            git -C "$DIR_SRC/memc-nginx-module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/openresty/memc-nginx-module.git
-        }
-        # devel kit
-        { [ -d "$DIR_SRC/ngx_devel_kit" ] && {
-            git -C "$DIR_SRC/ngx_devel_kit" pull
-        }; } || {
-            git clone --depth=50 https://github.com/simpl/ngx_devel_kit.git
-        }
-        # headers-more module
-        { [ -d "$DIR_SRC/headers-more-nginx-module" ] && {
-            git -C "$DIR_SRC/headers-more-nginx-module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/openresty/headers-more-nginx-module.git
-        }
-        # echo module
-        { [ -d "$DIR_SRC/echo-nginx-module" ] && {
-            git -C "$DIR_SRC/echo-nginx-module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/openresty/echo-nginx-module.git
-        }
-        # http_substitutions_filter module
-        { [ -d "$DIR_SRC/ngx_http_substitutions_filter_module" ] && {
-            git -C "$DIR_SRC/ngx_http_substitutions_filter_module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
-        }
-        # redis2 module
-        { [ -d "$DIR_SRC/redis2-nginx-module" ] && {
-            git -C "$DIR_SRC/redis2-nginx-module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/openresty/redis2-nginx-module.git
-        }
-        # srcache module
-        { [ -d "$DIR_SRC/srcache-nginx-module" ] && {
-            git -C "$DIR_SRC/srcache-nginx-module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/openresty/srcache-nginx-module.git
-        }
-        # set-misc module
-        { [ -d "$DIR_SRC/set-misc-nginx-module" ] && {
-            git -C "$DIR_SRC/set-misc-nginx-module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/openresty/set-misc-nginx-module.git
-        }
-        # auth_pam module
-        { [ -d "$DIR_SRC/ngx_http_auth_pam_module" ] && {
-            git -C "$DIR_SRC/ngx_http_auth_pam_module" pull
-        }; } || {
-            git clone --depth=50 https://github.com/sto/ngx_http_auth_pam_module.git
-        }
-        # nginx-vts module
-        { [ -d "$DIR_SRC/nginx-module-vts" ] && {
-            git -C "$DIR_SRC/nginx-module-vts" pull
-        }; } || {
-            git clone --depth=50 https://github.com/vozlt/nginx-module-vts.git
-        }
+        MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module simpl/ngx_devel_kit openresty/headers-more-nginx-module
+        openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module openresty/redis2-nginx-module openresty/srcache-nginx-module
+        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module vozlt/nginx-module-vts'
+        for MODULE in $MODULES; do
+            _gitget "$MODULE"
+        done
         # http redis module
         [ ! -d /usr/local/src/ngx_http_redis ] && {
             curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
@@ -691,19 +639,19 @@ _download_modules() {
         }
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
-                git -C "$DIR_SRC/nginx-rtmp-module" pull
+                git -C "$DIR_SRC/nginx-rtmp-module" pull &
             }; } || {
-                git clone --depth=50 https://github.com/arut/nginx-rtmp-module.git
+                git clone --depth=1 https://github.com/arut/nginx-rtmp-module.git &
             }
         fi
 
         # ipscrub module
         { [ -d "$DIR_SRC/ipscrubtmp" ] && {
-            git -C "$DIR_SRC/ipscrubtmp" pull origin master
+            git -C "$DIR_SRC/ipscrubtmp" pull origin master &
         }; } || {
-            git clone --depth=50 https://github.com/masonicboom/ipscrub.git ipscrubtmp
+            git clone --depth=1 https://github.com/masonicboom/ipscrub.git ipscrubtmp &
         }
-
+        wait
         echo "### additionals modules downloaded ###"
     } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
@@ -732,7 +680,7 @@ _download_zlib() {
                 git -c /usr/local/src/zlib-cf pull
             }; } || {
                 echo "### cloning zlib-cf ###"
-                git clone https://github.com/cloudflare/zlib.git -b gcc.amd64 /usr/local/src/zlib-cf
+                git clone --depth=1 https://github.com/cloudflare/zlib.git -b gcc.amd64 /usr/local/src/zlib-cf
             }
             cd /usr/local/src/zlib-cf || exit 1
             echo "### make distclean ###"
@@ -757,7 +705,6 @@ _download_zlib() {
 
 }
 
-
 ##################################
 # Download ngx_broti
 ##################################
@@ -770,9 +717,9 @@ _download_brotli() {
         {
             rm /usr/local/src/ngx_brotli -rf
             if [ "$DISTRO_CODENAME" = "jessie" ]; then
-                git clone --recursive --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+                git clone --recursive --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
             else
-                git clone --depth=50 https://github.com/eustas/ngx_brotli /usr/local/src/ngx_brotli -q
+                git clone --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
             fi
 
         } >> /tmp/nginx-ee.log 2>&1
@@ -992,6 +939,10 @@ _patch_nginx() {
 ##################################
 
 _configure_nginx() {
+    local DEB_CFLAGS
+    local DEB_LFLAGS
+    DEB_CFLAGS="$(dpkg-buildflags --get CPPFLAGS) -Wno-error=date-time"
+    DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 
     if {
         echo -ne '       Configuring nginx                      [..]\r'
@@ -1056,87 +1007,38 @@ _configure_nginx() {
 
         if [ "$OS_ARCH" = 'x86_64' ]; then
             if [ "$DISTRO_ID" = "Ubuntu" ]; then
-                ./configure \
-                    ${NGX_NAXSI} \
-                    --with-cc-opt='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf' \
-                    --with-ld-opt='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects' \
-                    ${NGINX_BUILD_OPTIONS} \
-                    --build='VirtuBox Nginx-ee' \
-                    ${NGX_USER} \
-                    --with-file-aio \
-                    --with-threads \
-                    ${NGX_HPACK} \
-                    --with-http_v2_module \
-                    --with-http_ssl_module \
-                    --with-pcre-jit \
-                    ${NGINX_INCLUDED_MODULES} \
-                    ${NGINX_THIRD_MODULES} \
-                    ${NGX_PAGESPEED} \
-                    ${NGX_RTMP} \
-                    --add-module=../echo-nginx-module \
-                    --add-module=../headers-more-nginx-module \
-                    --add-module=../ngx_cache_purge \
-                    --add-module=../ngx_brotli \
-                    --with-zlib=../zlib-cf \
-                    ${NGX_SSL_LIB} \
-                    --with-openssl-opt="$OPENSSL_OPT" \
-                    --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
-            else
-
-                ./configure \
-                    --with-cc-opt="$DEB_CFLAGS" \
-                    --with-ld-opt="$DEB_LFLAGS" \
-                    ${NGX_NAXSI} \
-                    ${NGINX_BUILD_OPTIONS} \
-                    --build='VirtuBox Nginx-ee' \
-                    ${NGX_USER} \
-                    --with-file-aio \
-                    --with-threads \
-                    ${NGX_HPACK} \
-                    --with-http_v2_module \
-                    --with-http_ssl_module \
-                    --with-pcre-jit \
-                    ${NGINX_INCLUDED_MODULES} \
-                    ${NGINX_THIRD_MODULES} \
-                    ${NGX_PAGESPEED} \
-                    ${NGX_RTMP} \
-                    --add-module=../echo-nginx-module \
-                    --add-module=../headers-more-nginx-module \
-                    --add-module=../ngx_cache_purge \
-                    --add-module=../ngx_brotli \
-                    --with-zlib=../zlib-cf \
-                    ${NGX_SSL_LIB} \
-                    --with-openssl-opt="$OPENSSL_OPT" \
-                    --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
+                DEB_CFLAGS='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf'
+                DEB_LFLAGS='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects'
             fi
+            ZLIB_PATH='../zlib-cf'
         else
-
-            ./configure \
-                ${NGX_NAXSI} \
-                --with-cc-opt="$DEB_CFLAGS" \
-                --with-ld-opt="$DEB_LFLAGS" \
-                ${NGINX_BUILD_OPTIONS} \
-                --build='VirtuBox Nginx-ee' \
-                ${NGX_USER} \
-                --with-file-aio \
-                --with-threads \
-                --with-http_v2_module \
-                --with-http_ssl_module \
-                --with-pcre-jit \
-                ${NGINX_INCLUDED_MODULES} \
-                ${NGINX_THIRD_MODULES} \
-                ${NGX_HPACK} \
-                ${NGX_PAGESPEED} \
-                ${NGX_RTMP} \
-                --add-module=../echo-nginx-module \
-                --add-module=../headers-more-nginx-module \
-                --add-module=../ngx_cache_purge \
-                --add-module=../ngx_brotli \
-                --with-zlib=../zlib \
-                ${NGX_SSL_LIB} \
-                --with-openssl-opt="$OPENSSL_OPT" \
-                --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1
+            ZLIB_PATH='../zlib'
         fi
+        bash -c "./configure \
+                    '${NGX_NAXSI}' \
+                    --with-cc-opt='$DEB_CFLAGS' \
+                    --with-ld-opt='$DEB_LFLAGS' \
+                    '$NGINX_BUILD_OPTIONS' \
+                    --build='VirtuBox Nginx-ee' \
+                    '$NGX_USER' \
+                    --with-file-aio \
+                    --with-threads \
+                    '$NGX_HPACK' \
+                    --with-http_v2_module \
+                    --with-http_ssl_module \
+                    --with-pcre-jit \
+                    '$NGINX_INCLUDED_MODULES' \
+                    '$NGINX_THIRD_MODULES' \
+                    '$NGX_PAGESPEED' \
+                    '$NGX_RTMP' \
+                    --add-module=../echo-nginx-module \
+                    --add-module=../headers-more-nginx-module \
+                    --add-module=../ngx_cache_purge \
+                    --add-module=../ngx_brotli \
+                    --with-zlib=$ZLIB_PATH \
+                    '$NGX_SSL_LIB' \
+                    --with-openssl-opt='$OPENSSL_OPT' \
+                    --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1;"
 
     }; then
         echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
@@ -1358,3 +1260,4 @@ if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
 fi
 _final_tasks
+wo_lib_echo "Give Nginx-ee a GitHub star : https://github.com/VirtuBox/nginx-ee"
