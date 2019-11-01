@@ -40,6 +40,7 @@ _help() {
     echo "       --rtmp ..... RTMP video streaming module"
     echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
     echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
+    echo "       --libressl ..... Compile Nginx with LibreSSL"
     echo ""
     return 0
 }
