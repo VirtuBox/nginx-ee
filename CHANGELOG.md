@@ -6,10 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+### Added
+
+- Dynamic modules configuration
+
 ### Changed
 
 - OpenSSL updated to 1.1.1d
 - Updated ngx_brotli module
+- LibreSSL updated to 3.0.2
 
 ### Fixed
 

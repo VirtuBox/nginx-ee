@@ -119,34 +119,47 @@ else
 
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
+# check if a command exist
+command_exists() {
+    command -v "$@" > /dev/null 2>&1
+}
+
 # updating packages list
 [ -z "$TRAVIS_BUILD" ] && {
     apt-get update -qq
 }
+
 # checking if curl is installed
-[ -z "$(command -v curl)" ] && {
-    apt-get -y install curl
-} >> /tmp/nginx-ee.log 2>&1
+if ! command_exists curl; then
+    apt-get install curl -qq > /dev/null 2>&1
+fi
 
 # Checking if lsb_release is installed
-[ -z "$(command -v lsb_release)" ] && {
-    apt-get -y install lsb-release
-} >> /tmp/nginx-ee.log 2>&1
+if ! command_exists lsb_release; then
+    apt-get -qq install lsb-release > /dev/null 2>&1
+fi
 
 # checking if tar is installed
-[ -z "$(command -v tar)" ] && {
-    apt-get -y install tar
-} >> /tmp/nginx-ee.log 2>&1
+if ! command_exists tar; then
+    apt-get -qq install tar > /dev/null 2>&1
+fi
+
+# checking if jq is installed
+if ! command_exists jq; then
+    apt-get install jq -qq > /dev/null 2>&1
+fi
 
 ##################################
 # Variables
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.6.4"
+NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
-LIBRESSL_VER="2.9.1"
+LIBRESSL_VER="3.0.2"
 OPENSSL_VER="1.1.1d"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 readonly OS_ARCH="$(uname -m)"
@@ -155,7 +168,6 @@ readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
 OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
-export DEBIAN_FRONTEND=noninteractive
 
 # Colors
 CSI='\033['
@@ -419,7 +431,7 @@ _install_dependencies() {
             libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev libpcre3-dev "$LIBBROTLI_DEV" "$LIBSSL_DEV"
+            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev "$LIBBROTLI_DEV" "$LIBSSL_DEV"
     } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -492,6 +504,23 @@ _nginx_from_scratch_setup() {
         exit 1
     fi
 
+}
+
+##################################
+# Dynamic modules
+##################################
+
+_dynamic_setup() {
+    if [ -d /usr/share/nginx/modules ]; then
+        rm -rf /usr/share/nginx/modules/*.old
+        mkdir -p /etc/nginx/{modules.available.d,modules.conf.d}
+        rm -rf /etc/nginx/modules.conf.d/*
+        modules_list=$(basename -a /usr/share/nginx/modules/*)
+        for module in $modules_list; do
+            echo "load_module /usr/share/nginx/modules/${module};" > "/etc/nginx/modules.available.d/${module%.so}.load"
+            ln -s "/etc/nginx/modules.conf.d/${module%.so}.conf" "/etc/nginx/modules.available.d/${module%.so}.load"
+        done
+    fi
 }
 
 ##################################
@@ -1259,6 +1288,9 @@ _compile_nginx
 _updating_nginx_manual
 if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
+fi
+if [ "$DYNAMIC_MODULES" = "y" ]; then
+    _dynamic_setup
 fi
 _final_tasks
 echo "Give Nginx-ee a GitHub star : https://github.com/VirtuBox/nginx-ee"
