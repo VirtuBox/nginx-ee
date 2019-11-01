@@ -8,10 +8,17 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Mainline build
       run: sudo bash nginx-build.sh
     - name: Stable build
       run: sudo bash nginx-build.sh --stable
-    - name: Full build
+    - name: Mainline Full build
       run: sudo bash nginx-build.sh --full
+    - name: Mainline LibreSSL
+      run: sudo bash nginx-build.sh --libressl
+    - name: Mainline Pagespeed beta
+      run: sudo bash nginx-build.sh --pagespeed-beta
+    - name: Mainline full dynamic
+      run: sudo bash nginx-build.sh --dynamic --full
+      
