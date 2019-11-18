@@ -411,8 +411,9 @@ _gitget() {
     else
         if [ -d /usr/local/src/${repodir} ]; then
             rm -rf /usr/local/src/${repodir}
-            git clone --depth 1 https://github.com/${REPO}.git /usr/local/src/${repodir} &
         fi
+        git clone --depth 1 https://github.com/${REPO}.git /usr/local/src/${repodir} &
+
     fi
 }
 
@@ -646,12 +647,14 @@ _cleanup_modules() {
 _download_modules() {
 
     echo -ne '       Downloading additionals modules        [..]\r'
-    cd "$DIR_SRC" || exit 1
     if {
         echo "### downloading additionals modules ###"
-        MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module simpl/ngx_devel_kit openresty/headers-more-nginx-module
-        openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module openresty/redis2-nginx-module openresty/srcache-nginx-module
-        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module vozlt/nginx-module-vts virtubox/ngx_http_redis'
+        MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module
+        simpl/ngx_devel_kit openresty/headers-more-nginx-module
+        openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module
+        openresty/redis2-nginx-module openresty/srcache-nginx-module
+        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module
+        vozlt/nginx-module-vts VirtuBox/ngx_http_redis '
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
