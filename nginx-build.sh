@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.4 - 2019-08-29
+# Version 3.6.5 - 2019-11-18
 # -------------------------------------------------------------------------
 
 ##################################
@@ -40,6 +40,7 @@ _help() {
     echo "       --rtmp ..... RTMP video streaming module"
     echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
     echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
+    echo "       --libressl ..... Compile Nginx with LibreSSL"
     echo ""
     return 0
 }
@@ -118,34 +119,47 @@ else
 
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
+# check if a command exist
+command_exists() {
+    command -v "$@" >/dev/null 2>&1
+}
+
 # updating packages list
 [ -z "$TRAVIS_BUILD" ] && {
     apt-get update -qq
 }
+
 # checking if curl is installed
-[ -z "$(command -v curl)" ] && {
-    apt-get -y install curl
-} >> /tmp/nginx-ee.log 2>&1
+if ! command_exists curl; then
+    apt-get install curl -qq >/dev/null 2>&1
+fi
 
 # Checking if lsb_release is installed
-[ -z "$(command -v lsb_release)" ] && {
-    apt-get -y install lsb-release
-} >> /tmp/nginx-ee.log 2>&1
+if ! command_exists lsb_release; then
+    apt-get -qq install lsb-release >/dev/null 2>&1
+fi
 
 # checking if tar is installed
-[ -z "$(command -v tar)" ] && {
-    apt-get -y install tar
-} >> /tmp/nginx-ee.log 2>&1
+if ! command_exists tar; then
+    apt-get -qq install tar >/dev/null 2>&1
+fi
+
+# checking if jq is installed
+if ! command_exists jq; then
+    apt-get install jq -qq >/dev/null 2>&1
+fi
 
 ##################################
 # Variables
 ##################################
 
 DIR_SRC="/usr/local/src"
-NGINX_EE_VER="3.6.4"
+NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
-LIBRESSL_VER="2.9.1"
+LIBRESSL_VER="3.0.2"
 OPENSSL_VER="1.1.1d"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 readonly OS_ARCH="$(uname -m)"
@@ -153,8 +167,7 @@ OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
-OPENSSL_COMMIT="3bbec1afed1c65b6f7f645b27808b070e6e7a509"
-export DEBIAN_FRONTEND=noninteractive
+OPENSSL_COMMIT="6f02932edba62186a6866e8c9f0f0714674f6bab"
 
 # Colors
 CSI='\033['
@@ -168,7 +181,7 @@ CEND="${CSI}0m"
 
 # clean previous install log
 
-echo "" > /tmp/nginx-ee.log
+echo "" >/tmp/nginx-ee.log
 
 # detect Plesk
 [ -d /etc/psa ] && {
@@ -193,7 +206,7 @@ echo "" > /tmp/nginx-ee.log
 ##################################
 
 echo ""
-echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
+echo "Welcome to the nginx-ee bash script ${NGINX_EE_VER}"
 echo ""
 
 # interactive
@@ -320,16 +333,6 @@ else
 fi
 
 ##################################
-# Set Brotli lib
-##################################
-
-if [ "$DISTRO_CODENAME" = "jessie" ]; then
-    LIBBROTLI_DEV=""
-else
-    LIBBROTLI_DEV="libbrotli-dev"
-fi
-
-##################################
 # Set Pagespeed module
 ##################################
 
@@ -406,7 +409,11 @@ _gitget() {
     if [ -d /usr/local/src/${repodir}/.git ]; then
         git -C /usr/local/src/${repodir} pull &
     else
+        if [ -d /usr/local/src/${repodir} ]; then
+            rm -rf /usr/local/src/${repodir}
+        fi
         git clone --depth 1 https://github.com/${REPO}.git /usr/local/src/${repodir} &
+
     fi
 }
 
@@ -418,8 +425,8 @@ _install_dependencies() {
             libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev libpcre3-dev "$LIBBROTLI_DEV" "$LIBSSL_DEV"
-    } >> /tmp/nginx-ee.log 2>&1; then
+            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev "$LIBSSL_DEV"
+    } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -441,7 +448,7 @@ _nginx_from_scratch_setup() {
         # clone custom nginx configuration
         [ ! -d /etc/nginx ] && {
             git clone --depth 50 https://github.com/VirtuBox/nginx-config.git /etc/nginx
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
         # create nginx temp directory
         mkdir -p /var/lib/nginx/{body,fastcgi,proxy,scgi,uwsgi}
@@ -480,7 +487,7 @@ _nginx_from_scratch_setup() {
             # download logrotate configuration
             wget -O /etc/logrotate.d/nginx https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/etc/logrotate.d/nginx
 
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Setting Up Nginx configurations        [${CGREEN}OK${CEND}]\\r"
@@ -491,6 +498,23 @@ _nginx_from_scratch_setup() {
         exit 1
     fi
 
+}
+
+##################################
+# Dynamic modules
+##################################
+
+_dynamic_setup() {
+    if [ -d /usr/share/nginx/modules ]; then
+        rm -rf /usr/share/nginx/modules/*.old
+        mkdir -p /etc/nginx/{modules.available.d,modules.conf.d}
+        rm -rf /etc/nginx/modules.conf.d/*
+        modules_list=$(basename -a /usr/share/nginx/modules/*)
+        for module in $modules_list; do
+            echo "load_module /usr/share/nginx/modules/${module};" >"/etc/nginx/modules.available.d/${module%.so}.load"
+            ln -s "/etc/nginx/modules.available.d/${module%.so}.load" "/etc/nginx/modules.conf.d/${module%.so}.conf"
+        done
+    fi
 }
 
 ##################################
@@ -505,14 +529,14 @@ _gcc_ubuntu_setup() {
         {
             echo "### adding gcc repository ###"
             add-apt-repository ppa:jonathonf/gcc -yu
-        } >> /dev/null 2>&1
+        } >>/dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
         echo -ne '       Installing gcc-8                       [..]\r'
         if {
             echo "### installing gcc8 ###"
             apt-get install gcc-8 g++-8 -y
-        } >> /dev/null 2>&1; then
+        } >>/dev/null 2>&1; then
             echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
@@ -524,14 +548,14 @@ _gcc_ubuntu_setup() {
             # update gcc alternative to use gcc-8 by default
             update-alternatives --remove-all gcc
             update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
-        } >> /dev/null 2>&1
+        } >>/dev/null 2>&1
     else
         echo -ne '       Installing gcc-7                       [..]\r'
 
         if {
             echo "### installing gcc7 ###"
             apt-get install gcc-7 g++-7 -y
-        } >> /dev/null 2>&1; then
+        } >>/dev/null 2>&1; then
             echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
@@ -543,7 +567,7 @@ _gcc_ubuntu_setup() {
             # update gcc alternative to use gcc-7 by default
             update-alternatives --remove-all gcc
             update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-        } >> /dev/null 2>&1
+        } >>/dev/null 2>&1
     fi
 
 }
@@ -556,27 +580,27 @@ _dependencies_repo() {
                 if [ "$DISTRO_CODENAME" = "xenial" ]; then
                     add-apt-repository ppa:virtubox/brotli -yu
                 fi
-                echo "deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/xUbuntu_${DISTRO_NUMBER}/ /" > /etc/apt/sources.list.d/nginx-ee.list
+                echo "deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/xUbuntu_${DISTRO_NUMBER}/ /" >/etc/apt/sources.list.d/nginx-ee.list
 
             elif [ "$DISTRO_ID" = "Debian" ]; then
                 if [ "$DISTRO_CODENAME" = "jessie" ]; then
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_8.0/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_8.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
                 elif [ "$DISTRO_CODENAME" = "strech" ]; then
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_9.0/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_9.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
                 else
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_10/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_10/ /' >/etc/apt/sources.list.d/nginx-ee.list
                 fi
             else
                 if [ "$DISTRO_CODENAME" = "strech" ]; then
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_9.0/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_9.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
                 else
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_10/ /' > /etc/apt/sources.list.d/nginx-ee.list
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_10/ /' >/etc/apt/sources.list.d/nginx-ee.list
                 fi
             fi
 
         fi
         apt-get update -qq
-    } >> /tmp/nginx-ee.log 2>&1
+    } >>/tmp/nginx-ee.log 2>&1
 }
 
 ##################################
@@ -595,7 +619,7 @@ _rtmp_setup() {
         else
             apt-get install ffmpeg -y
         fi
-    } >> /dev/null 2>&1; then
+    } >>/dev/null 2>&1; then
         echo -ne "       Installing FFMPEG for RMTP module      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -623,20 +647,17 @@ _cleanup_modules() {
 _download_modules() {
 
     echo -ne '       Downloading additionals modules        [..]\r'
-
     if {
         echo "### downloading additionals modules ###"
-        MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module simpl/ngx_devel_kit openresty/headers-more-nginx-module
-        openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module openresty/redis2-nginx-module openresty/srcache-nginx-module
-        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module vozlt/nginx-module-vts'
+        MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module
+        simpl/ngx_devel_kit openresty/headers-more-nginx-module
+        openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module
+        openresty/redis2-nginx-module openresty/srcache-nginx-module
+        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module
+        vozlt/nginx-module-vts VirtuBox/ngx_http_redis '
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
-        # http redis module
-        [ ! -d /usr/local/src/ngx_http_redis ] && {
-            curl -sL https://people.freebsd.org/~osa/ngx_http_redis-0.3.8.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-            mv ngx_http_redis-0.3.8 ngx_http_redis
-        }
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
                 git -C "$DIR_SRC/nginx-rtmp-module" pull &
@@ -653,7 +674,7 @@ _download_modules() {
         }
         wait
         echo "### additionals modules downloaded ###"
-    } >> /tmp/nginx-ee.log 2>&1; then
+    } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Downloading additionals modules        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -694,7 +715,7 @@ _download_zlib() {
             mv zlib-1.2.11 zlib
         fi
 
-    } >> /tmp/nginx-ee.log 2>&1; then
+    } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Downloading zlib                       [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -716,13 +737,9 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            if [ "$DISTRO_CODENAME" = "jessie" ]; then
-                git clone --recursive --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
-            else
-                git clone --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
-            fi
+            git clone --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
 
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Downloading brotli                     [${CGREEN}OK${CEND}]\\r"
@@ -770,7 +787,7 @@ _download_openssl_dev() {
                 echo "### git checkout commit ###"
                 git checkout $OPENSSL_COMMIT
             fi
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
         {
             if [ -d /usr/local/src/openssl-patch/.git ]; then
@@ -782,8 +799,8 @@ _download_openssl_dev() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 < ../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
-        } >> /tmp/nginx-ee.log 2>&1
+            patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
@@ -810,7 +827,7 @@ _download_libressl() {
             rm -rf /usr/local/src/libressl
             curl -sL http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
             mv /usr/local/src/libressl-${LIBRESSL_VER} /usr/local/src/libressl
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Downloading LibreSSL                   [${CGREEN}OK${CEND}]\\r"
@@ -838,7 +855,7 @@ _download_naxsi() {
 
             cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
 
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Downloading naxsi                      [${CGREEN}OK${CEND}]\\r"
@@ -869,7 +886,7 @@ _download_pagespeed() {
             else
                 ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b "$DIR_SRC"
             fi
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
@@ -895,7 +912,7 @@ _download_nginx() {
             rm -rf /usr/local/src/nginx
             curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
             mv /usr/local/src/nginx-${NGINX_VER} /usr/local/src/nginx
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Downloading nginx                      [${CGREEN}OK${CEND}]\\r"
@@ -921,7 +938,7 @@ _patch_nginx() {
         {
             curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
             #curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
 
     }; then
         echo -ne "       Applying nginx patches                 [${CGREEN}OK${CEND}]\\r"
@@ -1070,9 +1087,7 @@ _compile_nginx() {
             # install Nginx
             make install
 
-        } \
-            >> /tmp/nginx-ee.log 2>&1
-
+        } >>/tmp/nginx-ee.log 2>&1
     }; then
         echo -ne "       Compiling nginx                        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -1101,7 +1116,7 @@ _updating_nginx_manual() {
             cp -f ${DIR_SRC}/nginx/man/nginx.8 /usr/share/man/man8
             gzip /usr/share/man/man8/nginx.8
 
-        } >> /tmp/nginx-ee.log
+        } >>/tmp/nginx-ee.log
 
         # update mime.types
         cp -f ${DIR_SRC}/nginx/conf/mime.types /etc/nginx/mime.types
@@ -1120,7 +1135,7 @@ _updating_nginx_manual() {
 _cron_setup() {
     echo -ne '       Installing Nginx-ee Cronjob            [..]\r'
     if {
-        wget -O /etc/cron.daily/nginx-ee https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/cron.daily/nginx-ee >> /tmp/nginx-ee.log
+        wget -O /etc/cron.daily/nginx-ee https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/cron.daily/nginx-ee >>/tmp/nginx-ee.log
         chmod +x /etc/cron.daily/nginx-ee
 
     }; then
@@ -1146,9 +1161,9 @@ _final_tasks() {
                 # update nginx ssl_protocols
                 sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/conf.d/ssl.conf
                 # block sw-nginx package updates from APT repository
-                echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
+                echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold sw-nginx
-            } >> /tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log
         elif [ "$NGINX_EASYENGINE" = "1" ]; then
             {
                 # update nginx ssl_protocols
@@ -1156,9 +1171,9 @@ _final_tasks() {
                 # update nginx ciphers_suites
                 sed -i "s/ssl_ciphers\ \(\"\|'\)\(.*\)\(\"\|'\)/ssl_ciphers \"$TLS13_CIPHERS\"/" /etc/nginx/nginx.conf
                 # block nginx package updates from APT repository
-                echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
+                echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold nginx-ee nginx-common nginx-custom
-            } >> /tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log
         elif [ "$WO_VALID" = "1" ]; then
             {
                 # update nginx ssl_protocols
@@ -1166,14 +1181,14 @@ _final_tasks() {
                 # update nginx ciphers_suites
                 sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/nginx.conf
                 # block nginx package updates from APT repository
-                echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' > /etc/apt/preferences.d/nginx-block
+                echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 CHECK_NGINX_WO=$(dpkg --list | grep nginx-wo)
                 if [ -z "$CHECK_NGINX_WO" ]; then
                     apt-mark hold nginx-wo nginx-common nginx-custom
                 else
                     apt-mark hold nginx-ee nginx-common nginx-custom
                 fi
-            } >> /tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log
         fi
 
         {
@@ -1183,7 +1198,7 @@ _final_tasks() {
             systemctl start nginx.service
             # remove default configuration
             rm -f /etc/nginx/{*.default,*.dpkg-dist}
-        } > /dev/null 2>&1
+        } >/dev/null 2>&1
 
     }; then
         echo -ne "       Performing final steps                 [${CGREEN}OK${CEND}]\\r"
@@ -1202,7 +1217,7 @@ _final_tasks() {
         {
             systemctl stop nginx
             systemctl start nginx
-        } >> /tmp/nginx-ee.log 2>&1
+        } >>/tmp/nginx-ee.log 2>&1
         echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
         echo ""
         echo -e "       ${CGREEN}Nginx-ee was compiled successfully !${CEND}"
@@ -1258,6 +1273,9 @@ _compile_nginx
 _updating_nginx_manual
 if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
+fi
+if [ "$DYNAMIC_MODULES" = "y" ]; then
+    _dynamic_setup
 fi
 _final_tasks
 echo "Give Nginx-ee a GitHub star : https://github.com/VirtuBox/nginx-ee"

@@ -6,10 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+## [3.6.5] - 2019-11-18
+
+### Added
+
+- Dynamic modules configuration
+- Added Ubuntu EOAN (19.10) support
+
 ### Changed
 
-- OpenSSL updated to 1.1.1d
+- Bump OpenSSL version to 1.1.1d
 - Updated ngx_brotli module
+- Bump LibreSSL version to 3.0.2
+- Fix issue with ngx_http_redis module download
+- Update OpenSSL 3.0.0-dev commit number and patch
 
 ### Fixed
 

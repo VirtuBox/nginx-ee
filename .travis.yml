@@ -1,7 +1,11 @@
-sudo: required
+os: linux
 dist: bionic
 
-language: bash
+language: shell
+
+branches:
+  only:
+  - master
 
 cache:
   apt: true
@@ -27,7 +31,12 @@ addons:
 script:
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo apt-get install -y --force-yes curl wget ccze
-  - sudo bash nginx-build.sh --travis && sudo bash nginx-build.sh --travis --stable && sudo bash nginx-build.sh --full --travis || sudo bash -c 'tail -n 100 /tmp/nginx-ee.log | ccze -A'
+  - sudo bash nginx-build.sh --travis || exit 1
+  - sudo bash nginx-build.sh --travis --stable  || exit 1
+  - sudo bash nginx-build.sh --travis --full  || exit 1
+  - sudo bash nginx-build.sh --travis --pagespeed-beta  || exit 1
+  - sudo bash nginx-build.sh --travis --libressl  || exit 1
+  - sudo bash nginx-build.sh --travis --pagespeed-beta  || exit 1
   - sudo ls -alh /usr/sbin/nginx
   - sudo chown -R travis /usr/local/src
   - sudo chmod 755 /usr/local/src
