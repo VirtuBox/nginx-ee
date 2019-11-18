@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+### Added
+
+- Dynamic modules configuration
+
 ### Changed
 
 - Bump OpenSSL version to 1.1.1d
