@@ -1,4 +1,4 @@
----
+﻿---
 title: Nginx-ee - Automated Nginx compilation from sources with additional modules support
 layout: default
 ---
@@ -53,7 +53,7 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.17.4</strong>
+<p>Nginx current mainline release : <strong>v1.17.5</strong>
 Nginx current stable release : <strong>v1.16.1</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
@@ -96,7 +96,8 @@ Nginx current stable release : <strong>v1.16.1</strong></p>
 <li>Ubuntu 16.04 LTS (Xenial)</li>
 <li>Debian 9 (Stretch)</li>
 <li>Debian 8 (Jessie)</li>
-<li>Raspbian (Stretch)</li>
+<li>Raspbian 9 (Stretch)</li>
+<li>Raspbian 10 (Buster)</li>
 </ul>
 <h3 id="applications">Applications</h3>
 <h4 id="lemp-stack">LEMP Stack</h4>

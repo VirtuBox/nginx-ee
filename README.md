@@ -106,7 +106,8 @@ Optional modules :
 * Ubuntu 16.04 LTS (Xenial)
 * Debian 9 (Stretch)
 * Debian 8 (Jessie)
-* Raspbian (Stretch)
+* Raspbian 9 (Stretch)
+* Raspbian 10 (Buster)
 
 ### Applications
 
