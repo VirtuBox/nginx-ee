@@ -7,7 +7,7 @@
 # Copyright (c) 2019 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.4 - 2019-08-29
+# Version 3.6.5 - 2019-11-18
 # -------------------------------------------------------------------------
 
 ##################################
@@ -207,7 +207,7 @@ echo "" > /tmp/nginx-ee.log
 ##################################
 
 echo ""
-echo "Welcome to the nginx-ee bash script v${NGINX_EE_VER}"
+echo "Welcome to the nginx-ee bash script ${NGINX_EE_VER}"
 echo ""
 
 # interactive
