@@ -91,6 +91,7 @@ Nginx current stable release : <strong>v1.16.1</strong></p>
 </ul>
 <h4 id="also-compatible">Also compatible</h4>
 <ul>
+<li>Ubuntu 19.10 (Eoan)</li>
 <li>Ubuntu 19.04 (Disco)</li>
 <li>Ubuntu 18.10 (Cosmic)</li>
 <li>Ubuntu 16.04 LTS (Xenial)</li>

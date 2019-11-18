@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Dynamic modules configuration
+- Added Ubuntu EOAN (19.10) support
 
 ### Changed
 

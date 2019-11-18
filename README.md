@@ -100,6 +100,7 @@ Optional modules :
 
 #### Also compatible
 
+* Ubuntu 19.10 (Eoan)
 * Ubuntu 19.04 (Disco)
 * Ubuntu 18.10 (Cosmic)
 * Ubuntu 17.10 ()
