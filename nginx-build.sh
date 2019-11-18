@@ -123,7 +123,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # check if a command exist
 command_exists() {
-    command -v "$@" > /dev/null 2>&1
+    command -v "$@" >/dev/null 2>&1
 }
 
 # updating packages list
@@ -133,22 +133,22 @@ command_exists() {
 
 # checking if curl is installed
 if ! command_exists curl; then
-    apt-get install curl -qq > /dev/null 2>&1
+    apt-get install curl -qq >/dev/null 2>&1
 fi
 
 # Checking if lsb_release is installed
 if ! command_exists lsb_release; then
-    apt-get -qq install lsb-release > /dev/null 2>&1
+    apt-get -qq install lsb-release >/dev/null 2>&1
 fi
 
 # checking if tar is installed
 if ! command_exists tar; then
-    apt-get -qq install tar > /dev/null 2>&1
+    apt-get -qq install tar >/dev/null 2>&1
 fi
 
 # checking if jq is installed
 if ! command_exists jq; then
-    apt-get install jq -qq > /dev/null 2>&1
+    apt-get install jq -qq >/dev/null 2>&1
 fi
 
 ##################################
@@ -169,7 +169,6 @@ readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
 OPENSSL_COMMIT="6f02932edba62186a6866e8c9f0f0714674f6bab"
 
-
 # Colors
 CSI='\033['
 CRED="${CSI}1;31m"
@@ -182,7 +181,7 @@ CEND="${CSI}0m"
 
 # clean previous install log
 
-echo "" > /tmp/nginx-ee.log
+echo "" >/tmp/nginx-ee.log
 
 # detect Plesk
 [ -d /etc/psa ] && {
@@ -407,12 +406,12 @@ echo ""
 _gitget() {
     REPO="$1"
     repodir=$(echo "$REPO" | awk -F "/" '{print $2}')
-    if [ -d "/usr/local/src/${repodir}/.git" ]; then
-        git -C "/usr/local/src/${repodir}" pull &
+    if [ -d /usr/local/src/${repodir}/.git ]; then
+        git -C /usr/local/src/${repodir} pull &
     else
-        if [ -d "/usr/local/src/${repodir}" ]; then
-            rm -rf "/usr/local/src/${repodir}"
-            git clone --depth 1 "https://github.com/${REPO}.git" "/usr/local/src/${repodir}" &
+        if [ -d /usr/local/src/${repodir} ]; then
+            rm -rf /usr/local/src/${repodir}
+            git clone --depth 1 https://github.com/${REPO}.git /usr/local/src/${repodir} &
         fi
     fi
 }
@@ -426,7 +425,7 @@ _install_dependencies() {
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
             libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev "$LIBSSL_DEV"
-    } >> /tmp/nginx-ee.log 2>&1; then
+    } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
@@ -511,7 +510,7 @@ _dynamic_setup() {
         rm -rf /etc/nginx/modules.conf.d/*
         modules_list=$(basename -a /usr/share/nginx/modules/*)
         for module in $modules_list; do
-            echo "load_module /usr/share/nginx/modules/${module};" > "/etc/nginx/modules.available.d/${module%.so}.load"
+            echo "load_module /usr/share/nginx/modules/${module};" >"/etc/nginx/modules.available.d/${module%.so}.load"
             ln -s "/etc/nginx/modules.conf.d/${module%.so}.conf" "/etc/nginx/modules.available.d/${module%.so}.load"
         done
     fi
@@ -652,7 +651,7 @@ _download_modules() {
         echo "### downloading additionals modules ###"
         MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module simpl/ngx_devel_kit openresty/headers-more-nginx-module
         openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module openresty/redis2-nginx-module openresty/srcache-nginx-module
-        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module vozlt/nginx-module-vts VirtuBox/ngx_http_redis'
+        openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module vozlt/nginx-module-vts virtubox/ngx_http_redis'
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
@@ -797,7 +796,7 @@ _download_openssl_dev() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 < ../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
+            patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
