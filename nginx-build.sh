@@ -512,7 +512,7 @@ _dynamic_setup() {
         modules_list=$(basename -a /usr/share/nginx/modules/*)
         for module in $modules_list; do
             echo "load_module /usr/share/nginx/modules/${module};" >"/etc/nginx/modules.available.d/${module%.so}.load"
-            ln -s "/etc/nginx/modules.conf.d/${module%.so}.conf" "/etc/nginx/modules.available.d/${module%.so}.load"
+            ln -s "/etc/nginx/modules.available.d/${module%.so}.load" "/etc/nginx/modules.conf.d/${module%.so}.conf"
         done
     fi
 }
