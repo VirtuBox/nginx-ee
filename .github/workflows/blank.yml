@@ -15,3 +15,12 @@ jobs:
       run: sudo bash nginx-build.sh --stable
     - name: Full build
       run: sudo bash nginx-build.sh --full
+    - name: libressl build
+      run: sudo bash nginx-build.sh --libressl
+    - name: pagespeed beta build
+      run: sudo bash nginx-build.sh --pagespeed-beta
+    - name: openssl-dev build
+      run: sudo bash nginx-build.sh --openssl-dev
+    - name: dynamic build
+      run: sudo bash nginx-build.sh --dynamic
+      
