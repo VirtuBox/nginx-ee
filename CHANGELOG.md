@@ -8,8 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- OpenSSL updated to 1.1.1d
+- Bump OpenSSL version to 1.1.1d
 - Updated ngx_brotli module
+- Bump LibreSSL version to 3.0.2
+- Fix issue with ngx_http_redis module download
+- Update OpenSSL 3.0.0-dev commit and patch
 
 ### Fixed
 

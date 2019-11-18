@@ -1,4 +1,4 @@
-<h1 align="center">
+﻿<h1 align="center">
 <br>
 <img src="https://raw.githubusercontent.com/VirtuBox/nginx-ee/master/nginx-ee-logo.png">
 <br>
@@ -59,7 +59,7 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.4**
+Nginx current mainline release : **v1.17.5**
 Nginx current stable release : **v1.16.1**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
@@ -209,15 +209,21 @@ Extras :
 ## Packages
 
 You are looking for an up-to-date version of Nginx with additional modules but without having to recompile Nginx after new releases ?
-Feel free to use the custom Nginx package built for WordOps and available on [Launchpad.net](https://launchpad.net/~wordops/+archive/ubuntu/nginx-wo).
+Feel free to use the custom Nginx package built for WordOps and available on [Launchpad.net](https://launchpad.net/~wordops/+archive/ubuntu/nginx-wo) (for Ubuntu) and [OpenSuseBuildService](https://build.opensuse.org/package/show/home:virtubox:WordOps/nginx) (for Debian/Ubuntu/Raspbian).
 
-Add the repository
+### Add the repository
+
+#### Launchpad
 
 ```bash
 sudo add-apt-repository ppa:wordops/nginx-wo -uy
 ```
 
-Install Nginx
+#### OpenSuseBuildService
+
+Install steps available on [Download page](https://software.opensuse.org/download.html?project=home%3Avirtubox%3AWordOps&package=nginx)
+
+### Install Nginx
 
 ```bash
 sudo apt install nginx-custom nginx-wo -y
