@@ -168,7 +168,7 @@ readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
 OPENSSL_COMMIT="6f02932edba62186a6866e8c9f0f0714674f6bab"
-export DEBIAN_FRONTEND=noninteractive
+
 
 # Colors
 CSI='\033['
@@ -182,7 +182,7 @@ CEND="${CSI}0m"
 
 # clean previous install log
 
-echo "" >/tmp/nginx-ee.log
+echo "" > /tmp/nginx-ee.log
 
 # detect Plesk
 [ -d /etc/psa ] && {
@@ -425,7 +425,7 @@ _install_dependencies() {
             libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev "$LIBBROTLI_DEV" "$LIBSSL_DEV"
+            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev "$LIBSSL_DEV"
     } >> /tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -797,7 +797,7 @@ _download_openssl_dev() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
+            patch -p1 < ../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
@@ -1085,7 +1085,7 @@ _compile_nginx() {
             # install Nginx
             make install
 
-        } >>/tmp/nginx-ee.log
+        } >>/tmp/nginx-ee.log 2>&1
     }; then
         echo -ne "       Compiling nginx                        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
