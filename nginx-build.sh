@@ -1085,9 +1085,7 @@ _compile_nginx() {
             # install Nginx
             make install
 
-        } \
-            >>/tmp/nginx-ee.log 2>&1
-
+        } >>/tmp/nginx-ee.log
     }; then
         echo -ne "       Compiling nginx                        [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
