@@ -1154,7 +1154,7 @@ _final_tasks() {
     echo -ne '       Performing final steps                 [..]\r'
     if {
         # block Nginx package update from APT repository
-        if [ "$NGINX_PLESK" = "1" ]; then
+        if [ "$PLESK_VALID" = "YES" ]; then
             {
                 # update nginx ciphers_suites
                 sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/conf.d/ssl.conf
@@ -1164,7 +1164,7 @@ _final_tasks() {
                 echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold sw-nginx
             } >>/tmp/nginx-ee.log
-        elif [ "$NGINX_EASYENGINE" = "1" ]; then
+        elif [ "$EE_VALID" = "YES" ]; then
             {
                 # update nginx ssl_protocols
                 sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/nginx.conf
@@ -1174,7 +1174,7 @@ _final_tasks() {
                 echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold nginx-ee nginx-common nginx-custom
             } >>/tmp/nginx-ee.log
-        elif [ "$WO_VALID" = "1" ]; then
+        elif [ "$WO_VALID" = "YES" ]; then
             {
                 # update nginx ssl_protocols
                 sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/nginx.conf
@@ -1183,7 +1183,7 @@ _final_tasks() {
                 # block nginx package updates from APT repository
                 echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 CHECK_NGINX_WO=$(dpkg --list | grep nginx-wo)
-                if [ -z "$CHECK_NGINX_WO" ]; then
+                if [ ! -z "$CHECK_NGINX_WO" ]; then
                     apt-mark hold nginx-wo nginx-common nginx-custom
                 else
                     apt-mark hold nginx-ee nginx-common nginx-custom
