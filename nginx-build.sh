@@ -1163,7 +1163,7 @@ _final_tasks() {
                 # block sw-nginx package updates from APT repository
                 echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold sw-nginx
-            } >>/tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log 2>&1
         elif [ "$NGINX_EASYENGINE" = "1" ]; then
             {
                 # update nginx ssl_protocols
@@ -1173,7 +1173,7 @@ _final_tasks() {
                 # block nginx package updates from APT repository
                 echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold nginx-ee nginx-common nginx-custom
-            } >>/tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log 2>&1
         elif [ "$WO_VALID" = "1" ]; then
             {
                 # update nginx ssl_protocols
@@ -1188,7 +1188,7 @@ _final_tasks() {
                 else
                     apt-mark hold nginx-ee nginx-common nginx-custom
                 fi
-            } >>/tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log 2>&1
         fi
 
         {

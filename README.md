@@ -59,7 +59,7 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.5**
+Nginx current mainline release : **v1.17.8**
 Nginx current stable release : **v1.16.1**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
@@ -101,9 +101,6 @@ Optional modules :
 #### Also compatible
 
 * Ubuntu 19.10 (Eoan)
-* Ubuntu 19.04 (Disco)
-* Ubuntu 18.10 (Cosmic)
-* Ubuntu 17.10 ()
 * Ubuntu 16.04 LTS (Xenial)
 * Debian 9 (Stretch)
 * Debian 8 (Jessie)
@@ -119,7 +116,7 @@ Optional modules :
 
 #### Plesk
 
-* 17.5.x
+* 17.5.x (Onyx)
 * 17.8.x
 * 17.9.x
 * 18.x (Obsidian)
@@ -139,7 +136,7 @@ Optional modules :
 * without rtmp
 
 ```bash
-bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee)
+bash <(wget -qO - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee)
 ```
 
 ### Alternative Install Method
@@ -201,10 +198,10 @@ Extras :
 * [x] Add support for Plesk servers
 * [x] Add Nginx modules choice
 * [x] Add support for Debian 9
-* [ ] Add support for config.inc build configuration
 * [x] Add openssl release choice
 * [x] Add more compilation presets
 * [x] Add support for LibreSSL
+* [ ] Add support for config.inc build configuration
 
 ---
 
