@@ -48,7 +48,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
-* OpenSSL (1.1.1d or 3.0.0-dev or from system-lib) or LibreSSL
+* OpenSSL (1.1.1g or 3.0.0-dev or from system-lib) or LibreSSL
 * Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -59,8 +59,8 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.8**
-Nginx current stable release : **v1.16.1**
+Nginx current mainline release : **v1.17.10**
+Nginx current stable release : **v1.18.0**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
@@ -95,6 +95,7 @@ Optional modules :
 
 #### Recommended
 
+* Ubuntu 20.04 LTS (Focal)
 * Ubuntu 18.04 LTS (Bionic)
 * Debian 10 (Buster)
 
@@ -130,7 +131,7 @@ Optional modules :
 **Default settings** :
 
 * mainline release
-* openssl stable : 1.1.1d
+* openssl stable : 1.1.1g
 * without pagespeed
 * without naxsi
 * without rtmp
@@ -202,6 +203,7 @@ Extras :
 * [x] Add more compilation presets
 * [x] Add support for LibreSSL
 * [ ] Add support for config.inc build configuration
+* [ ] Add HTTP/3 QUIC support
 
 ---
 
