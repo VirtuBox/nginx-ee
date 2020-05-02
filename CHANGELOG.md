@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+## [3.6.6] - 2020-05-02
+
+### Changed
+
+- Update Nginx stable to 1.18.0
+- Update openssl package to 1.1.1g
+
+### Fixed
+
+- Fix final tasks not executed (PR [#90])
+- Fix non interactive pagespeed build (PR [#90])
+
 ## [3.6.5] - 2019-11-18
 
 ### Added
