@@ -785,7 +785,7 @@ _download_openssl_dev() {
                 git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
                 cd /usr/local/src/openssl || exit 1
                 echo "### git checkout commit ###"
-                git checkout $OPENSSL_COMMIT
+                #git checkout $OPENSSL_COMMIT
             fi
         } >>/tmp/nginx-ee.log 2>&1
 
