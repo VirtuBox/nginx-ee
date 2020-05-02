@@ -4,10 +4,10 @@
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
 # GitHub:        https://github.com/VirtuBox/nginx-ee
-# Copyright (c) 2019 VirtuBox <contact@virtubox.net>
+# Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.5 - 2019-11-18
+# Version 3.6.6 - 2020-05-02
 # -------------------------------------------------------------------------
 
 ##################################
@@ -167,7 +167,7 @@ OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
-OPENSSL_COMMIT="6f02932edba62186a6866e8c9f0f0714674f6bab"
+OPENSSL_COMMIT="7fa8bcfe4342df41919f5564b315f9c85d0a02d6"
 
 # Colors
 CSI='\033['
