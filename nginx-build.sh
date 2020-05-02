@@ -771,14 +771,14 @@ _download_openssl_dev() {
                     git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
                     cd /usr/local/src/openssl || exit 1
                     echo "### git checkout commit ###"
-                    git checkout $OPENSSL_COMMIT
+                    #git checkout $OPENSSL_COMMIT
                 else
                     cd /usr/local/src/openssl || exit 1
                     echo "### reset openssl to master and clean patches ###"
                     git fetch --all
                     git reset --hard origin/master
                     git clean -f
-                    git checkout $OPENSSL_COMMIT
+                    #git checkout $OPENSSL_COMMIT
                 fi
             else
                 echo "### cloning openssl ###"
@@ -799,7 +799,7 @@ _download_openssl_dev() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
+            #patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
