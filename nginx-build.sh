@@ -4,10 +4,10 @@
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
 # GitHub:        https://github.com/VirtuBox/nginx-ee
-# Copyright (c) 2019 VirtuBox <contact@virtubox.net>
+# Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.5 - 2019-11-18
+# Version 3.6.6 - 2020-05-02
 # -------------------------------------------------------------------------
 
 ##################################
@@ -158,16 +158,16 @@ fi
 DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
-NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.16 2>&1)"
+NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.18 2>&1)"
 LIBRESSL_VER="3.0.2"
-OPENSSL_VER="1.1.1d"
+OPENSSL_VER="1.1.1g"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 readonly OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
-OPENSSL_COMMIT="6f02932edba62186a6866e8c9f0f0714674f6bab"
+OPENSSL_COMMIT="7fa8bcfe4342df41919f5564b315f9c85d0a02d6"
 
 # Colors
 CSI='\033['
@@ -771,21 +771,21 @@ _download_openssl_dev() {
                     git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
                     cd /usr/local/src/openssl || exit 1
                     echo "### git checkout commit ###"
-                    git checkout $OPENSSL_COMMIT
+                    #git checkout $OPENSSL_COMMIT
                 else
                     cd /usr/local/src/openssl || exit 1
                     echo "### reset openssl to master and clean patches ###"
                     git fetch --all
                     git reset --hard origin/master
                     git clean -f
-                    git checkout $OPENSSL_COMMIT
+                    #git checkout $OPENSSL_COMMIT
                 fi
             else
                 echo "### cloning openssl ###"
                 git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
                 cd /usr/local/src/openssl || exit 1
                 echo "### git checkout commit ###"
-                git checkout $OPENSSL_COMMIT
+                #git checkout $OPENSSL_COMMIT
             fi
         } >>/tmp/nginx-ee.log 2>&1
 
@@ -799,7 +799,7 @@ _download_openssl_dev() {
             cd /usr/local/src/openssl || exit 1
             # apply openssl ciphers patch
             echo "### openssl ciphers patch ###"
-            patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
+            #patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
@@ -1188,7 +1188,7 @@ _final_tasks() {
                 else
                     apt-mark hold nginx-ee nginx-common nginx-custom
                 fi
-            } >>/tmp/nginx-ee.log
+            } >>/tmp/nginx-ee.log 2>&1
         fi
 
         {
