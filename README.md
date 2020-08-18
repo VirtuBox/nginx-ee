@@ -52,14 +52,14 @@ Automated Nginx compilation from sources with additional modules support
 * Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
-* Compilation with GCC-7/8
+* Compilation with GCC-7/9
 * Security hardening and performance optimization enabled with proper GCC flags
 
 ---
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.17.10**
+Nginx current mainline release : **v1.19.2**
 Nginx current stable release : **v1.18.0**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
