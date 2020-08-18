@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+## [3.6.7] - 2020-08-18
+
+### Changed
+
+- Compile with gcc-9
+
+### Fixed
+
+- wrong PPA repositories with Ubuntu 20.04
+
 ## [3.6.6] - 2020-05-02
 
 ### Changed

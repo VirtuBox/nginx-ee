@@ -411,7 +411,7 @@ _gitget() {
 }
 
 _install_dependencies() {
-    echo -ne '       Installing dependencies               [..]\r'
+    echo -ne '       Installing dependencies                [..]\r'
     if {
         apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
             git build-essential libtool automake autoconf \
