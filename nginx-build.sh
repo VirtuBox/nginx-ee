@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.6 - 2020-05-02
+# Version 3.6.7 - 2020-08-18
 # -------------------------------------------------------------------------
 
 ##################################
@@ -131,24 +131,17 @@ command_exists() {
     apt-get update -qq
 }
 
-# checking if curl is installed
-if ! command_exists curl; then
-    apt-get install curl -qq >/dev/null 2>&1
-fi
+# check if required packages are installed
+required_packages="curl tar jq"
+for package in $required_packages; do
+    if ! command_exists "$package"; then
+        apt-get install "$package" -qq >/dev/null 2>&1
+    fi
+done
 
 # Checking if lsb_release is installed
 if ! command_exists lsb_release; then
     apt-get -qq install lsb-release >/dev/null 2>&1
-fi
-
-# checking if tar is installed
-if ! command_exists tar; then
-    apt-get -qq install tar >/dev/null 2>&1
-fi
-
-# checking if jq is installed
-if ! command_exists jq; then
-    apt-get install jq -qq >/dev/null 2>&1
 fi
 
 ##################################
@@ -525,29 +518,29 @@ _dynamic_setup() {
 
 _gcc_ubuntu_setup() {
 
-    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ]; then
+    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ] && [ "$DISTRO_CODENAME" != "focal" ]; then
         {
             echo "### adding gcc repository ###"
             add-apt-repository ppa:jonathonf/gcc -yu
         } >>/dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
-        echo -ne '       Installing gcc-8                       [..]\r'
+        echo -ne '       Installing gcc-9                       [..]\r'
         if {
-            echo "### installing gcc8 ###"
-            apt-get install gcc-8 g++-8 -y
+            echo "### installing gcc9 ###"
+            apt-get install gcc-9 g++-9 -y
         } >>/dev/null 2>&1; then
-            echo -ne "       Installing gcc-8                       [${CGREEN}OK${CEND}]\\r"
+            echo -ne "       Installing gcc-9                       [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
-            echo -e "        Installing gcc-8                      [${CRED}FAIL${CEND}]"
+            echo -e "        Installing gcc-9                      [${CRED}FAIL${CEND}]"
             echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
         {
             # update gcc alternative to use gcc-8 by default
             update-alternatives --remove-all gcc
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-9
         } >>/dev/null 2>&1
     else
         echo -ne '       Installing gcc-7                       [..]\r'
@@ -611,7 +604,7 @@ _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     if {
 
-        if [ "$DISTRO_ID" = "Ubuntu" ]; then
+        if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "focal" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
                 add-apt-repository -y ppa:jonathonf/ffmpeg-4 -u
                 apt-get install ffmpeg -y
@@ -1157,9 +1150,9 @@ _final_tasks() {
         if [ "$PLESK_VALID" = "YES" ]; then
             {
                 # update nginx ciphers_suites
-                sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/conf.d/ssl.conf
+                # sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/conf.d/ssl.conf
                 # update nginx ssl_protocols
-                sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/conf.d/ssl.conf
+                # sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/conf.d/ssl.conf
                 # block sw-nginx package updates from APT repository
                 echo -e 'Package: sw-nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 apt-mark hold sw-nginx
@@ -1177,13 +1170,13 @@ _final_tasks() {
         elif [ "$WO_VALID" = "YES" ]; then
             {
                 # update nginx ssl_protocols
-                sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/nginx.conf
+                # sed -i "s/ssl_protocols\ \(.*\);/ssl_protocols TLSv1.2 TLSv1.3;/" /etc/nginx/nginx.conf
                 # update nginx ciphers_suites
-                sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/nginx.conf
+                # sed -i "s/ssl_ciphers\ \(\"\|.\|'\)\(.*\)\(\"\|.\|'\);/ssl_ciphers \"$TLS13_CIPHERS\";/" /etc/nginx/nginx.conf
                 # block nginx package updates from APT repository
                 echo -e 'Package: nginx*\nPin: release *\nPin-Priority: -1' >/etc/apt/preferences.d/nginx-block
                 CHECK_NGINX_WO=$(dpkg --list | grep nginx-wo)
-                if [ ! -z "$CHECK_NGINX_WO" ]; then
+                if [ -n "$CHECK_NGINX_WO" ]; then
                     apt-mark hold nginx-wo nginx-common nginx-custom
                 else
                     apt-mark hold nginx-ee nginx-common nginx-custom
