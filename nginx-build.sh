@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.7 - 2020-08-18
+# Version 3.6.7 - 2020-08-20
 # -------------------------------------------------------------------------
 
 ##################################
@@ -152,7 +152,7 @@ DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.18 2>&1)"
-LIBRESSL_VER="3.0.2"
+LIBRESSL_VER="3.1.4"
 OPENSSL_VER="1.1.1g"
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 readonly OS_ARCH="$(uname -m)"
@@ -525,22 +525,30 @@ _gcc_ubuntu_setup() {
         } >>/dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
-        echo -ne '       Installing gcc-9                       [..]\r'
+        echo -ne '       Installing gcc                       [..]\r'
         if {
-            echo "### installing gcc9 ###"
-            apt-get install gcc-9 g++-9 -y
+            echo "### installing gcc ###"
+            if [ "$DISTRO_CODENAME" = "xenial" ]; then
+                apt-get install gcc-8 g++-8 -y
+            else
+                apt-get install gcc-9 g++-9 -y
+            fi
         } >>/dev/null 2>&1; then
-            echo -ne "       Installing gcc-9                       [${CGREEN}OK${CEND}]\\r"
+            echo -ne "       Installing gcc                       [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
-            echo -e "        Installing gcc-9                      [${CRED}FAIL${CEND}]"
+            echo -e "        Installing gcc                      [${CRED}FAIL${CEND}]"
             echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
         {
             # update gcc alternative to use gcc-8 by default
             update-alternatives --remove-all gcc
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+            if [ "$DISTRO_CODENAME" = "xenial" ]; then
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            else
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+            fi
         } >>/dev/null 2>&1
     else
         echo -ne '       Installing gcc-7                       [..]\r'
