@@ -54,6 +54,7 @@ Automated Nginx compilation from sources with additional modules support
 * Automated nginx updates cronjob
 * Compilation with GCC-7/9
 * Security hardening and performance optimization enabled with proper GCC flags
+* An option to omitt nginx configuration, allowing usage of third party devops tools
 
 ---
 
@@ -171,6 +172,7 @@ Nginx build options :
 * `--stable` : compile Nginx stable release
 * `--full` : Naxsi + PageSpeed + RTMP
 * `--dynamic` : Compile Nginx modules as dynamic modules
+* `--noconf` : Compile Nginx without any configuring. Useful when you use devops tools like ansible.
 
 Optional third-party modules :
 
@@ -202,6 +204,7 @@ Extras :
 * [x] Add openssl release choice
 * [x] Add more compilation presets
 * [x] Add support for LibreSSL
+* [x] Add noconf support
 * [ ] Add support for config.inc build configuration
 * [ ] Add HTTP/3 QUIC support
 

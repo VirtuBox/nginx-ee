@@ -33,6 +33,7 @@ _help() {
     echo "       --stable ..... Nginx stable release"
     echo "       --full ..... Nginx mainline release with Pagespeed, Nasxi and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
+    echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
     echo "       --pagespeed ..... Pagespeed module stable release"
     echo "       --pagespeed-beta .....  Pagespeed module beta release"
@@ -75,6 +76,9 @@ else
             NAXSI="y"
             RTMP="y"
             ;;
+	--noconf)
+	    NOCONF="y"
+	    ;;
         --naxsi)
             NAXSI="y"
             ;;
@@ -854,7 +858,9 @@ _download_naxsi() {
 
             git clone --depth=50 https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi -q
 
-            cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
+	    if [ "$NOCONF" != "y" ]; then
+                cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
+	    fi
 
         } >>/tmp/nginx-ee.log 2>&1
 
@@ -963,7 +969,7 @@ _configure_nginx() {
     DEB_LFLAGS="$(dpkg-buildflags --get LDFLAGS)"
 
     if {
-        echo -ne '       Configuring nginx                      [..]\r'
+        echo -ne '       Configuring nginx build                [..]\r'
 
         # main configuration
         NGINX_BUILD_OPTIONS="--prefix=/usr/share \
@@ -1192,14 +1198,16 @@ _final_tasks() {
             } >>/tmp/nginx-ee.log 2>&1
         fi
 
-        {
-            # enable nginx service
-            systemctl unmask nginx.service
-            systemctl enable nginx.service
-            systemctl start nginx.service
-            # remove default configuration
-            rm -f /etc/nginx/{*.default,*.dpkg-dist}
-        } >/dev/null 2>&1
+	if [ "$NOCONF" != "y" ]; then
+            {
+                # enable nginx service
+                systemctl unmask nginx.service
+                systemctl enable nginx.service
+                systemctl start nginx.service
+                # remove default configuration
+                rm -f /etc/nginx/{*.default,*.dpkg-dist}
+            } >/dev/null 2>&1
+        fi
 
     }; then
         echo -ne "       Performing final steps                 [${CGREEN}OK${CEND}]\\r"
@@ -1212,21 +1220,26 @@ _final_tasks() {
 
     echo -ne '       Checking nginx configuration           [..]\r'
 
-    # check if nginx -t do not return errors
-    VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
-    if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-        {
-            systemctl stop nginx
-            systemctl start nginx
-        } >>/tmp/nginx-ee.log 2>&1
-        echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
-        echo ""
-        echo -e "       ${CGREEN}Nginx-ee was compiled successfully !${CEND}"
-        echo -e '\n       Installation log : /tmp/nginx-ee.log\n'
+    if [ "$NOCONF" != "y" ]; then
+        # check if nginx -t do not return errors
+        VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
+        if [ -z "$VERIFY_NGINX_CONFIG" ]; then
+            {
+                systemctl stop nginx
+                systemctl start nginx
+            } >>/tmp/nginx-ee.log 2>&1
+            echo -ne "       Checking nginx configuration           [${CGREEN}OK${CEND}]\\r"
+            echo ""
+            echo -e "       ${CGREEN}Nginx-ee was compiled successfully !${CEND}"
+            echo -e '\n       Installation log : /tmp/nginx-ee.log\n'
+        else
+            echo -e "       Checking nginx configuration           [${CRED}FAIL${CEND}]"
+            echo -e "       Nginx-ee was compiled successfully but there is an error in your nginx configuration"
+            echo -e '\nPlease look at /tmp/nginx-ee.log or use the command nginx -t to find the issue\n'
+        fi
     else
-        echo -e "       Checking nginx configuration           [${CRED}FAIL${CEND}]"
-        echo -e "       Nginx-ee was compiled successfully but there is an error in your nginx configuration"
-        echo -e '\nPlease look at /tmp/nginx-ee.log or use the command nginx -t to find the issue\n'
+        echo -e "       ${CGREEN}Nginx-ee was compiled successfully !${CEND}"
+	echo -e '\nAs you requested not to configure it, you must do it manually or using your favourite devops tools.\n'
     fi
 
 }
@@ -1238,7 +1251,9 @@ _final_tasks() {
 _dependencies_repo
 _install_dependencies
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
-    _nginx_from_scratch_setup
+    if [ "$NOCONF" != "y" ]; then
+        _nginx_from_scratch_setup
+    fi
 fi
 if [ "$DISTRO_ID" = "Ubuntu" ]; then
     _gcc_ubuntu_setup
@@ -1276,7 +1291,9 @@ if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
 fi
 if [ "$DYNAMIC_MODULES" = "y" ]; then
-    _dynamic_setup
+    if [ "$NOCONF" != "y" ]; then
+        _dynamic_setup
+    fi
 fi
 _final_tasks
 echo "Give Nginx-ee a GitHub star : https://github.com/VirtuBox/nginx-ee"
