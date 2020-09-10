@@ -529,7 +529,7 @@ _gcc_ubuntu_setup() {
         } >>/dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
-        echo -ne '       Installing gcc                       [..]\r'
+        echo -ne '       Installing gcc                         [..]\r'
         if {
             echo "### installing gcc ###"
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
@@ -538,10 +538,10 @@ _gcc_ubuntu_setup() {
                 apt-get install gcc-9 g++-9 -y
             fi
         } >>/dev/null 2>&1; then
-            echo -ne "       Installing gcc                       [${CGREEN}OK${CEND}]\\r"
+            echo -ne "       Installing gcc                         [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
-            echo -e "        Installing gcc                      [${CRED}FAIL${CEND}]"
+            echo -e "        Installing gcc                        [${CRED}FAIL${CEND}]"
             echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
