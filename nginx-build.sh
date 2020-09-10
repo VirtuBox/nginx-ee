@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.6.7 - 2020-08-20
+# Version 3.6.7 - 2020-09-10
 # -------------------------------------------------------------------------
 
 ##################################
@@ -76,9 +76,9 @@ else
             NAXSI="y"
             RTMP="y"
             ;;
-	--noconf)
-	    NOCONF="y"
-	    ;;
+        --noconf)
+            NOCONF="y"
+            ;;
         --naxsi)
             NAXSI="y"
             ;;
@@ -529,7 +529,7 @@ _gcc_ubuntu_setup() {
         } >>/dev/null 2>&1
     fi
     if [ "$RTMP" != "y" ]; then
-        echo -ne '       Installing gcc                       [..]\r'
+        echo -ne '       Installing gcc                         [..]\r'
         if {
             echo "### installing gcc ###"
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
@@ -538,10 +538,10 @@ _gcc_ubuntu_setup() {
                 apt-get install gcc-9 g++-9 -y
             fi
         } >>/dev/null 2>&1; then
-            echo -ne "       Installing gcc                       [${CGREEN}OK${CEND}]\\r"
+            echo -ne "       Installing gcc                         [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
         else
-            echo -e "        Installing gcc                      [${CRED}FAIL${CEND}]"
+            echo -e "        Installing gcc                        [${CRED}FAIL${CEND}]"
             echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
@@ -858,9 +858,9 @@ _download_naxsi() {
 
             git clone --depth=50 https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi -q
 
-	    if [ "$NOCONF" != "y" ]; then
+            if [ "$NOCONF" != "y" ]; then
                 cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
-	    fi
+            fi
 
         } >>/tmp/nginx-ee.log 2>&1
 
@@ -1065,10 +1065,10 @@ _configure_nginx() {
                     --sbin-path=/usr/sbin/nginx >> /tmp/nginx-ee.log 2>&1;"
 
     }; then
-        echo -ne "       Configuring nginx                      [${CGREEN}OK${CEND}]\\r"
+        echo -ne "       Configuring nginx build                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
     else
-        echo -e "        Configuring nginx    [${CRED}FAIL${CEND}]"
+        echo -e "       Configuring nginx build                [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
@@ -1156,6 +1156,13 @@ _cron_setup() {
 
 }
 
+_cron_update() {
+    if [ -f /etc/cron.daily/nginx-ee ]; then
+        wget -O /etc/cron.daily/nginx-ee https://raw.githubusercontent.com/VirtuBox/nginx-ee/develop/etc/cron.daily/nginx-ee >>/tmp/nginx-ee.log
+        chmod +x /etc/cron.daily/nginx-ee
+    fi
+}
+
 _final_tasks() {
 
     echo -ne '       Performing final steps                 [..]\r'
@@ -1198,7 +1205,7 @@ _final_tasks() {
             } >>/tmp/nginx-ee.log 2>&1
         fi
 
-	if [ "$NOCONF" != "y" ]; then
+        if [ "$NOCONF" != "y" ]; then
             {
                 # enable nginx service
                 systemctl unmask nginx.service
@@ -1239,7 +1246,7 @@ _final_tasks() {
         fi
     else
         echo -e "       ${CGREEN}Nginx-ee was compiled successfully !${CEND}"
-	echo -e '\nAs you requested not to configure it, you must do it manually or using your favourite devops tools.\n'
+        echo -e '\nAs you requested not to configure it, you must do it manually or using your favourite devops tools.\n'
     fi
 
 }
@@ -1287,6 +1294,7 @@ _patch_nginx
 _configure_nginx
 _compile_nginx
 _updating_nginx_manual
+_cron_update
 if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
 fi
