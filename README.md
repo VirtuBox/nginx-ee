@@ -54,7 +54,7 @@ Automated Nginx compilation from sources with additional modules support
 * Automated nginx updates cronjob
 * Compilation with GCC-7/9
 * Security hardening and performance optimization enabled with proper GCC flags
-* An option to omitt nginx configuration, allowing usage of third party devops tools
+* An option to omit nginx configuration, allowing usage of third party devops tools
 
 ---
 
