@@ -659,7 +659,7 @@ _download_modules() {
         openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module
         openresty/redis2-nginx-module openresty/srcache-nginx-module
         openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module
-        vozlt/nginx-module-vts VirtuBox/ngx_http_redis '
+        vozlt/nginx-module-vts'
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
@@ -1005,7 +1005,6 @@ _configure_nginx() {
                 NGINX_THIRD_MODULES="--with-compat \
          --add-module=../ngx_http_substitutions_filter_module \
         --add-dynamic-module=../srcache-nginx-module \
-        --add-dynamic-module=../ngx_http_redis \
         --add-dynamic-module=../redis2-nginx-module \
         --add-dynamic-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
@@ -1016,7 +1015,6 @@ _configure_nginx() {
             else
                 NGINX_THIRD_MODULES="--add-module=../ngx_http_substitutions_filter_module \
         --add-module=../srcache-nginx-module \
-        --add-module=../ngx_http_redis \
         --add-module=../redis2-nginx-module \
         --add-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
