@@ -19,7 +19,7 @@ jobs:
         sudo apt update -qq
         sudo apt install libgd-dev -y        
     - name: Mainline build
-      run: sudo bash nginx-build.sh
+      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name: Stable build
       run: sudo bash nginx-build.sh --stable
     - name: Full build
