@@ -1253,7 +1253,6 @@ _final_tasks() {
 # Main Setup
 ##################################
 
-_dependencies_repo
 _install_dependencies
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
     if [ "$NOCONF" != "y" ]; then
