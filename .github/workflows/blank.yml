@@ -14,7 +14,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Prepare VM
       run: |
-        sudo apt update -qq > /dev/null 2>&1
+        sudo apt update -qq
+        sudo apt install libgd2 -y        
     - name: Mainline build
       run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name: Stable build
