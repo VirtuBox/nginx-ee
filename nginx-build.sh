@@ -422,7 +422,7 @@ _install_dependencies() {
             libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev "$LIBSSL_DEV" -f
+            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev "$LIBSSL_DEV" --ignore-hold
     } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
