@@ -16,17 +16,17 @@ jobs:
       run: |
         sudo apt update -qq > /dev/null 2>&1
     - name: Mainline build
-      run: sudo bash nginx-build.sh
+      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name: Stable build
-      run: sudo bash nginx-build.sh --stable
+      run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log
     - name: Full build
-      run: sudo bash nginx-build.sh --full
+      run: sudo bash nginx-build.sh --full || cat /tmp/nginx-ee.log
     - name: libressl build
-      run: sudo bash nginx-build.sh --libressl
+      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log
     - name: pagespeed beta build
-      run: sudo bash nginx-build.sh --pagespeed-beta
+      run: sudo bash nginx-build.sh --pagespeed-beta || cat /tmp/nginx-ee.log
     - name: openssl-dev build
-      run: sudo bash nginx-build.sh --openssl-dev
+      run: sudo bash nginx-build.sh --openssl-dev || cat /tmp/nginx-ee.log
     - name: dynamic build
-      run: sudo bash nginx-build.sh --dynamic
+      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log
       
