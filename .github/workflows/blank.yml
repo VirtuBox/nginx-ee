@@ -11,7 +11,10 @@ jobs:
         os: [ubuntu-20.04, ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+    - name: Prepare VM
+      run: |
+        sudo apt update -qq > /dev/null 2>&1
     - name: Mainline build
       run: sudo bash nginx-build.sh
     - name: Stable build
