@@ -23,7 +23,7 @@ jobs:
     - name: Stable build
       run: sudo bash nginx-build.sh --stable
     - name: Full build
-      run: sudo bash nginx-build.sh --full
+      run: sudo bash nginx-build.sh --full --stable
     - name: libressl build
       run: sudo bash nginx-build.sh --libressl
     - name: pagespeed beta build
