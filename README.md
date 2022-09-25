@@ -60,8 +60,8 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.19.2**
-Nginx current stable release : **v1.18.0**
+Nginx current mainline release : **v1.23.1**
+Nginx current stable release : **v1.22.0**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
@@ -96,9 +96,11 @@ Optional modules :
 
 #### Recommended
 
+* Ubuntu 22.04 LTS (Jammy)
 * Ubuntu 20.04 LTS (Focal)
 * Ubuntu 18.04 LTS (Bionic)
 * Debian 10 (Buster)
+* Debian 11 (Bullseye)
 
 #### Also compatible
 
@@ -132,7 +134,7 @@ Optional modules :
 **Default settings** :
 
 * mainline release
-* openssl stable : 1.1.1g
+* openssl from system
 * without pagespeed
 * without naxsi
 * without rtmp
