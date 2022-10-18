@@ -577,6 +577,37 @@ _gcc_ubuntu_setup() {
 
 }
 
+_dependencies_repo() {
+    {
+        curl -sL https://build.opensuse.org/projects/home:virtubox:nginx-ee/public_key | apt-key add -
+        if [ ! -f /etc/apt/sources.list.d/nginx-ee.list ]; then
+            if [ "$DISTRO_ID" = "Ubuntu" ]; then
+                if [ "$DISTRO_CODENAME" = "xenial" ]; then
+                    add-apt-repository ppa:virtubox/brotli -yu
+                fi
+                echo "deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/xUbuntu_${DISTRO_NUMBER}/ /" >/etc/apt/sources.list.d/nginx-ee.list
+
+            elif [ "$DISTRO_ID" = "Debian" ]; then
+                if [ "$DISTRO_CODENAME" = "jessie" ]; then
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_8.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
+                elif [ "$DISTRO_CODENAME" = "strech" ]; then
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_9.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
+                else
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_10/ /' >/etc/apt/sources.list.d/nginx-ee.list
+                fi
+            else
+                if [ "$DISTRO_CODENAME" = "strech" ]; then
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_9.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
+                else
+                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_10/ /' >/etc/apt/sources.list.d/nginx-ee.list
+                fi
+            fi
+
+        fi
+        apt-get update -qq
+    } >>/tmp/nginx-ee.log 2>&1
+}
+
 ##################################
 # Install ffmpeg for rtmp module
 ##################################
@@ -1222,7 +1253,7 @@ _final_tasks() {
 # Main Setup
 ##################################
 
-apt-get update -qq > /dev/null 2>&1
+_install_dependencies
 if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
     if [ "$NOCONF" != "y" ]; then
         _nginx_from_scratch_setup
