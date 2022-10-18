@@ -15,9 +15,9 @@ jobs:
     - name: Prepare VM
       run: |
         sudo apt update -qq
-        sudo add-apt-repository ppa:ondrej/php -y
-        sudo apt update -qq
-        sudo apt install libgd-dev -y        
+        sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
+        sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* php* mysql* nginx* > /dev/null 2>&1
+        sudo apt-get -qq autoremove --purge > /dev/null 2>&1
     - name: Mainline build
       run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: Stable build
