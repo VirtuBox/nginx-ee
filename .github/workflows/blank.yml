@@ -19,17 +19,17 @@ jobs:
         sudo apt update -qq
         sudo apt install libgd-dev -y        
     - name: Mainline build
-      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
+      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: Stable build
-      run: sudo bash nginx-build.sh --stable
+      run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: Full build
-      run: sudo bash nginx-build.sh --full --stable
+      run: sudo bash nginx-build.sh --full --stable || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: libressl build
-      run: sudo bash nginx-build.sh --libressl
+      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: pagespeed beta build
-      run: sudo bash nginx-build.sh --pagespeed-beta
+      run: sudo bash nginx-build.sh --pagespeed-beta || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: openssl-dev build
-      run: sudo bash nginx-build.sh --openssl-dev
+      run: sudo bash nginx-build.sh --openssl-dev || cat /tmp/nginx-ee.log; sudo nginx -V
     - name: dynamic build
-      run: sudo bash nginx-build.sh --dynamic
+      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log; sudo nginx -V
       
