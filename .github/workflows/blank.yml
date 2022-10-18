@@ -14,23 +14,25 @@ jobs:
     - uses: actions/checkout@v2
     - name: Prepare VM
       run: |
-        sudo apt-get update -qq > /dev/null 2>&1
-        sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
+        sudo apt-get update -qq
+        sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
         sudo rm -rf /etc/mysql /var/lib/mysql
-        sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* php* mysql* nginx* > /dev/null 2>&1
-        sudo apt-get -qq autoremove --purge > /dev/null 2>&1
+        sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* php* mysql* nginx*
+        sudo apt-get -qq autoremove --purge
     - name: Mainline build
-      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
+    - name : Nginx check
+      run: sudo nginx -V
     - name: Stable build
-      run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log
     - name: Full build
-      run: sudo bash nginx-build.sh --full --stable || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh --full --stable || cat /tmp/nginx-ee.log
     - name: libressl build
-      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log
     - name: pagespeed beta build
-      run: sudo bash nginx-build.sh --pagespeed-beta || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh --pagespeed-beta || cat /tmp/nginx-ee.log
     - name: openssl-dev build
-      run: sudo bash nginx-build.sh --openssl-dev || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh --openssl-dev || cat /tmp/nginx-ee.log
     - name: dynamic build
-      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log; sudo nginx -V
+      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log
       
