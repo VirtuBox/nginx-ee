@@ -14,7 +14,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Prepare VM
       run: |
-        unset LANG
         sudo apt-get update -qq > /dev/null 2>&1
         sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
         sudo rm -rf /etc/mysql /var/lib/mysql
