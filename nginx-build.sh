@@ -150,7 +150,7 @@ DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.22 2>&1)"
-LIBRESSL_VER="3.1.4"
+LIBRESSL_VER="3.5.3"
 if command_exists openssl; then
     OPENSSL_BIN_VER=$(openssl version)
     OPENSSL_VER=${OPENSSL_BIN_VER:0:15}
@@ -162,7 +162,6 @@ readonly OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
-readonly DISTRO_NUMBER="$(lsb_release -sr)"
 
 # Colors
 CSI='\033['
