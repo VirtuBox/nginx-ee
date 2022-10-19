@@ -175,7 +175,6 @@ Nginx build options :
 Optional third-party modules :
 
 * `--pagespeed`: compile nginx with ngx_pagespeed latest-stable
-* `--pagespeed-beta`: compile nginx with ngx_pagespeed latest-beta
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 * `--libressl` : compile nginx with LibreSSL instead of OpenSSL
