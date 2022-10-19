@@ -48,7 +48,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
-* OpenSSL (1.1.1g or 3.0.0-dev or from system-lib) or LibreSSL
+* OpenSSL or LibreSSL
 * Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -60,8 +60,8 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.23.1**
-Nginx current stable release : **v1.22.0**
+Nginx current mainline release : **v1.23.2**
+Nginx current stable release : **v1.22.1**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
@@ -104,12 +104,8 @@ Optional modules :
 
 #### Also compatible
 
-* Ubuntu 19.10 (Eoan)
-* Ubuntu 16.04 LTS (Xenial)
-* Debian 9 (Stretch)
-* Debian 8 (Jessie)
-* Raspbian 9 (Stretch)
 * Raspbian 10 (Buster)
+* Raspbian 11 (Bullseye)
 
 ### Applications
 
@@ -179,12 +175,9 @@ Nginx build options :
 Optional third-party modules :
 
 * `--pagespeed`: compile nginx with ngx_pagespeed latest-stable
-* `--pagespeed-beta`: compile nginx with ngx_pagespeed latest-beta
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 * `--libressl` : compile nginx with LibreSSL instead of OpenSSL
-* `--openssl-dev` : compile nginx with OpenSSL 3.0.0-dev
-* `--openssl-system` : compile nginx with OpenSSL system lib
 
 Extras :
 
