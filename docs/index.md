@@ -53,8 +53,8 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.23.1</strong>
-Nginx current stable release : <strong>v1.22.0</strong></p>
+<p>Nginx current mainline release : <strong>v1.23.2</strong>
+Nginx current stable release : <strong>v1.22.1</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
 <li><a href="https://github.com/openresty/headers-more-nginx-module">headers-more-nginx-module</a></li>
