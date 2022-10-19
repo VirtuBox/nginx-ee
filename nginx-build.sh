@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.7.0 - 2022-03-14
+# Version 3.7.0 - 2022-10-18
 # -------------------------------------------------------------------------
 
 ##################################
@@ -82,12 +82,6 @@ else
         --naxsi)
             NAXSI="y"
             ;;
-        --openssl-dev)
-            OPENSSL_LIB="2"
-            ;;
-        --openssl-system)
-            OPENSSL_LIB="3"
-            ;;
         --libressl)
             LIBRESSL="y"
             ;;
@@ -157,14 +151,18 @@ NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/ngi
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.22 2>&1)"
 LIBRESSL_VER="3.1.4"
-OPENSSL_VER="1.1.1g"
+if command_exists openssl; then
+    OPENSSL_BIN_VER=$(openssl version)
+    OPENSSL_VER=${OPENSSL_BIN_VER:0:15}
+else
+    OPENSSL_VER="From system"
+fi
 TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES"
 readonly OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
 readonly DISTRO_CODENAME="$(lsb_release -sc)"
 readonly DISTRO_NUMBER="$(lsb_release -sr)"
-OPENSSL_COMMIT="7fa8bcfe4342df41919f5564b315f9c85d0a02d6"
 
 # Colors
 CSI='\033['
@@ -233,13 +231,7 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
         echo -e "Select an option [1-2]: " && read -r SSL_LIB_CHOICE
     done
     if [ "$SSL_LIB_CHOICE" = "1" ]; then
-        echo -e '\nWhat OpenSSL release do you want ?\n'
-        echo -e "  [1] OpenSSL stable $OPENSSL_VER\n"
-        echo -e '  [2] OpenSSL dev 3.0.0-dev\n'
-        echo -e '  [3] OpenSSL from system lib\n'
-        while [[ "$OPENSSL_LIB" != "1" && "$OPENSSL_LIB" != "2" && "$OPENSSL_LIB" != "3" ]]; do
-            echo -e "Select an option [1-2-3]: " && read -r OPENSSL_LIB
-        done
+        OPENSSL_LIB=3
     else
         LIBRESSL="y"
     fi
@@ -314,19 +306,10 @@ else
             OPENSSL_OPT="enable-tls1_3"
         fi
     fi
-    if [ "$OPENSSL_LIB" = "2" ]; then
-        NGX_SSL_LIB="--with-openssl=../openssl"
-        OPENSSL_VALID="3.0.0-dev"
-        LIBSSL_DEV=""
-    elif [ "$OPENSSL_LIB" = "3" ]; then
-        NGX_SSL_LIB=""
-        OPENSSL_VALID="from system"
-        LIBSSL_DEV="libssl-dev"
-    else
-        NGX_SSL_LIB=""
-        OPENSSL_VALID="$OPENSSL_VER Stable"
-        LIBSSL_DEV="libssl-dev"
-    fi
+    NGX_SSL_LIB=""
+    OPENSSL_VALID="from system"
+    LIBSSL_DEV="libssl-dev"
+
 fi
 
 ##################################
@@ -376,7 +359,7 @@ echo " Detected Arch : $OS_ARCH"
 echo ""
 echo -e "  - Nginx release : $NGINX_VER"
 [ -n "$OPENSSL_VALID" ] && {
-    echo -e "  - OPENSSL : $OPENSSL_VALID"
+    echo -e "  - OPENSSL : $OPENSSL_VER"
 }
 [ -n "$LIBRESSL_VALID" ] && {
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
@@ -403,13 +386,13 @@ echo ""
 _gitget() {
     REPO="$1"
     repodir=$(echo "$REPO" | awk -F "/" '{print $2}')
-    if [ -d /usr/local/src/${repodir}/.git ]; then
-        git -C /usr/local/src/${repodir} pull &
+    if [ -d "/usr/local/src/${repodir}/.git" ]; then
+        git -C "/usr/local/src/${repodir}" pull &
     else
-        if [ -d /usr/local/src/${repodir} ]; then
-            rm -rf /usr/local/src/${repodir}
+        if [ -d "/usr/local/src/${repodir}" ]; then
+            rm -rf "/usr/local/src/${repodir}"
         fi
-        git clone --depth 1 https://github.com/${REPO}.git /usr/local/src/${repodir} &
+        git clone --depth 1 "https://github.com/${REPO}.git" "/usr/local/src/${repodir}" &
 
     fi
 }
@@ -422,7 +405,7 @@ _install_dependencies() {
             libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
             libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev "$LIBSSL_DEV" --ignore-hold
+            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev libpcre2-dev "$LIBSSL_DEV"
     } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -575,37 +558,6 @@ _gcc_ubuntu_setup() {
         } >>/dev/null 2>&1
     fi
 
-}
-
-_dependencies_repo() {
-    {
-        curl -sL https://build.opensuse.org/projects/home:virtubox:nginx-ee/public_key | apt-key add -
-        if [ ! -f /etc/apt/sources.list.d/nginx-ee.list ]; then
-            if [ "$DISTRO_ID" = "Ubuntu" ]; then
-                if [ "$DISTRO_CODENAME" = "xenial" ]; then
-                    add-apt-repository ppa:virtubox/brotli -yu
-                fi
-                echo "deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/xUbuntu_${DISTRO_NUMBER}/ /" >/etc/apt/sources.list.d/nginx-ee.list
-
-            elif [ "$DISTRO_ID" = "Debian" ]; then
-                if [ "$DISTRO_CODENAME" = "jessie" ]; then
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_8.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
-                elif [ "$DISTRO_CODENAME" = "strech" ]; then
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_9.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
-                else
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Debian_10/ /' >/etc/apt/sources.list.d/nginx-ee.list
-                fi
-            else
-                if [ "$DISTRO_CODENAME" = "strech" ]; then
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_9.0/ /' >/etc/apt/sources.list.d/nginx-ee.list
-                else
-                    echo 'deb http://download.opensuse.org/repositories/home:/virtubox:/nginx-ee/Raspbian_10/ /' >/etc/apt/sources.list.d/nginx-ee.list
-                fi
-            fi
-
-        fi
-        apt-get update -qq
-    } >>/tmp/nginx-ee.log 2>&1
 }
 
 ##################################
@@ -917,8 +869,8 @@ _download_nginx() {
 
         {
             rm -rf /usr/local/src/nginx
-            curl -sL http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
-            mv /usr/local/src/nginx-${NGINX_VER} /usr/local/src/nginx
+            curl -sL "http://nginx.org/download/nginx-${NGINX_VER}.tar.gz" | /bin/tar xzf - -C "$DIR_SRC"
+            mv "/usr/local/src/nginx-${NGINX_VER}" /usr/local/src/nginx
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then

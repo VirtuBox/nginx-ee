@@ -48,7 +48,7 @@ Automated Nginx compilation from sources with additional modules support
 * Dynamic modules support
 * Brotli Support
 * TLS v1.3 support (Final)
-* OpenSSL (1.1.1g or 3.0.0-dev or from system-lib) or LibreSSL
+* OpenSSL or LibreSSL
 * Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
@@ -104,12 +104,8 @@ Optional modules :
 
 #### Also compatible
 
-* Ubuntu 19.10 (Eoan)
-* Ubuntu 16.04 LTS (Xenial)
-* Debian 9 (Stretch)
-* Debian 8 (Jessie)
-* Raspbian 9 (Stretch)
 * Raspbian 10 (Buster)
+* Raspbian 11 (Bullseye)
 
 ### Applications
 
@@ -183,8 +179,6 @@ Optional third-party modules :
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 * `--libressl` : compile nginx with LibreSSL instead of OpenSSL
-* `--openssl-dev` : compile nginx with OpenSSL 3.0.0-dev
-* `--openssl-system` : compile nginx with OpenSSL system lib
 
 Extras :
 
