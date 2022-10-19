@@ -44,7 +44,7 @@ Automated Nginx compilation from sources with additional modules support
 <li>Dynamic modules support</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
-<li>OpenSSL (1.1.1g or 3.0.0-dev or from system-lib) or LibreSSL</li>
+<li>OpenSSL or LibreSSL</li>
 <li>Cloudflare HPACK</li>
 <li>Cloudflare zlib</li>
 <li>Automated nginx updates cronjob</li>
@@ -53,8 +53,8 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.19.2</strong>
-Nginx current stable release : <strong>v1.18.0</strong></p>
+<p>Nginx current mainline release : <strong>v1.23.1</strong>
+Nginx current stable release : <strong>v1.22.0</strong></p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
 <li><a href="https://github.com/openresty/headers-more-nginx-module">headers-more-nginx-module</a></li>
@@ -86,19 +86,15 @@ Nginx current stable release : <strong>v1.18.0</strong></p>
 <h3 id="operating-system">Operating System</h3>
 <h4 id="recommended">Recommended</h4>
 <ul>
+<li>Ubuntu 22.04 LTS (Jammy)</li>
 <li>Ubuntu 20.04 LTS (Focal)</li>
 <li>Ubuntu 18.04 LTS (Bionic)</li>
+<li>Debian 11 (Bullseye)</li>
 <li>Debian 10 (Buster)</li>
 </ul>
 <h4 id="also-compatible">Also compatible</h4>
 <ul>
-<li>Ubuntu 19.10 (Eoan)</li>
-<li>Ubuntu 19.04 (Disco)</li>
-<li>Ubuntu 18.10 (Cosmic)</li>
-<li>Ubuntu 16.04 LTS (Xenial)</li>
-<li>Debian 9 (Stretch)</li>
-<li>Debian 8 (Jessie)</li>
-<li>Raspbian 9 (Stretch)</li>
+<li>Raspbian 11 (Bullseye)</li>
 <li>Raspbian 10 (Buster)</li>
 </ul>
 <h3 id="applications">Applications</h3>
@@ -120,7 +116,7 @@ Nginx current stable release : <strong>v1.18.0</strong></p>
 <p><strong>Default settings</strong> :</p>
 <ul>
 <li>mainline release</li>
-<li>openssl stable : 1.1.1g</li>
+<li>openssl from system lib</li>
 <li>without pagespeed</li>
 <li>without naxsi</li>
 <li>without rtmp</li>
@@ -150,12 +146,9 @@ sudo bash nginx-build.sh
 <p>Optional third-party modules :</p>
 <ul>
 <li><code>--pagespeed</code>: compile nginx with ngx_pagespeed latest-stable</li>
-<li><code>--pagespeed-beta</code>: compile nginx with ngx_pagespeed latest-beta</li>
 <li><code>--naxsi</code> : compile nginx with naxsi</li>
 <li><code>--rtmp</code> : compile nginx with rtmp module</li>
 <li><code>--libressl</code> : compile nginx with LibreSSL instead of OpenSSL</li>
-<li><code>--openssl-dev</code> : compile nginx with OpenSSL 3.0.0-dev</li>
-<li><code>--openssl-system</code> : compile nginx with OpenSSL system lib</li>
 </ul>
 <p>Extras :</p>
 <ul>
