@@ -24,8 +24,12 @@ jobs:
       run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log
     - name : Nginx check
       run: sudo nginx -V
-    - name: Full build
+    - name: Full build stable
       run: sudo bash nginx-build.sh --full --stable || cat /tmp/nginx-ee.log
+    - name : Nginx check
+      run: sudo nginx -V
+    - name: Mainline naxsi
+      run: sudo bash nginx-build.sh --naxsi || cat /tmp/nginx-ee.log
     - name : Nginx check
       run: sudo nginx -V
     - name: libressl build
