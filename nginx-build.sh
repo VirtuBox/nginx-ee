@@ -504,7 +504,7 @@ _dynamic_setup() {
 
 _gcc_ubuntu_setup() {
 
-    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ] && [ "$DISTRO_CODENAME" != "focal" ]; then
+    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ] && [ "$DISTRO_CODENAME" != "focal" ] && [ "$DISTRO_CODENAME" != "jammy" ]; then
         {
             echo "### adding gcc repository ###"
             add-apt-repository ppa:jonathonf/gcc -yu
@@ -516,6 +516,8 @@ _gcc_ubuntu_setup() {
             echo "### installing gcc ###"
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
                 apt-get install gcc-8 g++-8 -y
+            elif [ "$DISTRO_CODENAME" = "jammy" ] || [ "$DISTRO_CODENAME" = "focal" ]; then
+                apt-get install gcc-10 g++-10 -y
             else
                 apt-get install gcc-9 g++-9 -y
             fi
@@ -532,6 +534,8 @@ _gcc_ubuntu_setup() {
             update-alternatives --remove-all gcc
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            elif [ "$DISTRO_CODENAME" = "jammy" ] || [ "$DISTRO_CODENAME" = "focal" ]; then
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 80 --slave /usr/bin/g++ g++ /usr/bin/g++-10
             else
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-9
             fi
@@ -567,7 +571,7 @@ _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     if {
 
-        if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "focal" ]; then
+        if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "focal" ] && [ "$DISTRO_CODENAME" != "jammy" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
                 add-apt-repository -y ppa:jonathonf/ffmpeg-4 -u
                 apt-get install ffmpeg -y
