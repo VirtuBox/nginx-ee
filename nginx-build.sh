@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.7.0 - 2022-10-18
+# Version 3.7.0 - 2022-12-03
 # -------------------------------------------------------------------------
 
 ##################################
@@ -126,6 +126,9 @@ command_exists() {
 
 # updating packages list
 [ -z "$TRAVIS_BUILD" ] && {
+    if [ -f "/etc/apt/sources.list.d/nginx-ee.list" ]; then
+        rm /etc/apt/sources.list.d/nginx-ee.list -f
+    fi
     apt-get update -qq
 }
 
@@ -502,13 +505,14 @@ _dynamic_setup() {
 # gcc7 if Nginx is compiled with RTMP module
 # otherwise gcc8 is used
 
-_gcc_ubuntu_setup() {
-
-    if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ] && [ "$DISTRO_CODENAME" != "focal" ]; then
-        {
-            echo "### adding gcc repository ###"
-            add-apt-repository ppa:jonathonf/gcc -yu
-        } >>/dev/null 2>&1
+_gcc_setup() {
+    if [ "$DISTRO_ID" = "Ubuntu" ]; then
+        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ] && [ "$DISTRO_CODENAME" != "focal" ] && [ "$DISTRO_CODENAME" != "jammy" ]; then
+            {
+                echo "### adding gcc repository ###"
+                add-apt-repository ppa:jonathonf/gcc -yu
+            } >>/dev/null 2>&1
+        fi
     fi
     if [ "$RTMP" != "y" ]; then
         echo -ne '       Installing gcc                         [..]\r'
@@ -516,6 +520,8 @@ _gcc_ubuntu_setup() {
             echo "### installing gcc ###"
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
                 apt-get install gcc-8 g++-8 -y
+            elif [ "$DISTRO_CODENAME" = "jammy" ] || [ "$DISTRO_CODENAME" = "focal" ] || [ "$DISTRO_CODENAME" = "bullseye" ]; then
+                apt-get install gcc-10 g++-10 -y
             else
                 apt-get install gcc-9 g++-9 -y
             fi
@@ -532,6 +538,8 @@ _gcc_ubuntu_setup() {
             update-alternatives --remove-all gcc
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+            elif [ "$DISTRO_CODENAME" = "jammy" ] || [ "$DISTRO_CODENAME" = "focal" ] || [ "$DISTRO_CODENAME" = "bullseye" ]; then
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 80 --slave /usr/bin/g++ g++ /usr/bin/g++-10
             else
                 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-9
             fi
@@ -567,7 +575,7 @@ _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     if {
 
-        if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "focal" ]; then
+        if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "focal" ] && [ "$DISTRO_CODENAME" != "jammy" ]; then
             if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
                 add-apt-repository -y ppa:jonathonf/ffmpeg-4 -u
                 apt-get install ffmpeg -y
@@ -1210,9 +1218,7 @@ if [ "$NGINX_FROM_SCRATCH" = "1" ]; then
         _nginx_from_scratch_setup
     fi
 fi
-if [ "$DISTRO_ID" = "Ubuntu" ]; then
-    _gcc_ubuntu_setup
-fi
+_gcc_setup
 if [ "$RTMP" = "y" ]; then
     _rtmp_setup
 fi
