@@ -126,6 +126,9 @@ command_exists() {
 
 # updating packages list
 [ -z "$TRAVIS_BUILD" ] && {
+    if [ -f "/etc/apt/sources.list.d/nginx-ee.list" ]; then
+        rm /etc/apt/sources.list.d/nginx-ee.list -f
+    fi
     apt-get update -qq
 }
 
