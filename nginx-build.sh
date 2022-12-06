@@ -818,7 +818,7 @@ _download_naxsi() {
             git clone --depth=50 --recurse-submodules https://github.com/wargio/naxsi.git /usr/local/src/naxsi -q
 
             if [ "$NOCONF" != "y" ]; then
-                cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
+                cp -f /usr/local/src/naxsi/naxsi_rules/naxsi_core.rules /etc/nginx/naxsi_core.rules
             fi
 
         } >>/tmp/nginx-ee.log 2>&1
