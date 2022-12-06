@@ -815,7 +815,7 @@ _download_naxsi() {
         echo -ne '       Downloading naxsi                      [..]\r'
         {
 
-            git clone --depth=50 https://github.com/nbs-system/naxsi.git /usr/local/src/naxsi -q
+            git clone --depth=50 https://github.com/wargio/naxsi.git /usr/local/src/naxsi -q
 
             if [ "$NOCONF" != "y" ]; then
                 cp -f /usr/local/src/naxsi/naxsi_config/naxsi_core.rules /etc/nginx/naxsi_core.rules
