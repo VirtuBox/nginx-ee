@@ -25,6 +25,8 @@ jobs:
         sudo rm -rf /etc/mysql /var/lib/mysql /etc/nginx
         sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* mysql* nginx
         sudo apt-get -qq autoremove --purge
+        sudo apt-get -qq install libgoogle-perftools-dev
+        sudo apt-get -qq install -f
     - name: Mainline build
       run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name : Nginx check
