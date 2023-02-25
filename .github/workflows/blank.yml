@@ -1,11 +1,20 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - develop
+      - master
+  schedule:
+    - cron: '0 0 * * 0'
 
 jobs:
-  build:
-
-    runs-on: ubuntu-20.04
+  my_job:
+    name: test Nginx-ee
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
 
     steps:
     - uses: actions/checkout@v2
