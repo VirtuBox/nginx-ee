@@ -618,7 +618,7 @@ _download_modules() {
         openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module
         openresty/redis2-nginx-module openresty/srcache-nginx-module
         openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module
-        vozlt/nginx-module-vts'
+        vozlt/nginx-module-vts centminmod/ngx_http_redis'
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
@@ -975,6 +975,7 @@ _configure_nginx() {
                 NGINX_THIRD_MODULES="--add-module=../ngx_http_substitutions_filter_module \
         --add-module=../srcache-nginx-module \
         --add-module=../redis2-nginx-module \
+        --add-module=../ngx_http_redis \
         --add-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
         --add-module=../set-misc-nginx-module \
