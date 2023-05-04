@@ -31,12 +31,10 @@ _help() {
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
     echo "       --stable ..... Nginx stable release"
-    echo "       --full ..... Nginx mainline release with Pagespeed, Nasxi and RTMP module"
+    echo "       --full ..... Nginx mainline release with Nasxi and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
     echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
-    echo "       --pagespeed ..... Pagespeed module stable release"
-    echo "       --pagespeed-beta .....  Pagespeed module beta release"
     echo "       --naxsi ..... Naxsi WAF module"
     echo "       --rtmp ..... RTMP video streaming module"
     echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
@@ -62,17 +60,7 @@ else
 
     while [ "$#" -gt 0 ]; do
         case "$1" in
-        --pagespeed)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="2"
-            ;;
-        --pagespeed-beta)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="1"
-            ;;
         --full)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="2"
             NAXSI="y"
             RTMP="y"
             ;;
@@ -214,18 +202,6 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$NGINX_RELEASE" != "1" && "$NGINX_RELEASE" != "2" ]]; do
         echo -e "Select an option [1-2]: " && read -r NGINX_RELEASE
     done
-    echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
-    while [[ "$PAGESPEED" != "y" && "$PAGESPEED" != "n" ]]; do
-        echo -e "Select an option [y/n]: " && read -r PAGESPEED
-    done
-    if [ "$PAGESPEED" = "y" ]; then
-        echo -e '\nWhat Ngx_Pagespeed release do you want ?\n'
-        echo -e '  [1] Beta Release'
-        echo -e '  [2] Stable Release\n'
-        while [[ "$PAGESPEED_RELEASE" != "1" && "$PAGESPEED_RELEASE" != "2" ]]; do
-            echo -e "Select an option [1-2]: " && read -r PAGESPEED_RELEASE
-        done
-    fi
     echo -e '\nDo you prefer to compile Nginx with OpenSSL [1] or LibreSSL [2] ? (y/n)'
     echo -e '  [1] OpenSSL'
     echo -e '  [2] LibreSSL\n'
@@ -318,18 +294,9 @@ fi
 # Set Pagespeed module
 ##################################
 
-if [ -n "$PAGESPEED_RELEASE" ]; then
-    if [ "$PAGESPEED_RELEASE" = "1" ]; then
-        NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-beta "
-        PAGESPEED_VALID="beta"
-    elif [ "$PAGESPEED_RELEASE" = "2" ]; then
-        NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-stable "
-        PAGESPEED_VALID="stable"
-    fi
-else
-    NGX_PAGESPEED=""
-    PAGESPEED_VALID="NO"
-fi
+NGX_PAGESPEED=""
+PAGESPEED_VALID="NO"
+
 
 ##################################
 # Set Plesk configuration
@@ -367,7 +334,6 @@ echo -e "  - Nginx release : $NGINX_VER"
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
 }
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
-echo "  - Pagespeed : $PAGESPEED_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
 echo "  - RTMP : $RTMP_VALID"
 [ -n "$EE_VALID" ] && {
@@ -1197,9 +1163,6 @@ else
     else
         sleep 1
     fi
-fi
-if [ "$PAGESPEED" = "y" ]; then
-    _download_pagespeed
 fi
 _download_nginx
 _patch_nginx
