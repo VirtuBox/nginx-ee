@@ -45,8 +45,6 @@ jobs:
       run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log
     - name : Nginx check libressl build
       run: sudo nginx -V
-    - name: pagespeed mainline build
-      run: sudo bash nginx-build.sh --pagespeed || cat /tmp/nginx-ee.log
     - name: dynamic build
       run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log
       

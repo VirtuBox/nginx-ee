@@ -31,12 +31,10 @@ _help() {
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
     echo "       --stable ..... Nginx stable release"
-    echo "       --full ..... Nginx mainline release with Pagespeed, Nasxi and RTMP module"
+    echo "       --full ..... Nginx mainline release with Nasxi and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
     echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
-    echo "       --pagespeed ..... Pagespeed module stable release"
-    echo "       --pagespeed-beta .....  Pagespeed module beta release"
     echo "       --naxsi ..... Naxsi WAF module"
     echo "       --rtmp ..... RTMP video streaming module"
     echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
@@ -62,17 +60,7 @@ else
 
     while [ "$#" -gt 0 ]; do
         case "$1" in
-        --pagespeed)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="2"
-            ;;
-        --pagespeed-beta)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="1"
-            ;;
         --full)
-            PAGESPEED="y"
-            PAGESPEED_RELEASE="2"
             NAXSI="y"
             RTMP="y"
             ;;
@@ -214,18 +202,6 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$NGINX_RELEASE" != "1" && "$NGINX_RELEASE" != "2" ]]; do
         echo -e "Select an option [1-2]: " && read -r NGINX_RELEASE
     done
-    echo -e '\nDo you want Ngx_Pagespeed ? (y/n)'
-    while [[ "$PAGESPEED" != "y" && "$PAGESPEED" != "n" ]]; do
-        echo -e "Select an option [y/n]: " && read -r PAGESPEED
-    done
-    if [ "$PAGESPEED" = "y" ]; then
-        echo -e '\nWhat Ngx_Pagespeed release do you want ?\n'
-        echo -e '  [1] Beta Release'
-        echo -e '  [2] Stable Release\n'
-        while [[ "$PAGESPEED_RELEASE" != "1" && "$PAGESPEED_RELEASE" != "2" ]]; do
-            echo -e "Select an option [1-2]: " && read -r PAGESPEED_RELEASE
-        done
-    fi
     echo -e '\nDo you prefer to compile Nginx with OpenSSL [1] or LibreSSL [2] ? (y/n)'
     echo -e '  [1] OpenSSL'
     echo -e '  [2] LibreSSL\n'
@@ -318,18 +294,9 @@ fi
 # Set Pagespeed module
 ##################################
 
-if [ -n "$PAGESPEED_RELEASE" ]; then
-    if [ "$PAGESPEED_RELEASE" = "1" ]; then
-        NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-beta "
-        PAGESPEED_VALID="beta"
-    elif [ "$PAGESPEED_RELEASE" = "2" ]; then
-        NGX_PAGESPEED="--add-module=../incubator-pagespeed-ngx-latest-stable "
-        PAGESPEED_VALID="stable"
-    fi
-else
-    NGX_PAGESPEED=""
-    PAGESPEED_VALID="NO"
-fi
+NGX_PAGESPEED=""
+PAGESPEED_VALID="NO"
+
 
 ##################################
 # Set Plesk configuration
@@ -367,7 +334,6 @@ echo -e "  - Nginx release : $NGINX_VER"
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
 }
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
-echo "  - Pagespeed : $PAGESPEED_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
 echo "  - RTMP : $RTMP_VALID"
 [ -n "$EE_VALID" ] && {
@@ -506,24 +472,13 @@ _dynamic_setup() {
 # otherwise gcc8 is used
 
 _gcc_setup() {
-    if [ "$DISTRO_ID" = "Ubuntu" ]; then
-        if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-gcc-"$(lsb_release -sc)".list ] && [ "$DISTRO_CODENAME" != "focal" ] && [ "$DISTRO_CODENAME" != "jammy" ]; then
-            {
-                echo "### adding gcc repository ###"
-                add-apt-repository ppa:jonathonf/gcc -yu
-            } >>/dev/null 2>&1
-        fi
-    fi
-    if [ "$RTMP" != "y" ]; then
         echo -ne '       Installing gcc                         [..]\r'
         if {
             echo "### installing gcc ###"
             if [ "$DISTRO_CODENAME" = "xenial" ]; then
                 apt-get install gcc-8 g++-8 -y
-            elif [ "$DISTRO_CODENAME" = "jammy" ] || [ "$DISTRO_CODENAME" = "focal" ] || [ "$DISTRO_CODENAME" = "bullseye" ]; then
-                apt-get install gcc-10 g++-10 -y
             else
-                apt-get install gcc-9 g++-9 -y
+                apt-get install gcc g++ -y
             fi
         } >>/dev/null 2>&1; then
             echo -ne "       Installing gcc                         [${CGREEN}OK${CEND}]\\r"
@@ -533,38 +488,6 @@ _gcc_setup() {
             echo -e '\n      Please look at /tmp/nginx-ee.log\n'
             exit 1
         fi
-        {
-            # update gcc alternative to use gcc-8 by default
-            update-alternatives --remove-all gcc
-            if [ "$DISTRO_CODENAME" = "xenial" ]; then
-                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8
-            elif [ "$DISTRO_CODENAME" = "jammy" ] || [ "$DISTRO_CODENAME" = "focal" ] || [ "$DISTRO_CODENAME" = "bullseye" ]; then
-                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 80 --slave /usr/bin/g++ g++ /usr/bin/g++-10
-            else
-                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-            fi
-        } >>/dev/null 2>&1
-    else
-        echo -ne '       Installing gcc-7                       [..]\r'
-
-        if {
-            echo "### installing gcc7 ###"
-            apt-get install gcc-7 g++-7 -y
-        } >>/dev/null 2>&1; then
-            echo -ne "       Installing gcc-7                       [${CGREEN}OK${CEND}]\\r"
-            echo -ne '\n'
-        else
-            echo -e "        Installing gcc-7                      [${CRED}FAIL${CEND}]"
-            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-            exit 1
-        fi
-        {
-            # update gcc alternative to use gcc-7 by default
-            update-alternatives --remove-all gcc
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 80 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-        } >>/dev/null 2>&1
-    fi
-
 }
 
 ##################################
@@ -1240,9 +1163,6 @@ else
     else
         sleep 1
     fi
-fi
-if [ "$PAGESPEED" = "y" ]; then
-    _download_pagespeed
 fi
 _download_nginx
 _patch_nginx
