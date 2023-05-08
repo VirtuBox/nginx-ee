@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.7.0 - 2022-12-03
+# Version 3.8.0 - 2023-05-08
 # -------------------------------------------------------------------------
 
 ##################################
@@ -141,7 +141,7 @@ DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.24 2>&1)"
-LIBRESSL_VER="3.5.3"
+LIBRESSL_VER="3.7.2"
 if command_exists openssl; then
     OPENSSL_BIN_VER=$(openssl version)
     OPENSSL_VER=${OPENSSL_BIN_VER:0:15}
@@ -475,11 +475,7 @@ _gcc_setup() {
         echo -ne '       Installing gcc                         [..]\r'
         if {
             echo "### installing gcc ###"
-            if [ "$DISTRO_CODENAME" = "xenial" ]; then
-                apt-get install gcc-8 g++-8 -y
-            else
                 apt-get install gcc g++ -y
-            fi
         } >>/dev/null 2>&1; then
             echo -ne "       Installing gcc                         [${CGREEN}OK${CEND}]\\r"
             echo -ne '\n'
@@ -497,15 +493,7 @@ _gcc_setup() {
 _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     if {
-
-        if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "focal" ] && [ "$DISTRO_CODENAME" != "jammy" ]; then
-            if [ ! -f /etc/apt/sources.list.d/jonathonf-ubuntu-ffmpeg-4-"$(lsb_release -sc)".list ]; then
-                add-apt-repository -y ppa:jonathonf/ffmpeg-4 -u
-                apt-get install ffmpeg -y
-            fi
-        else
             apt-get install ffmpeg -y
-        fi
     } >>/dev/null 2>&1; then
         echo -ne "       Installing FFMPEG for RMTP module      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -758,36 +746,6 @@ _download_naxsi() {
 }
 
 ##################################
-# Download Pagespeed
-##################################
-
-_download_pagespeed() {
-
-    cd "$DIR_SRC" || exit 1
-    if {
-        echo -ne '       Downloading pagespeed                  [..]\r'
-
-        {
-            wget -O build_ngx_pagespeed.sh https://raw.githubusercontent.com/pagespeed/ngx_pagespeed/master/scripts/build_ngx_pagespeed.sh
-            chmod +x build_ngx_pagespeed.sh
-            if [ "$PAGESPEED_RELEASE" = "1" ]; then
-                ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-beta -b "$DIR_SRC" -y
-            else
-                ./build_ngx_pagespeed.sh --ngx-pagespeed-version latest-stable -b "$DIR_SRC" -y
-            fi
-        } >>/tmp/nginx-ee.log 2>&1
-
-    }; then
-        echo -ne "       Downloading pagespeed                  [${CGREEN}OK${CEND}]\\r"
-        echo -ne '\n'
-    else
-        echo -e "       Downloading pagespeed                  [${CRED}FAIL${CEND}]"
-        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-        exit 1
-    fi
-}
-
-##################################
 # Download Nginx
 ##################################
 
@@ -890,6 +848,7 @@ _configure_nginx() {
         --add-dynamic-module=../redis2-nginx-module \
         --add-dynamic-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
+        --add-module=../ngx_http_redis \
         --add-module=../set-misc-nginx-module \
         --add-dynamic-module=../ngx_http_auth_pam_module \
         --add-module=../nginx-module-vts \
@@ -934,7 +893,6 @@ _configure_nginx() {
                     --with-pcre-jit \
                     $NGINX_INCLUDED_MODULES \
                     $NGINX_THIRD_MODULES \
-                    $NGX_PAGESPEED \
                     $NGX_RTMP \
                     --add-module=../echo-nginx-module \
                     --add-module=../headers-more-nginx-module \
