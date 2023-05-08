@@ -60,14 +60,15 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.23.2**
-Nginx current stable release : **v1.22.1**
+Nginx current mainline release : **v1.23.4**
+Nginx current stable release : **v1.24.0**
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
 * [ngx_brotli](https://github.com/google/ngx_brotli)
 * [memc-nginx-module](https://github.com/openresty/memc-nginx-module.git)
 * [ngx-devel-kit](https://github.com/simpl/ngx_devel_kit.git)
+* [ngx_http_redis](https://github.com/centminmod/ngx_http_redis)
 * [srcache-nginx-module](https://github.com/openresty/srcache-nginx-module)
 * [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
 * [nginx_dynamic_tls_records](https://github.com/nginx-modules/ngx_http_tls_dyn_size)
@@ -84,7 +85,6 @@ For Nginx http_ssl_module :
 
 Optional modules :
 
-* [ngx_pagespeed](https://github.com/apache/incubator-pagespeed-ngx)
 * [naxsi WAF](https://github.com/nbs-system/naxsi)
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
 
@@ -131,7 +131,6 @@ Optional modules :
 
 * mainline release
 * openssl from system
-* without pagespeed
 * without naxsi
 * without rtmp
 
@@ -157,10 +156,10 @@ bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 
 ### Custom installation
 
-Example : Nginx stable release with pagespeed and naxsi
+Example : Nginx stable release with naxsi
 
 ```bash
-bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --pagespeed --naxsi
+bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
 ```
 
 #### Options available
@@ -168,13 +167,12 @@ bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --pagespe
 Nginx build options :
 
 * `--stable` : compile Nginx stable release
-* `--full` : Naxsi + PageSpeed + RTMP
+* `--full` : Naxsi + RTMP
 * `--dynamic` : Compile Nginx modules as dynamic modules
 * `--noconf` : Compile Nginx without any configuring. Useful when you use devops tools like ansible.
 
 Optional third-party modules :
 
-* `--pagespeed`: compile nginx with ngx_pagespeed latest-stable
 * `--naxsi` : compile nginx with naxsi
 * `--rtmp` : compile nginx with rtmp module
 * `--libressl` : compile nginx with LibreSSL instead of OpenSSL

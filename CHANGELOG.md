@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+## [3.7.1] - 2023-05-08
+
+### Changed
+
+- Nginx stable bumped to 1.24.0
+- Remove pagespeed module because deprecated
+
+### Fixed
+
+- Nginx compilation with ngx_http_redis module
+- RTMP module compilation with gcc version
+- Naxsi compilation
+
+
 ## [3.6.7] - 2020-08-18
 
 ### Changed
