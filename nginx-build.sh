@@ -783,7 +783,11 @@ _patch_nginx() {
         echo -ne '       Applying nginx patches                 [..]\r'
 
         {
-            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
+            if [ "$NGINX_RELEASE" = "2" ]; then
+                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_for_1.23.4.patch | patch -p1
+            else
+                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
+            fi
             #curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
         } >>/tmp/nginx-ee.log 2>&1
 
