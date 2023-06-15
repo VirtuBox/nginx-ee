@@ -241,7 +241,7 @@ if [ "$NGINX_RELEASE" = "2" ]; then
     NGX_HPACK="--with-http_v2_hpack_enc"
 else
     NGINX_VER="$NGINX_MAINLINE"
-    NGX_HPACK="--with-http_v2_hpack_enc"
+    NGX_HPACK=""
 fi
 
 ##################################
@@ -786,7 +786,7 @@ _patch_nginx() {
             if [ "$NGINX_RELEASE" = "2" ]; then
                 curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_for_1.23.4.patch | patch -p1
             else
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx.patch | patch -p1
+                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_dynamic_tls_records.patch | patch -p1
             fi
             #curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
         } >>/tmp/nginx-ee.log 2>&1
