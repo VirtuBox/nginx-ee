@@ -584,10 +584,10 @@ _download_zlib() {
             echo "### configure zlib-cf ###"
             ./configure --prefix=/usr/local/zlib-cf
         else
-            echo "### downloading zlib 1.2.12 ###"
+            echo "### downloading zlib 1.2.13 ###"
             rm -rf zlib
-            curl -sL http://zlib.net/zlib-1.2.12.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-            mv zlib-1.2.12 zlib
+            curl -sL http://zlib.net/zlib-1.2.13.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+            mv zlib-1.2.13 zlib
         fi
 
     } >>/tmp/nginx-ee.log 2>&1; then
