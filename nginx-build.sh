@@ -31,11 +31,12 @@ _help() {
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
     echo "       --stable ..... Nginx stable release"
-    echo "       --full ..... Nginx mainline release with Nasxi and RTMP module"
+    echo "       --full ..... Nginx mainline release with Nasxi, Njs and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
     echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
     echo "       --naxsi ..... Naxsi WAF module"
+    echo "       --njs ..... Njs module"
     echo "       --rtmp ..... RTMP video streaming module"
     echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
     echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
@@ -63,6 +64,7 @@ else
         --full)
             NAXSI="y"
             RTMP="y"
+            NJS="y"
             ;;
         --noconf)
             NOCONF="y"
@@ -75,6 +77,9 @@ else
             ;;
         --rtmp)
             RTMP="y"
+            ;;
+        --njs)
+            NJS="y"
             ;;
         --latest | --mainline)
             NGINX_RELEASE="1"
@@ -217,6 +222,10 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$NAXSI" != "y" && "$NAXSI" != "n" ]]; do
         echo -e "Select an option [y/n]: " && read -r NAXSI
     done
+    echo -e '\nDo you want njs support? (y/n)'
+    while [[ "$NJS" != "y" && "$NJS" != "n" ]]; do
+        echo -e "Select an option [y/n]: " && read -r NJS
+    done
     echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
         echo -e "Select an option [y/n]: " && read -r RTMP
@@ -253,6 +262,18 @@ if [ "$RTMP" = "y" ]; then
     RTMP_VALID="YES"
 else
     NGX_RTMP=""
+    RTMP_VALID="NO"
+fi
+
+##################################
+# Set NJS module
+##################################
+
+if [ "$NJS" = "y" ]; then
+    NGX_NJS="../njs/nginx"
+    RTMP_VALID="YES"
+else
+    NGX_NJS=""
     RTMP_VALID="NO"
 fi
 
@@ -533,12 +554,18 @@ _download_modules() {
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
+
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
                 git -C "$DIR_SRC/nginx-rtmp-module" pull &
             }; } || {
                 git clone --depth=1 https://github.com/arut/nginx-rtmp-module.git &
             }
+        fi
+
+        if [ "$NJS" = "y" ]; then
+            rm -rf $DIR_SRC/njs
+            hg clone http://hg.nginx.org/njs $DIR_SRC/njs &
         fi
 
         # ipscrub module
@@ -612,7 +639,7 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            git clone --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
+            git clone --recursive https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
 
         } >>/tmp/nginx-ee.log 2>&1
 
@@ -745,6 +772,8 @@ _download_naxsi() {
 
 }
 
+
+
 ##################################
 # Download Nginx
 ##################################
@@ -843,6 +872,14 @@ _configure_nginx() {
             NGINX_INCLUDED_MODULES="$OVERRIDE_NGINX_MODULES"
         fi
 
+        if [ ! -z "$NGX_NJS" ]; then
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                NGX_NJS="--add-dynamic-module=$NGX_NJS"
+            else
+                NGX_NJS="--add-module=$NGX_NJS"
+            fi
+        fi
+
         # third party modules
         if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
             if [ "$DYNAMIC_MODULES" = "y" ]; then
@@ -852,11 +889,13 @@ _configure_nginx() {
         --add-dynamic-module=../redis2-nginx-module \
         --add-dynamic-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
-        --add-module=../ngx_http_redis \
+        --add-dynamic-module=../ngx_http_redis \
         --add-module=../set-misc-nginx-module \
         --add-dynamic-module=../ngx_http_auth_pam_module \
         --add-module=../nginx-module-vts \
-        --add-dynamic-module=../ipscrubtmp/ipscrub"
+        --add-dynamic-module=../ngx_brotli \
+        --add-dynamic-module=../ipscrubtmp/ipscrub \
+        $NGX_NJS"
             else
                 NGINX_THIRD_MODULES="--add-module=../ngx_http_substitutions_filter_module \
         --add-module=../srcache-nginx-module \
@@ -864,10 +903,12 @@ _configure_nginx() {
         --add-module=../ngx_http_redis \
         --add-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
+        --add-module=../ngx_brotli \
         --add-module=../set-misc-nginx-module \
         --add-module=../ngx_http_auth_pam_module \
         --add-module=../nginx-module-vts \
-        --add-module=../ipscrubtmp/ipscrub"
+        --add-module=../ipscrubtmp/ipscrub \
+        $NGX_NJS"
             fi
         else
             NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
@@ -882,10 +923,11 @@ _configure_nginx() {
         else
             ZLIB_PATH='../zlib'
         fi
+
         bash -c "./configure \
                     ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
-                    --with-ld-opt='$DEB_LFLAGS' \
+                    --with-ld-opt='$DEB_LFLAGS -lpcre' \
                     $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
                     $NGX_USER \
@@ -901,7 +943,6 @@ _configure_nginx() {
                     --add-module=../echo-nginx-module \
                     --add-module=../headers-more-nginx-module \
                     --add-module=../ngx_cache_purge \
-                    --add-module=../ngx_brotli \
                     --with-zlib=$ZLIB_PATH \
                     $NGX_SSL_LIB \
                     --with-openssl-opt='$OPENSSL_OPT' \
