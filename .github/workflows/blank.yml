@@ -5,6 +5,9 @@ on:
     branches:
       - develop
       - master
+  pull_request:
+    branches:
+      - master
   schedule:
     - cron: '0 0 * * 0'
 
@@ -26,9 +29,9 @@ jobs:
         sudo rm -rf /etc/mysql /var/lib/mysql /etc/nginx
         sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* mysql* nginx || sudo dpkg --configure -a
     - name: Mainline build
-      run: sudo bash nginx-build.sh
+      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name : Nginx check Mainline build
-      run: sudo nginx -V
+      run: sudo nginx -V || cat /tmp/nginx-ee.log
     - name: Stable build
       run: sudo bash nginx-build.sh --stable
     - name : Nginx check Stable build
@@ -38,13 +41,13 @@ jobs:
     - name : Nginx check Full build stable
       run: sudo nginx -V
     - name: Mainline naxsi
-      run: sudo bash nginx-build.sh --naxsi
+      run: sudo bash nginx-build.sh --naxsi || cat /tmp/nginx-ee.log
     - name : Nginx check Mainline naxsi
       run: sudo nginx -V
     - name: libressl build
-      run: sudo bash nginx-build.sh --libressl
+      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log
     - name : Nginx check libressl build
       run: sudo nginx -V
     - name: dynamic build
-      run: sudo bash nginx-build.sh --dynamic
+      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log
       
