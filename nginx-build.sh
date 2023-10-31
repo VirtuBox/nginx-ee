@@ -297,7 +297,6 @@ fi
 NGX_PAGESPEED=""
 PAGESPEED_VALID="NO"
 
-
 ##################################
 # Set Plesk configuration
 ##################################
@@ -472,18 +471,18 @@ _dynamic_setup() {
 # otherwise gcc8 is used
 
 _gcc_setup() {
-        echo -ne '       Installing gcc                         [..]\r'
-        if {
-            echo "### installing gcc ###"
-                apt-get install gcc g++ -y
-        } >>/dev/null 2>&1; then
-            echo -ne "       Installing gcc                         [${CGREEN}OK${CEND}]\\r"
-            echo -ne '\n'
-        else
-            echo -e "        Installing gcc                        [${CRED}FAIL${CEND}]"
-            echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-            exit 1
-        fi
+    echo -ne '       Installing gcc                         [..]\r'
+    if {
+        echo "### installing gcc ###"
+        apt-get install gcc g++ -y
+    } >>/dev/null 2>&1; then
+        echo -ne "       Installing gcc                         [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
+        echo -e "        Installing gcc                        [${CRED}FAIL${CEND}]"
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+        exit 1
+    fi
 }
 
 ##################################
@@ -493,7 +492,7 @@ _gcc_setup() {
 _rtmp_setup() {
     echo -ne '       Installing FFMPEG for RTMP module      [..]\r'
     if {
-            apt-get install ffmpeg -y
+        apt-get install ffmpeg -y
     } >>/dev/null 2>&1; then
         echo -ne "       Installing FFMPEG for RMTP module      [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -536,7 +535,7 @@ _download_modules() {
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
                 git -C "$DIR_SRC/nginx-rtmp-module" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/arut/nginx-rtmp-module.git &
             }
         fi
@@ -544,7 +543,7 @@ _download_modules() {
         # ipscrub module
         { [ -d "$DIR_SRC/ipscrubtmp" ] && {
             git -C "$DIR_SRC/ipscrubtmp" pull origin master &
-        }; } || {
+        } } || {
             git clone --depth=1 https://github.com/masonicboom/ipscrub.git ipscrubtmp &
         }
         wait
@@ -613,7 +612,8 @@ _download_brotli() {
         {
             rm /usr/local/src/ngx_brotli -rf
             git clone --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
-
+            cd /usr/local/src/ngx_brotli || exit 1
+            git submodule update --init
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
