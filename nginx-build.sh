@@ -1174,7 +1174,7 @@ _configure_nginx() {
         echo "Build nginx with ./configure \
                     ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
-                    --with-ld-opt='$DEB_LFLAGS,-lpcre' \
+                    --with-ld-opt='$DEB_LFLAGS, -lpcre' \
                     $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
                     $NGX_USER \
@@ -1198,7 +1198,7 @@ _configure_nginx() {
         bash -c "./configure \
                     ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
-                    --with-ld-opt='$DEB_LFLAGS,-lpcre' \
+                    --with-ld-opt='$DEB_LFLAGS, -lpcre' \
                     $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
                     $NGX_USER \
