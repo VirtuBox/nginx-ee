@@ -469,7 +469,7 @@ _gitget() {
 _install_dependencies() {
     echo -ne '       Installing dependencies                [..]\r'
     if {
-        apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="libmodsecurity-dev" -o Dpkg::Options::="--force-confold" -y install \
+        apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
             git build-essential libmaxminddb-dev libtool automake autoconf \
             libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev libmodsecurity-dev ruby ruby-dev libcurl4-gnutls-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
