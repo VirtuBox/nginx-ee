@@ -31,11 +31,16 @@ _help() {
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
     echo "       --stable ..... Nginx stable release"
-    echo "       --full ..... Nginx mainline release with Nasxi and RTMP module"
+    echo "       --full ..... Nginx mainline release with Nasxi, Njs, lua and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
     echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
     echo "       --naxsi ..... Naxsi WAF module"
+    echo "       --njs ..... Njs module"
+    echo "       --lua ..... Openresty's lua module"
+    echo "       --geoip ..... GeoIP2 module"
+    echo "       --modsec ..... ModSecurity module"
+    echo "       --passenger ..... Phusion Passenger module"
     echo "       --rtmp ..... RTMP video streaming module"
     echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
     echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
@@ -63,6 +68,11 @@ else
         --full)
             NAXSI="y"
             RTMP="y"
+            NJS="y"
+            LUA="y"
+            GEOIP="y"
+            MODSEC="y"
+            PASSENGER="y"
             ;;
         --noconf)
             NOCONF="y"
@@ -75,6 +85,21 @@ else
             ;;
         --rtmp)
             RTMP="y"
+            ;;
+        --geoip)
+            GEOIP="y"
+            ;;
+        --modsec)
+            MODSEC="y"
+            ;;
+        --njs)
+            NJS="y"
+            ;;
+        --lua)
+            LUA="y"
+            ;;
+        --passenger)
+            PASSENGER="y"
             ;;
         --latest | --mainline)
             NGINX_RELEASE="1"
@@ -217,6 +242,26 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$NAXSI" != "y" && "$NAXSI" != "n" ]]; do
         echo -e "Select an option [y/n]: " && read -r NAXSI
     done
+    echo -e '\nDo you want njs support? (y/n)'
+    while [[ "$NJS" != "y" && "$NJS" != "n" ]]; do
+        echo -e "Select an option [y/n]: " && read -r NJS
+    done
+    echo -e '\nDo you want LUA support? (y/n)'
+    while [[ "$LUA" != "y" && "$LUA" != "n" ]]; do
+        echo -e "Select an option [y/n]: " && read -r LUA
+    done
+    echo -e '\nDo you want Passenger support? (y/n)'
+    while [[ "$PASSENGER" != "y" && "$PASSENGER" != "n" ]]; do
+        echo -e "Select an option [y/n]: " && read -r PASSENGER
+    done
+    echo -e '\nDo you want GeoIP support? (y/n)'
+    while [[ "$GEOIP" != "y" && "$GEOIP" != "n" ]]; do
+        echo -e "Select an option [y/n]: " && read -r GEOIP
+    done
+    echo -e '\nDo you want ModSecurity support? (y/n)'
+    while [[ "$MODSEC" != "y" && "$MODSEC" != "n" ]]; do
+        echo -e "Select an option [y/n]: " && read -r MODSEC
+    done
     echo -e '\nDo you want RTMP streaming module (used for video streaming) ? (y/n)'
     while [[ "$RTMP" != "y" && "$RTMP" != "n" ]]; do
         echo -e "Select an option [y/n]: " && read -r RTMP
@@ -257,6 +302,64 @@ else
 fi
 
 ##################################
+# Set NJS module
+##################################
+
+if [ "$NJS" = "y" ]; then
+    NGX_NJS="../njs/nginx"
+    NJS_VALID="YES"
+else
+    NGX_NJS=""
+    NJS_VALID="NO"
+fi
+
+##################################
+# Set LUA module
+##################################
+
+if [ "$LUA" = "y" ]; then
+    NGX_LUA="../lua-nginx-module"
+    LUA_VALID="YES"
+else
+    NGX_LUA=""
+    LUA_VALID="NO"
+fi
+
+##################################
+# Set Phusion Passenger module
+##################################
+
+if [ "$PASSENGER" = "y" ]; then
+    PASSENGER_VALID="YES"
+else
+    PASSENGER_VALID="NO"
+fi
+
+##################################
+# Set GeoIP module
+##################################
+
+if [ "$GEOIP" = "y" ]; then
+    NGX_GEOIP="../ngx_http_geoip2_module"
+    GEOIP_VALID="YES"
+else
+    NGX_GEOIP=""
+    GEOIP_VALID="NO"
+fi
+
+##################################
+# Set ModSecurity module
+##################################
+
+if [ "$MODSEC" = "y" ]; then
+    NGX_MODSEC="../ModSecurity-nginx"
+    MODSEC_VALID="YES"
+else
+    NGX_MODSEC=""
+    MODSEC_VALID="NO"
+fi
+
+##################################
 # Set Naxsi module
 ##################################
 
@@ -289,13 +392,6 @@ else
     LIBSSL_DEV="libssl-dev"
 
 fi
-
-##################################
-# Set Pagespeed module
-##################################
-
-NGX_PAGESPEED=""
-PAGESPEED_VALID="NO"
 
 ##################################
 # Set Plesk configuration
@@ -335,6 +431,12 @@ echo -e "  - Nginx release : $NGINX_VER"
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
 echo "  - RTMP : $RTMP_VALID"
+echo "  - NJS : $NJS_VALID"
+echo "  - LUA : $LUA_VALID"
+echo "  - GeoIP : $GEOIP_VALID"
+echo "  - Mod Security : $MODSEC_VALID"
+echo "  - Phusion Passenger : $PASSENGER_VALID"
+
 [ -n "$EE_VALID" ] && {
     echo "  - EasyEngine : $EE_VALID"
 }
@@ -367,12 +469,12 @@ _gitget() {
 _install_dependencies() {
     echo -ne '       Installing dependencies                [..]\r'
     if {
-        apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="--force-confold" -y install \
-            git build-essential libtool automake autoconf \
-            libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev \
+        apt-get -o Dpkg::Options::="--force-confmiss" -o Dpkg::Options::="libmodsecurity-dev" -o Dpkg::Options::="--force-confold" -y install \
+            git build-essential libmaxminddb-dev libtool automake autoconf \
+            libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev libmodsecurity-dev ruby ruby-dev libcurl4-gnutls-dev \
             libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar \
-            libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 \
-            libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev libpcre2-dev "$LIBSSL_DEV"
+            libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libsparsehash-dev \
+            libgmp-dev autotools-dev libxml2-dev zlib1g-dev unzip libpcre3 libpcre3-dev uuid-dev libbrotli-dev libpcre2-dev "$LIBSSL_DEV"
     } >>/tmp/nginx-ee.log 2>&1; then
         echo -ne "       Installing dependencies                [${CGREEN}OK${CEND}]\\r"
         echo -ne '\n'
@@ -504,6 +606,75 @@ _rtmp_setup() {
 }
 
 ##################################
+# LUAJIT
+##################################
+
+_luajit_setup() {
+    echo -ne '       Compiling LuaJit                       [..]\r'
+    if {
+        bash -c "cd /usr/local/src/luajit2 && make && make install"
+    } >>/dev/null 2>&1; then
+        echo -ne "       Compiling LuaJit from /usr/local/src/luajit2\n"
+        echo -ne "                                              [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
+        echo -e "       Compiling LuaJit                       [${CRED}FAIL${CEND}]"
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+        exit 1
+    fi
+}
+
+##################################
+# OpenResty Lua tools
+##################################
+
+_install_resty_tools() {
+    echo -ne '       Install Openrestys lua core            [..]\r'
+    if {
+        bash -c "cd /usr/local/src/lua-resty-core && make && make install PREFIX=/usr/share/nginx"
+    } >>/dev/null 2>&1; then
+        echo -ne "       Install Openrestys lua core            [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
+        echo -e "       Install Openrestys lua core            [${CRED}FAIL${CEND}]"
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+        exit 1
+    fi
+
+    echo -ne '       Install Openrestys lua lrucache      [..]\r'
+    if {
+        bash -c "cd /usr/local/src/lua-resty-lrucache && make install PREFIX=/usr/share/nginx"
+    } >>/dev/null 2>&1; then
+        echo -ne "       Install Openrestys lua lrucache      [${CGREEN}OK${CEND}]\\r"
+        echo -ne '\n'
+    else
+        echo -e "       Install Openrestys lua lrucache      [${CRED}FAIL${CEND}]"
+        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
+        exit 1
+    fi
+
+    if [ -f "/etc/nginx/conf.d/lua.conf" ]; then
+        mv /etc/nginx/conf.d/lua.conf /etc/nginx/conf.d/lua.conf.$(date +%Y%m%d-%H%M).bak
+    fi
+
+    echo "lua_package_path \"/usr/share/nginx/lib/lua/?.lua;;\";" > /etc/nginx/conf.d/lua.conf
+}
+
+_setup_resty_tools() {
+    echo -ne '       Setup Openrestys lua tools             [..]\r'
+
+    if [ -f "/etc/nginx/conf.d/lua.conf" ]; then
+        mv /etc/nginx/conf.d/lua.conf /etc/nginx/conf.d/lua.conf.$(date +%Y%m%d-%H%M).bak
+    fi
+
+    echo "lua_package_path \"/usr/share/nginx/lib/lua/?.lua;;\";" > /etc/nginx/conf.d/lua.conf
+
+    echo -ne "       Setup Openrestys lua tools             [${CGREEN}OK${CEND}]\\r"
+    echo -ne '\n'
+}
+
+
+##################################
 # Cleanup modules
 ##################################
 
@@ -532,11 +703,68 @@ _download_modules() {
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
+
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
                 git -C "$DIR_SRC/nginx-rtmp-module" pull &
             } } || {
                 git clone --depth=1 https://github.com/arut/nginx-rtmp-module.git &
+            }
+        fi
+
+        if [ "$NJS" = "y" ]; then
+            rm -rf $DIR_SRC/njs
+            hg clone http://hg.nginx.org/njs $DIR_SRC/njs &
+        fi
+
+        if [ "$LUA" = "y" ]; then
+            { [ -d "$DIR_SRC/lua-nginx-module" ] && {
+                git -C "$DIR_SRC/lua-nginx-module" pull &
+            }; } || {
+                git clone --depth=1 https://github.com/openresty/lua-nginx-module.git &
+            }
+
+            { [ -d "$DIR_SRC/luajit2" ] && {
+                git -C "$DIR_SRC/luajit2" pull &
+            }; } || {
+                git clone --depth=1 https://github.com/openresty/luajit2.git &
+            }
+
+            { [ -d "$DIR_SRC/lua-resty-core" ] && {
+                git -C "$DIR_SRC/lua-resty-core" pull &
+            }; } || {
+                git clone --depth=1 https://github.com/openresty/lua-resty-core &
+            }
+
+            { [ -d "$DIR_SRC/lua-resty-lrucache" ] && {
+                git -C "$DIR_SRC/lua-resty-lrucache" pull &
+            }; } || {
+                git clone --depth=1 https://github.com/openresty/lua-resty-lrucache &
+            }
+        fi
+
+        if [ "$GEOIP" = "y" ]; then
+            { [ -d "$DIR_SRC/ngx_http_geoip2_module" ] && {
+                git -C "$DIR_SRC/ngx_http_geoip2_module" pull &
+            }; } || {
+                git clone --depth=1 https://github.com/leev/ngx_http_geoip2_module.git &
+            }
+        fi
+
+        if [ "$PASSENGER" = "y" ]; then
+            rm -rf "$DIR_SRC/ngx_http_passenger_module"
+            wget -O /tmp/ngx_passenger.tar.gz https://www.phusionpassenger.com/latest_stable_tarball
+            mkdir -p $DIR_SRC/ngx_http_passenger_module
+            tar --strip-components=1 -xzvf /tmp/ngx_passenger.tar.gz -C $DIR_SRC/ngx_http_passenger_module
+            rm -rf /tmp/ngx_passenger.tar.gz
+            export PATH="$PATH:$DIR_SRC/ngx_http_passenger_module/bin"
+        fi
+
+        if [ "$MODSEC" = "y" ]; then
+            { [ -d "$DIR_SRC/ModSecurity-nginx" ] && {
+                git -C "$DIR_SRC/ModSecurity-nginx" pull &
+            }; } || {
+                git clone --depth=1 https://github.com/SpiderLabs/ModSecurity-nginx.git &
             }
         fi
 
@@ -745,6 +973,8 @@ _download_naxsi() {
 
 }
 
+
+
 ##################################
 # Download Nginx
 ##################################
@@ -843,6 +1073,46 @@ _configure_nginx() {
             NGINX_INCLUDED_MODULES="$OVERRIDE_NGINX_MODULES"
         fi
 
+        if [ ! -z "$NGX_NJS" ]; then
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                NGX_NJS="--add-dynamic-module=$NGX_NJS"
+            else
+                NGX_NJS="--add-module=$NGX_NJS"
+            fi
+        fi
+
+        if [ ! -z "$NGX_LUA" ]; then
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                NGX_LUA="--add-module=$NGX_LUA"
+            else
+                NGX_LUA="--add-module=$NGX_LUA"
+            fi
+        fi
+
+        if [ ! -z "$NGX_GEOIP" ]; then
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                NGX_GEOIP="--add-dynamic-module=$NGX_GEOIP"
+            else
+                NGX_GEOIP="--add-module=$NGX_GEOIP"
+            fi
+        fi
+
+        if [ ! -z "$NGX_MODSEC" ]; then
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                NGX_MODSEC="--add-dynamic-module=$NGX_MODSEC"
+            else
+                NGX_MODSEC="--add-module=$NGX_MODSEC"
+            fi
+        fi
+
+        if [ "$PASSENGER" = "y" ]; then
+            if [ "$DYNAMIC_MODULES" = "y" ]; then
+                NGX_PASSENGER="--add-dynamic-module=$(passenger-config --nginx-addon-dir)"
+            else
+                NGX_PASSENGER="--add-module=$(passenger-config --nginx-addon-dir)"
+            fi
+        fi
+
         # third party modules
         if [ -z "$OVERRIDE_NGINX_ADDITIONAL_MODULES" ]; then
             if [ "$DYNAMIC_MODULES" = "y" ]; then
@@ -852,11 +1122,17 @@ _configure_nginx() {
         --add-dynamic-module=../redis2-nginx-module \
         --add-dynamic-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
-        --add-module=../ngx_http_redis \
+        --add-dynamic-module=../ngx_http_redis \
         --add-module=../set-misc-nginx-module \
         --add-dynamic-module=../ngx_http_auth_pam_module \
         --add-module=../nginx-module-vts \
-        --add-dynamic-module=../ipscrubtmp/ipscrub"
+        --add-dynamic-module=../ngx_brotli \
+        --add-dynamic-module=../ipscrubtmp/ipscrub \
+        $NGX_NJS \
+        $NGX_LUA \
+        $NGX_GEOIP \
+        $NGX_MODSEC \
+        $NGX_PASSENGER"
             else
                 NGINX_THIRD_MODULES="--add-module=../ngx_http_substitutions_filter_module \
         --add-module=../srcache-nginx-module \
@@ -864,10 +1140,16 @@ _configure_nginx() {
         --add-module=../ngx_http_redis \
         --add-module=../memc-nginx-module \
         --add-module=../ngx_devel_kit \
+        --add-module=../ngx_brotli \
         --add-module=../set-misc-nginx-module \
         --add-module=../ngx_http_auth_pam_module \
         --add-module=../nginx-module-vts \
-        --add-module=../ipscrubtmp/ipscrub"
+        --add-module=../ipscrubtmp/ipscrub \
+        $NGX_NJS \
+        $NGX_LUA \
+        $NGX_GEOIP \
+        $NGX_MODSEC \
+        $NGX_PASSENGER"
             fi
         else
             NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
@@ -882,10 +1164,17 @@ _configure_nginx() {
         else
             ZLIB_PATH='../zlib'
         fi
-        bash -c "./configure \
+
+        if [ "$LUA" = "y" ]; then
+            export LUAJIT_LIB=/usr/local/lib/libluajit-5.1.so
+            export LUAJIT_INC=/usr/local/include/luajit-2.1
+            DEB_LFLAGS="$DEB_LFLAGS,-rpath,$LUAJIT_LIB"
+        fi
+
+        echo "Build nginx with ./configure \
                     ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
-                    --with-ld-opt='$DEB_LFLAGS' \
+                    --with-ld-opt='$DEB_LFLAGS,-lpcre' \
                     $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
                     $NGX_USER \
@@ -901,7 +1190,30 @@ _configure_nginx() {
                     --add-module=../echo-nginx-module \
                     --add-module=../headers-more-nginx-module \
                     --add-module=../ngx_cache_purge \
-                    --add-module=../ngx_brotli \
+                    --with-zlib=$ZLIB_PATH \
+                    $NGX_SSL_LIB \
+                    --with-openssl-opt='$OPENSSL_OPT' \
+                    --sbin-path=/usr/sbin/nginx" >> /tmp/nginx-ee.log;
+
+        bash -c "./configure \
+                    ${NGX_NAXSI} \
+                    --with-cc-opt='$DEB_CFLAGS' \
+                    --with-ld-opt='$DEB_LFLAGS,-lpcre' \
+                    $NGINX_BUILD_OPTIONS \
+                    --build='VirtuBox Nginx-ee' \
+                    $NGX_USER \
+                    --with-file-aio \
+                    --with-threads \
+                    $NGX_HPACK \
+                    --with-http_v2_module \
+                    --with-http_ssl_module \
+                    --with-pcre-jit \
+                    $NGINX_INCLUDED_MODULES \
+                    $NGINX_THIRD_MODULES \
+                    $NGX_RTMP \
+                    --add-module=../echo-nginx-module \
+                    --add-module=../headers-more-nginx-module \
+                    --add-module=../ngx_cache_purge \
                     --with-zlib=$ZLIB_PATH \
                     $NGX_SSL_LIB \
                     --with-openssl-opt='$OPENSSL_OPT' \
@@ -1108,6 +1420,9 @@ _gcc_setup
 if [ "$RTMP" = "y" ]; then
     _rtmp_setup
 fi
+if [ "$LUA" = "y" ]; then
+    _luajit_setup
+fi
 _cleanup_modules
 _download_modules
 _download_zlib
@@ -1129,8 +1444,12 @@ fi
 _download_nginx
 _patch_nginx
 _configure_nginx
+_setup_resty_tools
 _compile_nginx
 _updating_nginx_manual
+if [ "$LUA" = "y" ]; then
+    _install_resty_tools
+fi
 _cron_update
 if [ "$CRON_SETUP" = "y" ]; then
     _cron_setup
