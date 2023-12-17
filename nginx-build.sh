@@ -657,7 +657,7 @@ _install_resty_tools() {
         mv /etc/nginx/conf.d/lua.conf /etc/nginx/conf.d/lua.conf.$(date +%Y%m%d-%H%M).bak
     fi
 
-    echo "lua_package_path \"/usr/share/nginx/lib/lua/?.lua;;\";" > /etc/nginx/conf.d/lua.conf
+    echo "lua_package_path \"/usr/share/nginx/lib/lua/?.lua;;\";" >/etc/nginx/conf.d/lua.conf
 }
 
 _setup_resty_tools() {
@@ -667,12 +667,11 @@ _setup_resty_tools() {
         mv /etc/nginx/conf.d/lua.conf /etc/nginx/conf.d/lua.conf.$(date +%Y%m%d-%H%M).bak
     fi
 
-    echo "lua_package_path \"/usr/share/nginx/lib/lua/?.lua;;\";" > /etc/nginx/conf.d/lua.conf
+    echo "lua_package_path \"/usr/share/nginx/lib/lua/?.lua;;\";" >/etc/nginx/conf.d/lua.conf
 
     echo -ne "       Setup Openrestys lua tools             [${CGREEN}OK${CEND}]\\r"
     echo -ne '\n'
 }
-
 
 ##################################
 # Cleanup modules
@@ -720,25 +719,25 @@ _download_modules() {
         if [ "$LUA" = "y" ]; then
             { [ -d "$DIR_SRC/lua-nginx-module" ] && {
                 git -C "$DIR_SRC/lua-nginx-module" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/openresty/lua-nginx-module.git &
             }
 
             { [ -d "$DIR_SRC/luajit2" ] && {
                 git -C "$DIR_SRC/luajit2" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/openresty/luajit2.git &
             }
 
             { [ -d "$DIR_SRC/lua-resty-core" ] && {
                 git -C "$DIR_SRC/lua-resty-core" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/openresty/lua-resty-core &
             }
 
             { [ -d "$DIR_SRC/lua-resty-lrucache" ] && {
                 git -C "$DIR_SRC/lua-resty-lrucache" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/openresty/lua-resty-lrucache &
             }
         fi
@@ -746,7 +745,7 @@ _download_modules() {
         if [ "$GEOIP" = "y" ]; then
             { [ -d "$DIR_SRC/ngx_http_geoip2_module" ] && {
                 git -C "$DIR_SRC/ngx_http_geoip2_module" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/leev/ngx_http_geoip2_module.git &
             }
         fi
@@ -763,7 +762,7 @@ _download_modules() {
         if [ "$MODSEC" = "y" ]; then
             { [ -d "$DIR_SRC/ModSecurity-nginx" ] && {
                 git -C "$DIR_SRC/ModSecurity-nginx" pull &
-            }; } || {
+            } } || {
                 git clone --depth=1 https://github.com/SpiderLabs/ModSecurity-nginx.git &
             }
         fi
@@ -973,8 +972,6 @@ _download_naxsi() {
 
 }
 
-
-
 ##################################
 # Download Nginx
 ##################################
@@ -1174,7 +1171,7 @@ _configure_nginx() {
         echo "Build nginx with ./configure \
                     ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
-                    --with-ld-opt='$DEB_LFLAGS, -lpcre' \
+                    --with-ld-opt='$DEB_LFLAGS' \
                     $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
                     $NGX_USER \
@@ -1193,12 +1190,12 @@ _configure_nginx() {
                     --with-zlib=$ZLIB_PATH \
                     $NGX_SSL_LIB \
                     --with-openssl-opt='$OPENSSL_OPT' \
-                    --sbin-path=/usr/sbin/nginx" >> /tmp/nginx-ee.log;
+                    --sbin-path=/usr/sbin/nginx" >>/tmp/nginx-ee.log
 
         bash -c "./configure \
                     ${NGX_NAXSI} \
                     --with-cc-opt='$DEB_CFLAGS' \
-                    --with-ld-opt='$DEB_LFLAGS, -lpcre' \
+                    --with-ld-opt='$DEB_LFLAGS' \
                     $NGINX_BUILD_OPTIONS \
                     --build='VirtuBox Nginx-ee' \
                     $NGX_USER \
