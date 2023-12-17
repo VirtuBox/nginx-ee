@@ -29,25 +29,25 @@ jobs:
         sudo rm -rf /etc/mysql /var/lib/mysql /etc/nginx
         sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* mysql* nginx || sudo dpkg --configure -a
     - name: Mainline build
-      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log | ccez -A
+      run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log | ccze -A
     - name : Nginx check Mainline build
       run: sudo nginx -V || cat /tmp/nginx-ee.log
     - name: Stable build
-      run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log | ccez -A
+      run: sudo bash nginx-build.sh --stable || cat /tmp/nginx-ee.log | ccze -A
     - name : Nginx check Stable build
       run: sudo nginx -V
     - name: Full build stable
-      run: sudo bash nginx-build.sh --full --stable || cat /tmp/nginx-ee.log | ccez -A
+      run: sudo bash nginx-build.sh --full --stable || cat /tmp/nginx-ee.log | ccze -A
     - name : Nginx check Full build stable
       run: sudo nginx -V
     - name: Mainline naxsi
-      run: sudo bash nginx-build.sh --naxsi || cat /tmp/nginx-ee.log | ccez -A
+      run: sudo bash nginx-build.sh --naxsi || cat /tmp/nginx-ee.log | ccze -A
     - name : Nginx check Mainline naxsi
       run: sudo nginx -V
     - name: libressl build
-      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log | ccez -A
+      run: sudo bash nginx-build.sh --libressl || cat /tmp/nginx-ee.log | ccze -A
     - name : Nginx check libressl build
       run: sudo nginx -V
     - name: dynamic build
-      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log | ccez -A
+      run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log | ccze -A
       
