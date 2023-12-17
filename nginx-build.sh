@@ -839,7 +839,7 @@ _download_brotli() {
         echo -ne '       Downloading brotli                     [..]\r'
         {
             rm /usr/local/src/ngx_brotli -rf
-            git clone --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
+            git clone --recursive --depth=1 https://github.com/google/ngx_brotli /usr/local/src/ngx_brotli -q
             cd /usr/local/src/ngx_brotli || exit 1
             git submodule update --init
         } >>/tmp/nginx-ee.log 2>&1
