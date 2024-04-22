@@ -141,7 +141,7 @@ DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.24 2>&1)"
-LIBRESSL_VER="3.7.2"
+LIBRESSL_VER="3.8.4"
 if command_exists openssl; then
     OPENSSL_BIN_VER=$(openssl version)
     OPENSSL_VER=${OPENSSL_BIN_VER:0:15}
@@ -291,6 +291,18 @@ else
 fi
 
 ##################################
+# Set LibreSSL HTTP/3 QUIC
+##################################
+
+if "$LIBRESSL_VALID"; then
+    NGX_QUIC="--with-http_v3_module"
+    QUIC_VALID="YES"
+else
+    NGX_QUIC=""
+    QUIC_VALID="NO"
+fi
+
+##################################
 # Set Pagespeed module
 ##################################
 
@@ -331,6 +343,7 @@ echo -e "  - Nginx release : $NGINX_VER"
 }
 [ -n "$LIBRESSL_VALID" ] && {
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
+    echo -e "  - HTTP/3 QUIC : $QUIC_VALID"
 }
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
@@ -892,6 +905,7 @@ _configure_nginx() {
                     --with-file-aio \
                     --with-threads \
                     $NGX_HPACK \
+                    $NGX_QUIC \
                     --with-http_v2_module \
                     --with-http_ssl_module \
                     --with-pcre-jit \
