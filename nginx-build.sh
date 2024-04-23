@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2024 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.9.0 - 2024-04-23
+# Version 3.8.0 - 2024-04-23
 # -------------------------------------------------------------------------
 
 ##################################
@@ -26,19 +26,17 @@ _help() {
     echo " -------------------------------------------------------------------- "
     echo ""
     echo "Usage: ./nginx-ee <options> [modules]"
-    echo "By default, Nginx-ee will compile the latest Nginx mainline release without Pagespeed, Naxsi or RTMP module"
+    echo "By default, Nginx-ee will compile the latest Nginx mainline release with HTTP/3 and without Naxsi or RTMP module"
     echo "  Options:"
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
     echo "       --stable ..... Nginx stable release"
-    echo "       --full ..... Nginx mainline release with Nasxi and RTMP module"
+    echo "       --full ..... Nginx with Nasxi and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
     echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
     echo "       --naxsi ..... Naxsi WAF module"
     echo "       --rtmp ..... RTMP video streaming module"
-    echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
-    echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
     echo "       --libressl ..... Compile Nginx with LibreSSL"
     echo ""
     return 0
@@ -325,10 +323,20 @@ echo ""
 echo -e "  - Nginx release : $NGINX_VER"
 [ -n "$OPENSSL_VALID" ] && {
     echo -e "  - OPENSSL : $OPENSSL_VER"
+    if [ "$NGINX_RELEASE" = "2" ]; then
+        echo -e "  - HTTP/2 HPACK : YES"
+    else
+        echo -e "  - with HTTP/3 : YES"
+    fi
+
 }
 [ -n "$LIBRESSL_VALID" ] && {
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
-    echo -e "  - HTTP/3 QUIC : $QUIC_VALID"
+    if [ "$NGINX_RELEASE" = "2" ]; then
+        echo -e "  - HTTP/2 HPACK : YES"
+    else
+        echo -e "  - HTTP/3 QUIC : YES"
+    fi
 }
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
 echo "  - Naxsi : $NAXSI_VALID"

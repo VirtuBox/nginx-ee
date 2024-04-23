@@ -45,13 +45,12 @@ Automated Nginx compilation from sources with additional modules support
 * Nginx built-in modules selection
 * Nginx Third-party modules selection
 * Dynamic modules support
+* HTTP/3 QUIC Support with Mainline Release
 * Brotli Support
-* TLS v1.3 support (Final)
+* TLS v1.3 support
 * OpenSSL or LibreSSL
-* Cloudflare HPACK
 * Cloudflare zlib
 * Automated nginx updates cronjob
-* Compilation with GCC-7/9
 * Security hardening and performance optimization enabled with proper GCC flags
 * An option to omit nginx configuration, allowing usage of third party devops tools
 
@@ -59,8 +58,8 @@ Automated Nginx compilation from sources with additional modules support
 
 ## Additional Third-party modules
 
-Nginx current mainline release : **v1.23.4**
-Nginx current stable release : **v1.24.0**
+Nginx current mainline release : **v1.25.5** with HTTP/3 QUIC
+Nginx current stable release : **v1.24.0** with Cloudflare HTTP/2 HPACK
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
@@ -84,7 +83,7 @@ For Nginx http_ssl_module :
 
 Optional modules :
 
-* [naxsi WAF](https://github.com/nbs-system/naxsi)
+* [naxsi WAF](https://github.com/wargio/naxsi)
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
 
 ---
@@ -120,6 +119,10 @@ Optional modules :
 * 17.9.x
 * 18.x (Obsidian)
 
+### HTTP/3 QUIC
+
+Full support of HTTP/3 QUIC is only available with Nginx mainline release and compiled with LibreSSL. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).
+
 ---
 
 ## Usage
@@ -128,7 +131,7 @@ Optional modules :
 
 **Default settings** :
 
-* mainline release
+* mainline release with HTTP/3
 * openssl from system
 * without naxsi
 * without rtmp
@@ -155,7 +158,7 @@ bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 
 ### Custom installation
 
-Example : Nginx stable release with naxsi
+Example : Nginx stable release HTTP/2 with naxsi
 
 ```bash
 bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
@@ -165,7 +168,7 @@ bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
 
 Nginx build options :
 
-* `--stable` : compile Nginx stable release
+* `--stable` : compile Nginx stable release with HTTP/2
 * `--full` : Naxsi + RTMP
 * `--dynamic` : Compile Nginx modules as dynamic modules
 * `--noconf` : Compile Nginx without any configuring. Useful when you use devops tools like ansible.
@@ -198,7 +201,7 @@ Extras :
 * [x] Add support for LibreSSL
 * [x] Add noconf support
 * [ ] Add support for config.inc build configuration
-* [ ] Add HTTP/3 QUIC support
+* [x] Add HTTP/3 QUIC support
 
 ---
 
