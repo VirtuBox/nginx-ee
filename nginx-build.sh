@@ -529,12 +529,12 @@ _download_modules() {
     echo -ne '       Downloading additionals modules        [..]\r'
     if {
         echo "### downloading additionals modules ###"
-        MODULES='FRiCKLE/ngx_cache_purge openresty/memc-nginx-module
+        MODULES='openresty/memc-nginx-module
         simpl/ngx_devel_kit openresty/headers-more-nginx-module
         openresty/echo-nginx-module yaoweibin/ngx_http_substitutions_filter_module
         openresty/redis2-nginx-module openresty/srcache-nginx-module
         openresty/set-misc-nginx-module sto/ngx_http_auth_pam_module
-        vozlt/nginx-module-vts centminmod/ngx_http_redis'
+        vozlt/nginx-module-vts centminmod/ngx_http_redis nginx-modules/ngx_cache_purge'
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
@@ -627,67 +627,6 @@ _download_brotli() {
         echo -ne '\n'
     else
         echo -e "       Downloading brotli      [${CRED}FAIL${CEND}]"
-        echo -e '\n      Please look at /tmp/nginx-ee.log\n'
-        exit 1
-    fi
-
-}
-
-##################################
-# Download and patch OpenSSL
-##################################
-
-_download_openssl_dev() {
-
-    cd "$DIR_SRC" || exit 1
-    if {
-        echo -ne '       Downloading openssl                    [..]\r'
-
-        {
-            if [ -d /usr/local/src/openssl ]; then
-                if [ ! -d /usr/local/src/openssl/.git ]; then
-                    echo "### removing openssl extracted archive ###"
-                    rm -rf /usr/local/src/openssl
-                    echo "### cloning openssl ###"
-                    git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
-                    cd /usr/local/src/openssl || exit 1
-                    echo "### git checkout commit ###"
-                    #git checkout $OPENSSL_COMMIT
-                else
-                    cd /usr/local/src/openssl || exit 1
-                    echo "### reset openssl to master and clean patches ###"
-                    git fetch --all
-                    git reset --hard origin/master
-                    git clean -f
-                    #git checkout $OPENSSL_COMMIT
-                fi
-            else
-                echo "### cloning openssl ###"
-                git clone --depth=50 https://github.com/openssl/openssl.git /usr/local/src/openssl
-                cd /usr/local/src/openssl || exit 1
-                echo "### git checkout commit ###"
-                #git checkout $OPENSSL_COMMIT
-            fi
-        } >>/tmp/nginx-ee.log 2>&1
-
-        {
-            if [ -d /usr/local/src/openssl-patch/.git ]; then
-                cd /usr/local/src/openssl-patch || exit 1
-                git pull origin master
-            else
-                git clone --depth=50 https://github.com/VirtuBox/openssl-patch.git /usr/local/src/openssl-patch
-            fi
-            cd /usr/local/src/openssl || exit 1
-            # apply openssl ciphers patch
-            echo "### openssl ciphers patch ###"
-            #patch -p1 <../openssl-patch/openssl-equal-3.0.0-dev_ciphers.patch
-        } >>/tmp/nginx-ee.log 2>&1
-
-    }; then
-        echo -ne "       Downloading openssl                    [${CGREEN}OK${CEND}]\\r"
-        echo -ne '\n'
-    else
-        echo -e "       Downloading openssl      [${CRED}FAIL${CEND}]"
         echo -e '\n      Please look at /tmp/nginx-ee.log\n'
         exit 1
     fi
@@ -1125,13 +1064,7 @@ fi
 if [ "$LIBRESSL" = "y" ]; then
     _download_libressl
 else
-    if [ "$OPENSSL_LIB" = "2" ]; then
-        _download_openssl_dev
-    elif [ "$OPENSSL_LIB" = "3" ]; then
-        sleep 1
-    else
-        sleep 1
-    fi
+    sleep 1
 fi
 _download_nginx
 _patch_nginx
