@@ -121,7 +121,7 @@ Optional modules :
 
 ### HTTP/3 QUIC
 
-Full support of HTTP/3 QUIC is only available with Nginx mainline release and compiled with LibreSSL. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).
+**Full support of HTTP/3 QUIC is only available with Nginx mainline release and compiled with LibreSSL**. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).
 
 ---
 

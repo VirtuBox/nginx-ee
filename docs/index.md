@@ -42,19 +42,18 @@ Automated Nginx compilation from sources with additional modules support
 <li>Nginx built-in modules selection</li>
 <li>Nginx Third-party modules selection</li>
 <li>Dynamic modules support</li>
+<li>HTTP/3 QUIC Support with Mainline Release</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
 <li>OpenSSL or LibreSSL</li>
-<li>Cloudflare HPACK</li>
 <li>Cloudflare zlib</li>
 <li>Automated nginx updates cronjob</li>
-<li>Compilation with GCC-7/9</li>
 <li>Security hardening and performance optimization enabled with proper GCC flags</li>
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.23.4</strong>
-Nginx current stable release : <strong>v1.24.0</strong></p>
+<p>Nginx current mainline release : <strong>v1.25.5</strong> with HTTP/3 QUIC
+Nginx current stable release : <strong>v1.24.0</strong></p> with Cloudflare HTTP/2 HPACK
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
 <li><a href="https://github.com/openresty/headers-more-nginx-module">headers-more-nginx-module</a></li>
@@ -77,7 +76,7 @@ Nginx current stable release : <strong>v1.24.0</strong></p>
 </ul>
 <p>Optional modules :</p>
 <ul>
-<li><a href="https://github.com/nbs-system/naxsi">naxsi WAF</a></li>
+<li><a href="https://github.com/wargio/naxsi">naxsi WAF</a></li>
 <li><a href="https://github.com/arut/nginx-rtmp-module">nginx-rtmp-module</a></li>
 </ul>
 <hr />
@@ -109,12 +108,15 @@ Nginx current stable release : <strong>v1.24.0</strong></p>
 <li>17.9.x</li>
 <li>18.x (Obsidian)</li>
 </ul>
+<h3>### HTTP/3 QUIC</h3>
+<p><strong>Full support of HTTP/3 QUIC is only available with Nginx mainline release and compiled with LibreSSL**</strong>. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).</p>
+
 <hr />
 <h2 id="usage">Usage</h2>
 <h3 id="one-step-automated-install">One-Step Automated Install</h3>
 <p><strong>Default settings</strong> :</p>
 <ul>
-<li>mainline release</li>
+<li>mainline release with HTTP/3</li>
 <li>openssl from system lib</li>
 <li>without naxsi</li>
 <li>without rtmp</li>
@@ -131,7 +133,7 @@ sudo bash nginx-build.sh
 <pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 </code></pre>
 <h3 id="custom-installation">Custom installation</h3>
-<p>Example : Nginx stable release with naxsi</p>
+<p>Example : Nginx stable release with HTTP/2 HPACK with naxsi</p>
 <pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
 </code></pre>
 <h4 id="options-available">Options available</h4>
@@ -177,6 +179,7 @@ Feel free to use the custom Nginx package built for WordOps and available on <a 
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add openssl release choice</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add more compilation presets</li>
 <li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for LibreSSL</li>
+<li class="task-list-item"><input disabled="disabled" type="checkbox" checked="checked" /> Add support for HTTP/3 QUIC</li>
 </ul>
 <hr />
 

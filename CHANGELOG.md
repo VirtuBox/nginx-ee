@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - LibreSSL release bumped to 3.8.4
+- Update zlib to 1.2.13 by @WinSCaP in [#146](https://github.com/VirtuBox/nginx-ee/pull/146)
+
+### Fixed
+
+- Fix compile error due to Brotli by @janiosarmento in [#151](https://github.com/VirtuBox/nginx-ee/pull/152)
 
 ## [3.7.1] - 2023-05-08
 
