@@ -239,9 +239,11 @@ fi
 if [ "$NGINX_RELEASE" = "2" ]; then
     NGINX_VER="$NGINX_STABLE"
     NGX_HPACK="--with-http_v2_hpack_enc"
+    NGX_QUIC=""
 else
     NGINX_VER="$NGINX_MAINLINE"
     NGX_HPACK=""
+    NGX_QUIC="--with-http_v3_module"
 fi
 
 ##################################
@@ -274,7 +276,6 @@ fi
 
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
-    NGX_QUIC="--with-http_v3_module"
     QUIC_VALID="YES"
     LIBRESSL_VALID="YES"
     OPENSSL_OPT=""
@@ -286,7 +287,6 @@ else
             OPENSSL_OPT="enable-tls1_3"
         fi
     fi
-    NGX_QUIC=""
     QUIC_VALID="NO"
     NGX_SSL_LIB=""
     OPENSSL_VALID="from system"
