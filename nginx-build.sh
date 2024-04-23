@@ -4,10 +4,10 @@
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
 # GitHub:        https://github.com/VirtuBox/nginx-ee
-# Copyright (c) 2019-2020 VirtuBox <contact@virtubox.net>
+# Copyright (c) 2019-2024 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.8.0 - 2023-05-08
+# Version 3.8.0 - 2024-04-23
 # -------------------------------------------------------------------------
 
 ##################################
@@ -26,19 +26,17 @@ _help() {
     echo " -------------------------------------------------------------------- "
     echo ""
     echo "Usage: ./nginx-ee <options> [modules]"
-    echo "By default, Nginx-ee will compile the latest Nginx mainline release without Pagespeed, Naxsi or RTMP module"
+    echo "By default, Nginx-ee will compile the latest Nginx mainline release with HTTP/3 and without Naxsi or RTMP module"
     echo "  Options:"
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
     echo "       --stable ..... Nginx stable release"
-    echo "       --full ..... Nginx mainline release with Nasxi and RTMP module"
+    echo "       --full ..... Nginx with Nasxi and RTMP module"
     echo "       --dynamic ..... Compile Nginx modules as dynamic"
     echo "       --noconf ..... Compile Nginx without any configuring. Useful when you use devops tools like ansible."
     echo "  Modules:"
     echo "       --naxsi ..... Naxsi WAF module"
     echo "       --rtmp ..... RTMP video streaming module"
-    echo "       --openssl-dev ..... Compile Nginx with OpenSSL 3.0.0-dev"
-    echo "       --openssl-system ..... Compile Nginx with OpenSSL from system lib"
     echo "       --libressl ..... Compile Nginx with LibreSSL"
     echo ""
     return 0
@@ -141,7 +139,7 @@ DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
 NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.24 2>&1)"
-LIBRESSL_VER="3.7.2"
+LIBRESSL_VER="3.8.4"
 if command_exists openssl; then
     OPENSSL_BIN_VER=$(openssl version)
     OPENSSL_VER=${OPENSSL_BIN_VER:0:15}
@@ -239,9 +237,11 @@ fi
 if [ "$NGINX_RELEASE" = "2" ]; then
     NGINX_VER="$NGINX_STABLE"
     NGX_HPACK="--with-http_v2_hpack_enc"
+    NGX_QUIC=""
 else
     NGINX_VER="$NGINX_MAINLINE"
     NGX_HPACK=""
+    NGX_QUIC="--with-http_v3_module"
 fi
 
 ##################################
@@ -274,6 +274,7 @@ fi
 
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
+    QUIC_VALID="YES"
     LIBRESSL_VALID="YES"
     OPENSSL_OPT=""
 else
@@ -284,18 +285,12 @@ else
             OPENSSL_OPT="enable-tls1_3"
         fi
     fi
+    QUIC_VALID="NO"
     NGX_SSL_LIB=""
     OPENSSL_VALID="from system"
     LIBSSL_DEV="libssl-dev"
 
 fi
-
-##################################
-# Set Pagespeed module
-##################################
-
-NGX_PAGESPEED=""
-PAGESPEED_VALID="NO"
 
 ##################################
 # Set Plesk configuration
@@ -328,9 +323,20 @@ echo ""
 echo -e "  - Nginx release : $NGINX_VER"
 [ -n "$OPENSSL_VALID" ] && {
     echo -e "  - OPENSSL : $OPENSSL_VER"
+    if [ "$NGINX_RELEASE" = "2" ]; then
+        echo -e "  - HTTP/2 HPACK : YES"
+    else
+        echo -e "  - with HTTP/3 : YES"
+    fi
+
 }
 [ -n "$LIBRESSL_VALID" ] && {
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
+    if [ "$NGINX_RELEASE" = "2" ]; then
+        echo -e "  - HTTP/2 HPACK : YES"
+    else
+        echo -e "  - HTTP/3 QUIC : YES"
+    fi
 }
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
@@ -892,6 +898,7 @@ _configure_nginx() {
                     --with-file-aio \
                     --with-threads \
                     $NGX_HPACK \
+                    $NGX_QUIC \
                     --with-http_v2_module \
                     --with-http_ssl_module \
                     --with-pcre-jit \

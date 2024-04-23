@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] - XX-XX-XX
 
+## [3.8.0] - 2024-04-23
+
+### Added
+
+- `--with-http_v3_module` on Mainline release
+- Full HTTP/3 QUIC support on Mainline release with LibreSSL
+
+### Changed
+
+- LibreSSL release bumped to 3.8.4
+- Update zlib to 1.2.13 by @WinSCaP in [#146](https://github.com/VirtuBox/nginx-ee/pull/146)
+
+### Fixed
+
+- Fix compile error due to Brotli by @janiosarmento in [#151](https://github.com/VirtuBox/nginx-ee/pull/152)
+
 ## [3.7.1] - 2023-05-08
 
 ### Changed
