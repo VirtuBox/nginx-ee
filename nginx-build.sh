@@ -274,6 +274,8 @@ fi
 
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
+    NGX_QUIC="--with-http_v3_module"
+    QUIC_VALID="YES"
     LIBRESSL_VALID="YES"
     OPENSSL_OPT=""
 else
@@ -284,30 +286,13 @@ else
             OPENSSL_OPT="enable-tls1_3"
         fi
     fi
+    NGX_QUIC=""
+    QUIC_VALID="NO"
     NGX_SSL_LIB=""
     OPENSSL_VALID="from system"
     LIBSSL_DEV="libssl-dev"
 
 fi
-
-##################################
-# Set LibreSSL HTTP/3 QUIC
-##################################
-
-if "$LIBRESSL_VALID"; then
-    NGX_QUIC="--with-http_v3_module"
-    QUIC_VALID="YES"
-else
-    NGX_QUIC=""
-    QUIC_VALID="NO"
-fi
-
-##################################
-# Set Pagespeed module
-##################################
-
-NGX_PAGESPEED=""
-PAGESPEED_VALID="NO"
 
 ##################################
 # Set Plesk configuration
