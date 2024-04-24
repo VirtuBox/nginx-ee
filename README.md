@@ -7,7 +7,7 @@
 </h1>
 
 <h4 align="center">
-Automated Nginx compilation from sources with additional modules support
+Automated Nginx compilation from sources with HTTP/3 QUIC and additional modules support
 </h4>
 
 ---
@@ -45,7 +45,7 @@ Automated Nginx compilation from sources with additional modules support
 * Nginx built-in modules selection
 * Nginx Third-party modules selection
 * Dynamic modules support
-* HTTP/3 QUIC Support with Mainline Release
+* HTTP/3 QUIC Support
 * Brotli Support
 * TLS v1.3 support
 * OpenSSL or LibreSSL
@@ -59,7 +59,7 @@ Automated Nginx compilation from sources with additional modules support
 ## Additional Third-party modules
 
 Nginx current mainline release : **v1.25.5** with HTTP/3 QUIC
-Nginx current stable release : **v1.24.0** with Cloudflare HTTP/2 HPACK
+Nginx current stable release : **v1.26.0** with HTTP/3 QUIC
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
 * [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
@@ -121,7 +121,7 @@ Optional modules :
 
 ### HTTP/3 QUIC
 
-**Full support of HTTP/3 QUIC is only available with Nginx mainline release and compiled with LibreSSL**. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).
+**Full support of HTTP/3 QUIC is only available with LibreSSL**. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).
 
 ---
 
@@ -158,7 +158,7 @@ bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 
 ### Custom installation
 
-Example : Nginx stable release HTTP/2 with naxsi
+Example : Nginx stable release HTTP/3 with naxsi
 
 ```bash
 bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
@@ -168,7 +168,7 @@ bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
 
 Nginx build options :
 
-* `--stable` : compile Nginx stable release with HTTP/2
+* `--stable` : compile Nginx stable release with HTTP/3
 * `--full` : Naxsi + RTMP
 * `--dynamic` : Compile Nginx modules as dynamic modules
 * `--noconf` : Compile Nginx without any configuring. Useful when you use devops tools like ansible.
