@@ -59,6 +59,7 @@ Automated Nginx compilation from sources with HTTP/3 QUIC and additional modules
 ## Additional Third-party modules
 
 Nginx current mainline release : **v1.25.5** with HTTP/3 QUIC
+
 Nginx current stable release : **v1.26.0** with HTTP/3 QUIC
 
 * [ngx_cache_purge](https://github.com/FRiCKLE/ngx_cache_purge)
