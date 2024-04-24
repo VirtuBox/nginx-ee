@@ -7,7 +7,7 @@
 # Copyright (c) 2019-2024 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.8.0 - 2024-04-23
+# Version 3.8.1 - 2024-04-24
 # -------------------------------------------------------------------------
 
 ##################################
@@ -26,7 +26,7 @@ _help() {
     echo " -------------------------------------------------------------------- "
     echo ""
     echo "Usage: ./nginx-ee <options> [modules]"
-    echo "By default, Nginx-ee will compile the latest Nginx mainline release with HTTP/3 and without Naxsi or RTMP module"
+    echo "By default, Nginx-ee will compile the latest Nginx mainline release without Naxsi or RTMP module"
     echo "  Options:"
     echo "       -h, --help ..... display this help"
     echo "       -i, --interactive ....... interactive installation"
@@ -138,8 +138,8 @@ fi
 DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
-NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.24 2>&1)"
-LIBRESSL_VER="3.8.4"
+NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.26 2>&1)"
+LIBRESSL_VER="$(curl https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/ 2>&1 | grep -E -o 'libressl\-[0-9.]+\.tar[.a-z]*' | awk -F "libressl-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | sort -r | head -n 1)"
 if command_exists openssl; then
     OPENSSL_BIN_VER=$(openssl version)
     OPENSSL_VER=${OPENSSL_BIN_VER:0:15}
@@ -150,7 +150,6 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 readonly OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
-readonly DISTRO_CODENAME="$(lsb_release -sc)"
 
 # Colors
 CSI='\033['
@@ -206,9 +205,7 @@ if [ "$INTERACTIVE_SETUP" = "1" ]; then
     while [[ "$SSL_LIB_CHOICE" != "1" && "$SSL_LIB_CHOICE" != "2" ]]; do
         echo -e "Select an option [1-2]: " && read -r SSL_LIB_CHOICE
     done
-    if [ "$SSL_LIB_CHOICE" = "1" ]; then
-        OPENSSL_LIB=3
-    else
+    if [ "$SSL_LIB_CHOICE" = "2" ]; then
         LIBRESSL="y"
     fi
     echo -e '\nDo you want NAXSI WAF (still experimental)? (y/n)'
@@ -236,11 +233,9 @@ fi
 
 if [ "$NGINX_RELEASE" = "2" ]; then
     NGINX_VER="$NGINX_STABLE"
-    NGX_HPACK="--with-http_v2_hpack_enc"
-    NGX_QUIC=""
+    NGX_QUIC="--with-http_v3_module"
 else
     NGINX_VER="$NGINX_MAINLINE"
-    NGX_HPACK=""
     NGX_QUIC="--with-http_v3_module"
 fi
 
@@ -285,7 +280,6 @@ else
             OPENSSL_OPT="enable-tls1_3"
         fi
     fi
-    QUIC_VALID="NO"
     NGX_SSL_LIB=""
     OPENSSL_VALID="from system"
     LIBSSL_DEV="libssl-dev"
@@ -323,20 +317,13 @@ echo ""
 echo -e "  - Nginx release : $NGINX_VER"
 [ -n "$OPENSSL_VALID" ] && {
     echo -e "  - OPENSSL : $OPENSSL_VER"
-    if [ "$NGINX_RELEASE" = "2" ]; then
-        echo -e "  - HTTP/2 HPACK : YES"
-    else
-        echo -e "  - with HTTP/3 : YES"
-    fi
+    echo -e "  - with HTTP/3 : YES"
 
 }
 [ -n "$LIBRESSL_VALID" ] && {
     echo -e "  - LIBRESSL : $LIBRESSL_VALID"
-    if [ "$NGINX_RELEASE" = "2" ]; then
-        echo -e "  - HTTP/2 HPACK : YES"
-    else
-        echo -e "  - HTTP/3 QUIC : YES"
-    fi
+    echo -e "  - HTTP/3 QUIC : YES"
+
 }
 echo "  - Dynamic modules $DYNAMIC_MODULES_VALID"
 echo "  - Naxsi : $NAXSI_VALID"
@@ -471,10 +458,8 @@ _dynamic_setup() {
 }
 
 ##################################
-# Install gcc7 or gcc8 from PPA
+# Install gcc
 ##################################
-# gcc7 if Nginx is compiled with RTMP module
-# otherwise gcc8 is used
 
 _gcc_setup() {
     echo -ne '       Installing gcc                         [..]\r'
@@ -589,9 +574,9 @@ _download_zlib() {
             echo "### configure zlib-cf ###"
             ./configure --prefix=/usr/local/zlib-cf
         else
-            echo "### downloading zlib 1.2.13 ###"
+            echo "### downloading zlib latest ###"
             rm -rf zlib
-            curl -sL http://zlib.net/zlib-1.2.13.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+            curl -sL http://zlib.net/current/zlib.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
             mv zlib-1.2.13 zlib
         fi
 
@@ -645,8 +630,8 @@ _download_libressl() {
 
         {
             rm -rf /usr/local/src/libressl
-            curl -sL http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz | /bin/tar xzf - -C "$DIR_SRC"
-            mv /usr/local/src/libressl-${LIBRESSL_VER} /usr/local/src/libressl
+            curl -sL "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-$LIBRESSL_VER.tar.gz" | /bin/tar xzf - -C "$DIR_SRC"
+            mv "/usr/local/src/libressl-$LIBRESSL_VER" /usr/local/src/libressl
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
@@ -728,12 +713,7 @@ _patch_nginx() {
         echo -ne '       Applying nginx patches                 [..]\r'
 
         {
-            if [ "$NGINX_RELEASE" = "2" ]; then
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_for_1.23.4.patch | patch -p1
-            else
-                curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_dynamic_tls_records.patch | patch -p1
-            fi
-            #curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_auto_using_PRIORITIZE_CHACHA.patch | patch -p1
+            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_dynamic_tls_records.patch | patch -p1
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
@@ -836,7 +816,6 @@ _configure_nginx() {
                     $NGX_USER \
                     --with-file-aio \
                     --with-threads \
-                    $NGX_HPACK \
                     $NGX_QUIC \
                     --with-http_v2_module \
                     --with-http_ssl_module \
