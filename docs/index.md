@@ -42,7 +42,7 @@ Automated Nginx compilation from sources with additional modules support
 <li>Nginx built-in modules selection</li>
 <li>Nginx Third-party modules selection</li>
 <li>Dynamic modules support</li>
-<li>HTTP/3 QUIC Support with Mainline Release</li>
+<li>HTTP/3 QUIC Support</li>
 <li>Brotli Support</li>
 <li>TLS v1.3 support (Final)</li>
 <li>OpenSSL or LibreSSL</li>
@@ -52,8 +52,8 @@ Automated Nginx compilation from sources with additional modules support
 </ul>
 <hr />
 <h2 id="additional-third-party-modules">Additional Third-party modules</h2>
-<p>Nginx current mainline release : <strong>v1.25.5</strong> with HTTP/3 QUIC
-Nginx current stable release : <strong>v1.24.0</strong></p> with Cloudflare HTTP/2 HPACK
+<p>Nginx current mainline release : <strong>v1.25.5</strong> with HTTP/3 QUIC</p>
+<p>Nginx current stable release : <strong>v1.26.0</strong> with HTTP/3 QUIC</p>
 <ul>
 <li><a href="https://github.com/FRiCKLE/ngx_cache_purge">ngx_cache_purge</a></li>
 <li><a href="https://github.com/openresty/headers-more-nginx-module">headers-more-nginx-module</a></li>
@@ -109,7 +109,7 @@ Nginx current stable release : <strong>v1.24.0</strong></p> with Cloudflare HTTP
 <li>18.x (Obsidian)</li>
 </ul>
 <h3>### HTTP/3 QUIC</h3>
-<p><strong>Full support of HTTP/3 QUIC is only available with Nginx mainline release and compiled with LibreSSL**</strong>. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).</p>
+<p><strong>Full support of HTTP/3 QUIC is only available with LibreSSL**</strong>. More information [here](https://nginx.org/en/docs/http/ngx_http_v3_module.html).</p>
 
 <hr />
 <h2 id="usage">Usage</h2>
@@ -133,7 +133,7 @@ sudo bash nginx-build.sh
 <pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --interactive
 </code></pre>
 <h3 id="custom-installation">Custom installation</h3>
-<p>Example : Nginx stable release with HTTP/2 HPACK with naxsi</p>
+<p>Example : Nginx stable release with HTTP/3 with naxsi</p>
 <pre><code class="language-bash">bash &lt;(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
 </code></pre>
 <h4 id="options-available">Options available</h4>
