@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - HTTP/3 now available on both mainline and stable release
 - Always download latest zlib library if zlib-cf not supported
 - Always download the latest libressl release
+- HTTP/2 HPACK removed
 
 ## [3.8.0] - 2024-04-23
 
