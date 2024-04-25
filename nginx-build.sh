@@ -577,7 +577,6 @@ _download_zlib() {
             echo "### downloading zlib latest ###"
             rm -rf zlib
             curl -sL http://zlib.net/current/zlib.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
-            mv zlib-1.2.13 zlib
         fi
 
     } >>/tmp/nginx-ee.log 2>&1; then
