@@ -807,11 +807,11 @@ _configure_nginx() {
             NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
         fi
         if [ -n "$MODULES_LIST" ]; then
-            while read -r ADDITIONAL_MODULE; do
+            while read -r CUSTOM_ADDITIONAL_MODULE; do
                 # Extraire le nom du module
-                MODULE_NAME=$(basename "$ADDITIONAL_MODULE")
+                CUSTOM_MODULE_NAME=$(basename "$CUSTOM_ADDITIONAL_MODULE")
                 # Ajouter le module à NGINX_THIRD_MODULES
-                NGINX_THIRD_MODULES+=" --add-module=../$MODULE_NAME"
+                NGINX_THIRD_MODULES+=" --add-module=../$CUSTOM_MODULE_NAME"
             done <<<"$MODULES_LIST"
         fi
 
