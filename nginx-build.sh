@@ -46,6 +46,8 @@ _help() {
 # Use config.inc if available
 ##################################
 
+MODULES_LIST=""
+
 if [ -f ./config.inc ]; then
 
     . ./config.inc
