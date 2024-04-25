@@ -575,8 +575,9 @@ _download_zlib() {
             ./configure --prefix=/usr/local/zlib-cf
         else
             echo "### downloading zlib latest ###"
-            rm -rf zlib
+            rm -rf zlib-*
             curl -sL http://zlib.net/current/zlib.tar.gz | /bin/tar zxf - -C "$DIR_SRC"
+            mv zlib-* zlib
         fi
 
     } >>/tmp/nginx-ee.log 2>&1; then
