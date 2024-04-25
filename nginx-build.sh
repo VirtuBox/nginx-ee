@@ -86,6 +86,10 @@ else
         --dynamic)
             DYNAMIC_MODULES="y"
             ;;
+        --modules)
+            MODULES_LIST="$2"
+            shift
+            ;;
         --cron | --cronjob)
             CRON_SETUP="y"
             ;;
@@ -523,6 +527,11 @@ _download_modules() {
         for MODULE in $MODULES; do
             _gitget "$MODULE"
         done
+        if [ -n "$MODULES_LIST" ]; then
+            for ADDITIONAL_MODULE in $MODULES_LIST; do
+                _gitget "$ADDITIONAL_MODULE"
+            done
+        fi
         if [ "$RTMP" = "y" ]; then
             { [ -d "$DIR_SRC/nginx-rtmp-module" ] && {
                 git -C "$DIR_SRC/nginx-rtmp-module" pull &
@@ -796,6 +805,14 @@ _configure_nginx() {
             fi
         else
             NGINX_THIRD_MODULES="$OVERRIDE_NGINX_ADDITIONAL_MODULES"
+        fi
+        if [ -n "$MODULES_LIST" ]; then
+            while read -r ADDITIONAL_MODULE; do
+                # Extraire le nom du module
+                MODULE_NAME=$(basename "$ADDITIONAL_MODULE")
+                # Ajouter le module à NGINX_THIRD_MODULES
+                NGINX_THIRD_MODULES+=" --add-module=../$MODULE_NAME"
+            done <<<"$MODULES_LIST"
         fi
 
         if [ "$OS_ARCH" = 'x86_64' ]; then
