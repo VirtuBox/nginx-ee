@@ -89,7 +89,7 @@ else
             DYNAMIC_MODULES="y"
             ;;
         --modules)
-            MODULES_LIST="$2"
+            MODULES_LIST="${@:2}"
             shift
             ;;
         --cron | --cronjob)
