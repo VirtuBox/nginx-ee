@@ -52,6 +52,6 @@ jobs:
     - name: dynamic build
       run: sudo bash nginx-build.sh --dynamic || cat /tmp/nginx-ee.log
     - name: additional modules
-      run: sudo bash nginx-build.sh --modules "nginx-modules/nginx-secure-token-module nginx-modules/rate-limit-nginx-module" || cat /tmp/nginx-ee.log
+      run: sudo bash nginx-build.sh --modules 'nginx-modules/nginx-secure-token-module nginx-modules/rate-limit-nginx-module' || cat /tmp/nginx-ee.log
     - name : Nginx check additional modules
       run: sudo nginx -V
