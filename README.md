@@ -13,7 +13,7 @@ Automated Nginx compilation from sources with HTTP/3 QUIC and additional modules
 ---
 
 <p align="center">
-<a href="https://travis-ci.org/VirtuBox/nginx-ee"><img src="https://travis-ci.com/VirtuBox/nginx-ee.svg?branch=master" alt="build" /></a>
+<a href="https://github.com/VirtuBox/nginx-ee/actions/workflows/blank.yml" ><img src="https://github.com/VirtuBox/nginx-ee/actions/workflows/blank.yml/badge.svg" alt="build" /></a>
 <img src="https://img.shields.io/github/license/VirtuBox/nginx-ee.svg" alt="MIT">
 <img src="https://img.shields.io/github/stars/VirtuBox/nginx-ee.svg" alt="Stars">
 <img src="https://img.shields.io/github/last-commit/virtubox/nginx-ee/master.svg?style=flat" alt="Commits">
@@ -95,11 +95,13 @@ Optional modules :
 
 #### Recommended
 
+* Ubuntu 24.04 LTS (Noble)
 * Ubuntu 22.04 LTS (Jammy)
 * Ubuntu 20.04 LTS (Focal)
 * Ubuntu 18.04 LTS (Bionic)
 * Debian 10 (Buster)
 * Debian 11 (Bullseye)
+* Debian 12 (Bookworm)
 
 #### Also compatible
 
