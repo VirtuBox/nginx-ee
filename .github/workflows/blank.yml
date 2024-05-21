@@ -6,6 +6,7 @@ on:
       - develop
       - master
       - dev
+      - ci
   pull_request:
     branches:
       - master
@@ -18,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
 
     steps:
     - uses: actions/checkout@v4
