@@ -26,10 +26,11 @@ jobs:
     - name: Prepare VM
       run: |
         sudo apt-get update -qq
-        sudo apt install make libunwind-dev libgoogle-perftools-dev
+        sudo apt install make libunwind-dev libgoogle-perftools-dev -y
         sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
         sudo rm -rf /etc/mysql /var/lib/mysql /etc/nginx
-        sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* mysql* nginx || sudo dpkg --configure -a
+        sudo apt-get purge --option=Dpkg::options::=--force-all --assume-yes graphviz* redis* mysql* nginx
+        sudo dpkg --configure -a
     - name: Mainline build
       run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name : Nginx check Mainline build
