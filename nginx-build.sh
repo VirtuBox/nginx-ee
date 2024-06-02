@@ -150,6 +150,7 @@ TLS13_CIPHERS="TLS13+AESGCM+AES256:TLS13+AESGCM+AES128:TLS13+CHACHA20:EECDH+CHAC
 readonly OS_ARCH="$(uname -m)"
 OS_DISTRO_FULL="$(lsb_release -ds)"
 readonly DISTRO_ID="$(lsb_release -si)"
+DISTRO_CODENAME="$(lsb_release -sc)"
 
 # Colors
 CSI='\033['
@@ -799,10 +800,10 @@ _configure_nginx() {
         fi
 
         if [ "$OS_ARCH" = 'x86_64' ]; then
-            #if [ "$DISTRO_ID" = "Ubuntu" ]; then
-            #    DEB_CFLAGS='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf'
-            #    DEB_LFLAGS='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects'
-            #fi
+            if [ "$DISTRO_ID" = "Ubuntu" ] && [ "$DISTRO_CODENAME" != "noble" ]; then
+                DEB_CFLAGS='-m64 -march=native -mtune=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong -flto -ffat-lto-objects -fuse-ld=gold --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf'
+                DEB_LFLAGS='-lrt -ljemalloc -Wl,-z,relro -Wl,-z,now -fPIC -flto -ffat-lto-objects'
+            fi
             ZLIB_PATH='../zlib-cf'
         else
             ZLIB_PATH='../zlib'
