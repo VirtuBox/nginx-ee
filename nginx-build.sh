@@ -270,7 +270,6 @@ fi
 
 if [ "$LIBRESSL" = "y" ]; then
     NGX_SSL_LIB="--with-openssl=../libressl"
-    QUIC_VALID="YES"
     LIBRESSL_VALID="YES"
     OPENSSL_OPT=""
 else
@@ -283,7 +282,9 @@ else
     fi
     NGX_SSL_LIB=""
     OPENSSL_VALID="from system"
-    LIBSSL_DEV="libssl-dev"
+    if [ "$TRAVIS_BUILD" != "1" ]; then
+        LIBSSL_DEV="libssl-dev"
+    fi
 
 fi
 
