@@ -25,7 +25,7 @@ jobs:
     - name: Prepare VM
       run: sudo bash tests.sh
     - name: Install packages
-      run: sudo apt-get install -y git build-essential libtool automake autoconf libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev libpcre2-dev
+      run: sudo apt-get install -y git build-essential libtool automake autoconf libgd-dev dpkg-dev libgeoip-dev libjemalloc-dev libbz2-1.0 libreadline-dev libbz2-dev libbz2-ocaml libbz2-ocaml-dev software-properties-common tar libgoogle-perftools-dev perl libperl-dev libpam0g-dev libbsd-dev gnupg gnupg2 libgmp-dev autotools-dev libxml2-dev libpcre3-dev uuid-dev libbrotli-dev libpcre2-dev libssl-dev
     - name: Mainline build
       run: sudo bash nginx-build.sh || cat /tmp/nginx-ee.log
     - name : Nginx check Mainline build
