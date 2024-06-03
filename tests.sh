@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 apt-get update -qq >/dev/null 2>&1
 LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y >/dev/null 2>&1
 rm -rf /etc/mysql /var/lib/mysql /etc/nginx
