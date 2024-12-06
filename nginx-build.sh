@@ -713,7 +713,11 @@ _patch_nginx() {
         echo -ne '       Applying nginx patches                 [..]\r'
 
         {
-            curl -sL https://raw.githubusercontent.com/kn007/patch/refs/heads/master/nginx_dynamic_tls_records.patch | patch -p1
+            if [ "$NGINX_RELEASE" = "2" ]; then
+                curl -sL https://raw.githubusercontent.com/kn007/patch/e2fcf45e320bb8317042b6796b8f9dd42ffdb25c/nginx_dynamic_tls_records.patch | patch -p1
+            else
+                curl -sL https://raw.githubusercontent.com/kn007/patch/refs/heads/master/nginx_dynamic_tls_records.patch | patch -p1
+            fi
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
