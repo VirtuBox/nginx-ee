@@ -234,10 +234,8 @@ fi
 
 if [ "$NGINX_RELEASE" = "2" ]; then
     NGINX_VER="$NGINX_STABLE"
-    NGX_QUIC="--with-http_v3_module"
 else
     NGINX_VER="$NGINX_MAINLINE"
-    NGX_QUIC="--with-http_v3_module"
 fi
 
 ##################################
@@ -715,7 +713,11 @@ _patch_nginx() {
         echo -ne '       Applying nginx patches                 [..]\r'
 
         {
-            curl -sL https://raw.githubusercontent.com/kn007/patch/master/nginx_dynamic_tls_records.patch | patch -p1
+            if [ "$NGINX_RELEASE" = "2" ]; then
+                curl -sL https://raw.githubusercontent.com/kn007/patch/e2fcf45e320bb8317042b6796b8f9dd42ffdb25c/nginx_dynamic_tls_records.patch | patch -p1
+            else
+                curl -sL https://raw.githubusercontent.com/kn007/patch/refs/heads/master/nginx_dynamic_tls_records.patch | patch -p1
+            fi
         } >>/tmp/nginx-ee.log 2>&1
 
     }; then
@@ -818,7 +820,7 @@ _configure_nginx() {
                     $NGX_USER \
                     --with-file-aio \
                     --with-threads \
-                    $NGX_QUIC \
+                    --with-http_v3_module \
                     --with-http_v2_module \
                     --with-http_ssl_module \
                     --with-pcre-jit \
