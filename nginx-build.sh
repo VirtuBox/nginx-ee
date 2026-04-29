@@ -138,7 +138,7 @@ fi
 DIR_SRC="/usr/local/src"
 NGINX_EE_VER=$(curl -m 5 --retry 3 -sL https://api.github.com/repos/VirtuBox/nginx-ee/releases/latest 2>&1 | jq -r '.tag_name')
 NGINX_MAINLINE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 1 2>&1)"
-NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.28 2>&1)"
+NGINX_STABLE="$(curl -sL https://nginx.org/en/download.html 2>&1 | grep -E -o 'nginx\-[0-9.]+\.tar[.a-z]*' | awk -F "nginx-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | head -n 2 | grep 1.30 2>&1)"
 LIBRESSL_VER="$(curl https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/ 2>&1 | grep -E -o 'libressl\-[0-9.]+\.tar[.a-z]*' | awk -F "libressl-" '/.tar.gz$/ {print $2}' | sed -e 's|.tar.gz||g' | sort -r | head -n 1)"
 if command_exists openssl; then
     OPENSSL_BIN_VER=$(openssl version)
