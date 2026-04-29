@@ -4,10 +4,10 @@
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
 # GitHub:        https://github.com/VirtuBox/nginx-ee
-# Copyright (c) 2019-2025 VirtuBox <contact@virtubox.net>
+# Copyright (c) 2019-2026 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
-# Version 3.8.2 - 2025-10-30
+# Version 3.8.2 - 2026-04-29
 # -------------------------------------------------------------------------
 
 ##################################
